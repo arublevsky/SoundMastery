@@ -22,7 +22,6 @@ artifacts/
 bld/
 [Bb]in/
 [Oo]bj/
-[Dd]ist/
 generated/
 **/StaticContent/css/
 **/StaticContent/js/
