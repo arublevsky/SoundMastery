@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: './src/index.tsx',
@@ -12,6 +13,10 @@ module.exports = {
         exclude: /node_modules/,
         use: ['babel-loader', 'eslint-loader'],
       },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   resolve: {
@@ -24,13 +29,14 @@ module.exports = {
   },
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
+    new HtmlWebpackPlugin({
+      template: 'dist/index.html'
+    })
   ],
   devServer: {
     contentBase: './dist',
     hot: true,
-  },
-  externals: {
-    react: 'React',
-    'react-dom': 'ReactDOM',
+    historyApiFallback: true,
   },
 };
+
