@@ -1,11 +1,13 @@
 import * as React from "react";
 import { Navbar, Nav } from "react-bootstrap";
+import { AppState } from "../../state/store";
+import { connect } from 'react-redux';
 
 interface Props {
-    isLoggedIn: boolean;
+    isLoggedIn?: boolean;
 }
 
-export class NavBarComponent extends React.Component<Props> {
+class NavBarComponent extends React.Component<Props> {
     render() {
         return (<Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
             <Navbar.Brand href={"/login"}>Sound Mastery</Navbar.Brand>
@@ -23,3 +25,9 @@ export class NavBarComponent extends React.Component<Props> {
         </Navbar>);
     }
 }
+
+const mapStateToProps = (state: AppState) => ({
+    isLoggedIn: state.user.isLoggedIn,
+});
+
+export const TopNavBar = connect(mapStateToProps)(NavBarComponent);

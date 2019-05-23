@@ -1,15 +1,27 @@
 import * as React from "react";
 import { Container, Row } from "react-bootstrap";
-import authStore from "../stores/authorizationStore";
+import { connect } from "react-redux";
+import { AppState } from "../state/store";
 
-export class Index extends React.Component {
+interface Props {
+    isLoggedIn: boolean;
+    username: string;
+}
+export class IndexComponent extends React.Component<Props> {
     render() {
         return (
             <Container>
                 <Row>
-                    Welcome. Status: {authStore.isLoggedIn.toString()}
+                    Welcome, {this.props.username}. Status: {this.props.isLoggedIn.toString()}
                 </Row>
-            </Container >
+            </Container>
         );
     }
 }
+
+const mapStateToProps = (state: AppState) => ({
+    isLoggedIn: state.user.isLoggedIn,
+    username: state.user.login,
+});
+
+export const Index = connect(mapStateToProps)(IndexComponent);
