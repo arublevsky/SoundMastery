@@ -4,13 +4,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SoundMastery.Domain;
+using SoundMastery.Domain.Identity;
 using SoundMastery.Migrations;
 
 namespace SoundMastery.Api
@@ -45,9 +44,10 @@ namespace SoundMastery.Api
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<User>()
-                .AddDefaultUI(UIFramework.Bootstrap4)
+            services.AddIdentity<User, Role>()
+                .AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
@@ -67,8 +67,22 @@ namespace SoundMastery.Api
                 options.User.AllowedUserNameCharacters =
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
+
+                // sign in
+                options.SignIn.RequireConfirmedEmail = true;
             });
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddCors(
+                    options =>
+                    {
+                        options.AddPolicy(
+                            CorsPolicyName.AllowAny,
+                            x => x
+                                .AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+                    });;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,6 +102,7 @@ namespace SoundMastery.Api
 
             app.UseAuthentication();
             app.UseMvc();
+            app.UseCors(CorsPolicyName.AllowAny);
         }
     }
 }

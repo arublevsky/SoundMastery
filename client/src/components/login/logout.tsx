@@ -3,6 +3,7 @@ import { Redirect } from "react-router";
 import { RootAction } from "../../state/types";
 import { logoutUser } from "../../state/actions";
 import { connect } from "react-redux";
+import { Dispatch } from "redux";
 
 interface Props {
     handleLogout: () => void;
@@ -19,7 +20,7 @@ export class LogoutComponent extends React.Component<Props> {
     }
 }
 
-const mapDispatchToProps = (dispatch: React.Dispatch<RootAction>) => {
+const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => {
     return {
         handleLogout: () => { dispatch(logoutUser()) }
     }

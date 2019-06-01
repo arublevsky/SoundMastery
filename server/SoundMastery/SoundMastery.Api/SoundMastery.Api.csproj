@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SoundMastery.Application\SoundMastery.Application.csproj" />
     <ProjectReference Include="..\SoundMastery.DataAccess\SoundMastery.DataAccess.csproj" />
     <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
   </ItemGroup>

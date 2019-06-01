@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SoundMastery.Domain;
+using SoundMastery.Domain.Identity;
 using SoundMastery.Migrations;
 
 namespace SoundMastery.Migration
@@ -11,8 +13,7 @@ namespace SoundMastery.Migration
         /// <summary>
         ///     Default password for all seed users. Value: UserPass123
         /// </summary>
-        private const string DefaultPassword =
-            "AQAAAAEAACcQAAAAEEV/ceGE2f6GymUVfyWgT+45KabCWswea5/vO8R36iR9fs6LpbIodlXRme4nBqFgUQ==";
+        private const string DefaultPassword = "AQAAAAEAACcQAAAAEEV/ceGE2f6GymUVfyWgT+45KabCWswea5/vO8R36iR9fs6LpbIodlXRme4nBqFgUQ==";
 
         public static async Task Main(string[] args)
         {
@@ -25,7 +26,31 @@ namespace SoundMastery.Migration
                 case "drop":
                     await Drop();
                     break;
-                default: throw new ArgumentException($"Unknown command {command}.");
+                case "recreate":
+                    await Recreate();
+                    break;
+                case "update":
+                    await Update();
+                    break;
+                default:
+                    throw new ArgumentException($"Unknown command {command}.");
+            }
+        }
+
+        private static async Task Recreate()
+        {
+            await Drop();
+            await Update();
+            await ApplySeeds();
+
+        }
+
+        private static async Task Update()
+        {
+            var factory = new DbContextDesignTimeFactory();
+            using (var context = factory.CreateDbContext(new string[0]))
+            {
+                await context.Database.MigrateAsync();
             }
         }
 
@@ -48,12 +73,19 @@ namespace SoundMastery.Migration
                 var admin = context.Users.FirstOrDefault(b => b.UserName == "admin@gmail.com");
                 if (admin == null)
                 {
+                    const string username = "admin@gmail.com";
                     await context.Users.AddAsync(new User
                     {
-                        Id = default(Guid),
-                        UserName = "admin@gmail.com",
+                        Id = default,
+                        UserName = username,
+                        NormalizedUserName = username.ToUpperInvariant(),
+                        Email = username,
+                        NormalizedEmail = username.ToUpperInvariant(),
                         EmailConfirmed = true,
-                        PasswordHash = DefaultPassword
+                        PasswordHash = DefaultPassword,
+                        FirstName = "Aleksey",
+                        LastName = "Rublevsky",
+                        SecurityStamp = Guid.NewGuid().ToString()
                     });
                 }
 

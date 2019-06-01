@@ -1,8 +1,8 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { loginUser } from "../../state/actions";
+import { loginUserAsync } from "../../state/actions";
 import { Dispatch } from "redux";
-import { RootAction } from "../../state/types";
+import { RootAction, LoginAction } from "../../state/types";
 import { LoginCardForm } from "./loginForm";
 
 interface Props {
@@ -15,12 +15,14 @@ class LoginCardComponent extends React.Component<Props> {
     }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => {
+const mapDispatchToProps = (dispatch: any) => {
     return {
         handleLogin: (email: string, password: string) => {
-            dispatch(loginUser(email, password))
+            dispatch(loginUserAsync(email, password))
         }
     }
 }
 
-export const LoginCard = connect(() => { }, mapDispatchToProps)(LoginCardComponent)
+const mapStateToProps = () => ({});
+
+export const LoginCard = connect(mapStateToProps, mapDispatchToProps)(LoginCardComponent)

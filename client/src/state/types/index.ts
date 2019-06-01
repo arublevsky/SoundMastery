@@ -1,4 +1,5 @@
 import { LOGIN_USER, LOGOUT_USER } from "../actionTypes";
+import { TokenAuthorizationResult } from "../../modules/authorization/authorizationApi";
 
 export interface UserContext {
     isLoggedIn: boolean;
@@ -7,8 +8,7 @@ export interface UserContext {
 
 export interface LoginAction {
     type: typeof LOGIN_USER;
-    email: string;
-    password: string;
+    result: TokenAuthorizationResult;
 }
 
 export interface LogoutAction {

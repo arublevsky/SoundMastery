@@ -27,7 +27,7 @@ class NavBarComponent extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: AppState) => ({
-    isLoggedIn: state.user.isLoggedIn,
+    isLoggedIn: state.user.isLoggedIn(),
 });
 
 export const TopNavBar = connect(mapStateToProps)(NavBarComponent);

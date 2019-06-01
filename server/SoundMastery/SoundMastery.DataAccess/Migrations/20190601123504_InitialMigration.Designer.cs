@@ -10,7 +10,7 @@ using SoundMastery.Migrations;
 namespace SoundMastery.Migrations.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20190525183939_InitialMigration")]
+    [Migration("20190601123504_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,7 +23,7 @@ namespace SoundMastery.Migrations.Migrations
 
             modelBuilder.Entity("SoundMastery.Domain.User", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("AccessFailedCount");
@@ -33,6 +33,14 @@ namespace SoundMastery.Migrations.Migrations
                     b.Property<string>("Email");
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(255);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(255);
 
                     b.Property<bool>("LockoutEnabled");
 
