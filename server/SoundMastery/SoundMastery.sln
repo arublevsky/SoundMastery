@@ -10,12 +10,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundMastery.DataAccess", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundMastery.Migration", "SoundMastery.Migration\SoundMastery.Migration.csproj", "{3B6BD551-E949-4129-956A-8DDFC71C2EF1}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "..\..\build\_build.csproj", "{82FA2B79-E3BF-42F0-85EE-9DE7CE81EC8F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{82FA2B79-E3BF-42F0-85EE-9DE7CE81EC8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82FA2B79-E3BF-42F0-85EE-9DE7CE81EC8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C44626F-96CF-4597-9C11-B4D4A191C503}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0C44626F-96CF-4597-9C11-B4D4A191C503}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C44626F-96CF-4597-9C11-B4D4A191C503}.Release|Any CPU.ActiveCfg = Release|Any CPU
