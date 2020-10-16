@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
@@ -46,7 +47,7 @@ class Build : NukeBuild
             // do nothing
         });
 
-    Target Clean => _ => _
+    Target FullClean => _ => _
         .Executes(() =>
         {
             Git("clean -xf");
@@ -56,8 +57,16 @@ class Build : NukeBuild
             EnsureCleanDirectory(ArtifactsDirectory);
         });
 
+    Target FastClean => _ => _
+        .Executes(() =>
+        {
+            BackendDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            TestsDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            EnsureCleanDirectory(ArtifactsDirectory);
+        });
+
     Target Restore => _ => _
-        .DependsOn(Clean)
+        .DependsOn(IsLocalBuild ? FastClean : FullClean)
         .Executes(() =>
         {
             DotNetRestore(s => s.SetProjectFile(Solution));

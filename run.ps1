@@ -1,0 +1,2 @@
+Start-Process -FilePath "powershell.exe" -ArgumentList "npm run dev" -WorkingDirectory "src/client"
+Start-Process -FilePath "powershell.exe" -ArgumentList "dotnet run" -WorkingDirectory "src/server/SoundMastery/SoundMastery.Api"
