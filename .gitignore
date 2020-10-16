@@ -29,10 +29,6 @@ generated/
 # webstorm settings
 *.idea
 
-# nightwatch
-src/libs/nightwatch/
-screenshots
-
 # Roslyn cache directories
 *.ide/
 
@@ -207,10 +203,6 @@ FakesAssemblies/
 # Visual Studio 6 build log
 *.plg
 
-# Visual Studio 6 workspace options file
-*.opt
-src/wwwroot/flowvision/.idea/
-
 *.log
 # Code generated artifacts
 *.generated.cs
@@ -226,44 +218,9 @@ build/tools/**/
 *.tfstate.backup
 .vscode/**
 
-customerdata/showcase/src/nightwatch/reports
-customerdata/showcase/src/nightwatch/screenshots
+# nuke tools
+.tmp/**
 
-customerdata/BaseBuild-SandBox/src/nightwatch/reports
-customerdata/BaseBuild-SandBox/src/nightwatch/screenshots
+# client app
+/src/client/dist
 
-# Cake tools
-tools/**
-.dotNet
-
-# customer data
-customerdata/*
-!customerdata/ShowCase
-/customerdata/ShowCase/src/nighwatch/reports/*
-/customerdata/ShowCase/src/ExportClientExamples/V7 Export Sample/results*
-/customerdata/ShowCase/src/ExportClientExamples/ShowCase Export Sample/results*.json
-customerdata/ShowCase/ReferenceDataSets/Regionless
-
-customerdata/ShowCase/src/nighwatch/\.vscode/
-
-#basebuild
-!customerdata/BaseBuild-SandBox
-/customerdata/BaseBuild-SandBox/src/nighwatch/reports/*
-/customerdata/BaseBuild-SandBox/src/ExportClientExamples/V7 Export Sample/results*
-/customerdata/BaseBuild-SandBox/src/ExportClientExamples/BaseBuild-SandBox Export Sample/results*.json
-customerdata/BaseBuild-SandBox/ReferenceDataSets/Regionless
-
-customerdata/BaseBuild-SandBox/src/nighwatch/\.vscode/
-
-eVision.PermitVision.ini
-
-# Should be covered by more generic definitions but somehow that doesn't work in Gitkraken
-customerdata/*/src/StaticContent/css/branding.css*
-customerdata/*/src/StaticContent/js/externalComponents.js
-**/**/bin/debug/
-**/**/bin/release/
-**/**/obj/
-
-# Automatically created backups of transformed files
-**/*.config.xml.bak
-**/version.js

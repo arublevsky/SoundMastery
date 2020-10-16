@@ -1,4 +1,4 @@
-import { authState } from "../../state/reducers/users";
+import { authService } from "./authtorizationService";
 
 const baseApiRoute = "http://localhost:5000/api/account";
 
@@ -12,7 +12,7 @@ export const refreshToken = async () => {
 };
 
 async function postData<TResult>(url: string, data: any = {}) {
-    const authHeader = authState.getAuthHeader();
+    const authHeader = authService.getAuthHeader();
     const response = await fetch(url, {
         method: 'POST',
         cache: 'no-cache',

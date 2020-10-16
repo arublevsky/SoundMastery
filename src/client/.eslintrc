@@ -3,11 +3,11 @@
     "plugins": [
         "react"
     ],
-    "rules": {
-        "linebreak-style": ["error", "windows"]
-    },
+    "rules": {},
     "extends": [
-        "airbnb-base"
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "env": {
         "browser": true,

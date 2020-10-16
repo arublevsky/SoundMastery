@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.Git;
@@ -8,10 +6,9 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
+using Nuke.Common.Tools.Npm;
 using Nuke.Common.Utilities.Collections;
-using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
-using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 
 [CheckBuildProjectConfigurations]
@@ -24,7 +21,7 @@ class Build : NukeBuild
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
 
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main() => Execute<Build>(x => x.Default);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
@@ -33,27 +30,40 @@ class Build : NukeBuild
     [GitRepository] readonly GitRepository GitRepository;
     [GitVersion] readonly GitVersion GitVersion;
 
-    AbsolutePath SourceDirectory => RootDirectory / "src";
+    AbsolutePath BackendDirectory => RootDirectory / "src/server";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
+    AbsolutePath FrontendDirectory => RootDirectory / "src/client";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
-    Target Clean => _ => _
-        .Before(Restore)
+    [PathExecutable] readonly Tool Npm;
+    [PathExecutable] readonly Tool Git;
+
+    Target Default => _ => _
+        .DependsOn(CompileBackend)
+        .DependsOn(CompileFrontend)
         .Executes(() =>
         {
-            SourceDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            // do nothing
+        });
+
+    Target Clean => _ => _
+        .Executes(() =>
+        {
+            Git("clean -xf");
+            BackendDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
+            FrontendDirectory.GlobDirectories("**/node_modules", "**/dist").ForEach(DeleteDirectory);
             TestsDirectory.GlobDirectories("**/bin", "**/obj").ForEach(DeleteDirectory);
             EnsureCleanDirectory(ArtifactsDirectory);
         });
 
     Target Restore => _ => _
+        .DependsOn(Clean)
         .Executes(() =>
         {
-            DotNetRestore(s => s
-                .SetProjectFile(Solution));
+            DotNetRestore(s => s.SetProjectFile(Solution));
         });
 
-    Target Compile => _ => _
+    Target CompileBackend => _ => _
         .DependsOn(Restore)
         .Executes(() =>
         {
@@ -66,4 +76,11 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target CompileFrontend => _ => _
+        .After(CompileBackend)
+        .Executes(() =>
+        {
+            Npm("i", workingDirectory: FrontendDirectory);
+            Npm("run build", workingDirectory: FrontendDirectory);
+        });
 }

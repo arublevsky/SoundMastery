@@ -1,6 +1,6 @@
-import { TokenAuthorizationResult } from "../../../modules/authorization/authorizationApi";
+import { TokenAuthorizationResult } from "./authorizationApi";
 
-export class AuthorizationState {
+export class AuthorizationService {
     private token: string;
     private expiresInMilliseconds: number;
 
@@ -27,3 +27,5 @@ export class AuthorizationState {
         return localStorage.getItem("isLoggedIn") === 'true' && new Date().getTime() < this.expiresInMilliseconds
     }
 }
+
+export const authService = new AuthorizationService();

@@ -1,29 +1,15 @@
 import * as React from "react";
-import { Redirect } from "react-router";
-import { RootAction } from "../../state/types";
-import { logoutUser } from "../../state/actions";
-import { connect } from "react-redux";
-import { Dispatch } from "redux";
+import { useEffect } from "react";
+import { Redirect } from "react-router-dom";
 
 interface Props {
     handleLogout: () => void;
 }
 
-export class LogoutComponent extends React.Component<Props> {
-    public render() {
-        this.handleLogout();
-        return <Redirect to="/index" />;
-    }
+export const Logout = (props: Props) => {
+    useEffect(() => {
+        props.handleLogout();
+    })
 
-    private handleLogout = () => {
-        this.props.handleLogout();
-    }
+    return <Redirect to="/index" />;
 }
-
-const mapDispatchToProps = (dispatch: Dispatch<RootAction>) => {
-    return {
-        handleLogout: () => { dispatch(logoutUser()) }
-    }
-}
-
-export const Logout = connect(() => { }, mapDispatchToProps)(LogoutComponent)
