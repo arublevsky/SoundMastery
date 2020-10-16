@@ -8,6 +8,7 @@ namespace SoundMastery.Migrations
         public static IConfiguration Create(params string[] args)
         {
             var configurationBuilder = new ConfigurationBuilder();
+
             configurationBuilder
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)

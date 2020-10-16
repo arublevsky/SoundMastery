@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using SoundMastery.Domain;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Migrations;
 
@@ -17,80 +16,70 @@ namespace SoundMastery.Migration
 
         public static async Task Main(string[] args)
         {
+            var factory = new DbContextDesignTimeFactory();
+            await using var context = factory.CreateDbContext(new string[0]);
+
             var command = args.First();
             switch (command)
             {
                 case "seeds":
-                    await ApplySeeds();
+                    await ApplySeeds(context);
                     break;
                 case "drop":
-                    await Drop();
+                    await Drop(context);
                     break;
                 case "recreate":
-                    await Recreate();
+                    await Recreate(context);
                     break;
                 case "update":
-                    await Update();
+                    await Update(context);
                     break;
                 default:
                     throw new ArgumentException($"Unknown command {command}.");
             }
         }
 
-        private static async Task Recreate()
+        private static async Task Recreate(ApplicationDbContext context)
         {
-            await Drop();
-            await Update();
-            await ApplySeeds();
-
+            await Drop(context);
+            await Update(context);
+            await ApplySeeds(context);
         }
 
-        private static async Task Update()
+        private static async Task Update(DbContext context)
         {
-            var factory = new DbContextDesignTimeFactory();
-            using (var context = factory.CreateDbContext(new string[0]))
-            {
-                await context.Database.MigrateAsync();
-            }
+            await context.Database.MigrateAsync();
         }
 
-        private static async Task Drop()
+        private static async Task Drop(DbContext context)
         {
-            var factory = new DbContextDesignTimeFactory();
-            using (var context = factory.CreateDbContext(new string[0]))
-            {
-                await context.Database.EnsureDeletedAsync();
-            }
+            await context.Database.EnsureDeletedAsync();
         }
 
-        private static async Task ApplySeeds()
+        private static async Task ApplySeeds(ApplicationDbContext context)
         {
-            var factory = new DbContextDesignTimeFactory();
-            using (var context = factory.CreateDbContext(new string[0]))
-            {
-                await context.Database.EnsureCreatedAsync();
+            await context.Database.EnsureCreatedAsync();
 
-                var admin = context.Users.FirstOrDefault(b => b.UserName == "admin@gmail.com");
-                if (admin == null)
+            var admin = context.Users.FirstOrDefault(b => b.UserName == "admin@gmail.com");
+            if (admin == null)
+            {
+                const string username = "admin@gmail.com";
+                await context.Users.AddAsync(new User
                 {
-                    const string username = "admin@gmail.com";
-                    await context.Users.AddAsync(new User
-                    {
-                        Id = default,
-                        UserName = username,
-                        NormalizedUserName = username.ToUpperInvariant(),
-                        Email = username,
-                        NormalizedEmail = username.ToUpperInvariant(),
-                        EmailConfirmed = true,
-                        PasswordHash = DefaultPassword,
-                        FirstName = "Aleksey",
-                        LastName = "Rublevsky",
-                        SecurityStamp = Guid.NewGuid().ToString()
-                    });
-                }
-
-                context.SaveChanges();
+                    Id = default,
+                    UserName = username,
+                    NormalizedUserName = username.ToUpperInvariant(),
+                    Email = username,
+                    NormalizedEmail = username.ToUpperInvariant(),
+                    EmailConfirmed = true,
+                    PasswordHash = DefaultPassword,
+                    FirstName = "Aleksey",
+                    LastName = "Rublevsky",
+                    SecurityStamp = Guid.NewGuid().ToString()
+                });
             }
+
+            await context.SaveChangesAsync();
         }
     }
 }

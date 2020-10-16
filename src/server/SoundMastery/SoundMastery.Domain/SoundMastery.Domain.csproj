@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="microsoft.extensions.identity.stores" Version="2.2.0" />
+      <PackageReference Include="microsoft.extensions.identity.stores" Version="3.1.9" />
     </ItemGroup>
 </Project>

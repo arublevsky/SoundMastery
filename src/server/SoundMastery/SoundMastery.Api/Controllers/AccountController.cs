@@ -10,14 +10,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SoundMastery.Application.Authorization;
-using SoundMastery.Domain;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors(CorsPolicyName.AllowAny)]
+    [EnableCors(CorsPolicyName.FrontendApp)]
     public class AccountController : ControllerBase
     {
         private readonly IConfiguration _config;

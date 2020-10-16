@@ -20,6 +20,7 @@ async function postData<TResult>(url: string, data: any = {}) {
             "Accept": "application/json",
             'Content-Type': 'application/json',
             "Authorization": authHeader,
+            'Access-Control-Allow-Origin': "http://localhost:9000",
         },
         body: JSON.stringify(data),
     });

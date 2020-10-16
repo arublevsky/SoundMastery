@@ -2,6 +2,6 @@ namespace SoundMastery.Api
 {
     public static class CorsPolicyName
     {
-        public const string AllowAny = nameof(AllowAny);
+        public const string FrontendApp = "FrontendApp";
     }
 }

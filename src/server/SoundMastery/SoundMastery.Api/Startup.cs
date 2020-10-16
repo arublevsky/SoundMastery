@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Migrations;
@@ -26,6 +27,19 @@ namespace SoundMastery.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(
+                options =>
+                {
+                    options.AddPolicy(
+                        CorsPolicyName.FrontendApp,
+                        builder => builder.WithOrigins("http://localhost:9000")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials());
+                });
+
+            services.AddControllers();
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -45,8 +59,8 @@ namespace SoundMastery.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, Role>()
-                .AddDefaultTokenProviders()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -72,37 +86,23 @@ namespace SoundMastery.Api
                 options.SignIn.RequireConfirmedEmail = true;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-            services.AddCors(
-                    options =>
-                    {
-                        options.AddPolicy(
-                            CorsPolicyName.AllowAny,
-                            x => x
-                                .AllowAnyOrigin()
-                                .AllowAnyMethod()
-                                .AllowAnyHeader());
-                    });;
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
 
-            app.UseHttpsRedirection();
-
+            app.UseRouting();
+            app.UseCors(CorsPolicyName.FrontendApp);
             app.UseAuthentication();
-            app.UseMvc();
-            app.UseCors(CorsPolicyName.AllowAny);
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints => endpoints.MapControllers().RequireCors(CorsPolicyName.FrontendApp));
         }
     }
 }
