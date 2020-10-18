@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { AdminPage } from "./components/adminPage";
 import { HomePage } from "./components/homePage";

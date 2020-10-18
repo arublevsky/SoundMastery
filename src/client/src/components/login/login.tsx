@@ -5,9 +5,13 @@ import { LoginCard } from "./loginCard";
 import './login.css';
 import { login } from "../../modules/authorization/authorizationApi";
 import { useAuthorization } from "../../modules/authorization/context";
-import { Redirect, useHistory } from "react-router-dom";
+import { Redirect, RouteProps, useHistory } from "react-router-dom";
 
-export const Login = (props: any) => {
+interface LoginRouteState {
+    referer: string;
+}
+
+export const Login = (props: RouteProps) => {
     const history = useHistory();
     const { isAuthorized, onLogin } = useAuthorization();
 
@@ -18,7 +22,7 @@ export const Login = (props: any) => {
     }
 
     if (isAuthorized()) {
-        const referer = props.location.state?.referer || '/';
+        const referer = (props.location.state as LoginRouteState)?.referer || '/';
         return <Redirect to={referer} />;
     }
 
