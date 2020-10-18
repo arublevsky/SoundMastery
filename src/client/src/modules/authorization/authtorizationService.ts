@@ -1,30 +1,32 @@
 import { TokenAuthorizationResult } from "./authorizationApi";
 
-export class AuthorizationService {
-    private token: string;
-    private expiresInMilliseconds: number;
+const localStorageKey = "userTokenKey";
 
-    public login = (result: TokenAuthorizationResult) => {
-        localStorage.setItem('isLoggedIn', 'true');
-        this.expiresInMilliseconds = result.expiresInMilliseconds + new Date().getTime();
-        this.token = result.token;
+export class AuthorizationService {
+    public getAuthData = (): TokenAuthorizationResult => {
+        const data = localStorage.getItem(localStorageKey);
+        if (data) {
+            return JSON.parse(data);
+        }
+
+        return null;
     }
 
-    public logout = () => {
-        localStorage.removeItem('isLoggedIn');
-        this.expiresInMilliseconds = 0;
-        this.token = undefined;
+    public setAuthData = (data: TokenAuthorizationResult) => {
+        localStorage.setItem(localStorageKey, JSON.stringify(data));
     }
 
     public getAuthHeader = () => {
-        if (this.isAuthenticated() && this.token) {
-            return `Bearer ${this.token}`;
+        const data = this.getAuthData();
+        if (data && data.token) {
+            return `Bearer ${data.token}`;
         }
-        return undefined;
+
+        return null;
     }
 
-    public isAuthenticated = () => {
-        return localStorage.getItem("isLoggedIn") === 'true' && new Date().getTime() < this.expiresInMilliseconds
+    public removeAuthData = () => {
+        localStorage.removeItem(localStorageKey);
     }
 }
 
