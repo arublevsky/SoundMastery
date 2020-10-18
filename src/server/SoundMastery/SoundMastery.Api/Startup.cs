@@ -38,9 +38,20 @@ namespace SoundMastery.Api
                             .AllowCredentials());
                 });
 
-            services.AddControllers();
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            // .AddIdentity sets default auth scheme to cookies auth, so .AddAuthentication must go after that.
+            services.AddAuthentication(x =>
+                {
+                    // need to set both schemes to make JWT work
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
                 .AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -51,16 +62,9 @@ namespace SoundMastery.Api
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = Configuration["Jwt:Issuer"],
                         ValidAudience = Configuration["Jwt:Issuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
                     };
                 });
-
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-            services.AddIdentity<User, Role>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -101,8 +105,7 @@ namespace SoundMastery.Api
             app.UseCors(CorsPolicyName.FrontendApp);
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseEndpoints(endpoints => endpoints.MapControllers().RequireCors(CorsPolicyName.FrontendApp));
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

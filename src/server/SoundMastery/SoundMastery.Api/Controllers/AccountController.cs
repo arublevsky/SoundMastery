@@ -4,7 +4,6 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +15,6 @@ namespace SoundMastery.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors(CorsPolicyName.FrontendApp)]
     public class AccountController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -86,6 +84,7 @@ namespace SoundMastery.Api.Controllers
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[] {
+                new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
                 new Claim(JwtRegisteredClaimNames.Email, userName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
