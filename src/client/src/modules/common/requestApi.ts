@@ -11,23 +11,23 @@ export interface RequestOptions extends Options {
     params?: unknown;
 }
 
-export const httpGet = async <Data extends {}>(url: string, options?: RequestOptions) => {
-    return await request<Data>(url, "GET", options);
+export const httpGet = async <T extends unknown>(url: string, options?: RequestOptions) => {
+    return await request<T>(url, "GET", options);
 };
 
-export const httpPost = async <Data extends {}>(url: string, options?: RequestOptions) => {
-    return await request<Data>(url, "POST", options);
+export const httpPost = async <T extends unknown>(url: string, options?: RequestOptions) => {
+    return await request<T>(url, "POST", options);
 };
 
-export const httpPut = async <Data extends {}>(url: string, options?: RequestOptions) => {
-    return await request<Data>(url, "PUT", options);
+export const httpPut = async <T extends unknown>(url: string, options?: RequestOptions) => {
+    return await request<T>(url, "PUT", options);
 };
 
 export const httpDelete = async (url: string, options?: RequestOptions) => {
     await request(url, "DELETE", options);
 };
 
-const request = async <Data extends {}>(
+const request = async <T extends unknown>(
     url: string,
     method: "GET" | "POST" | "DELETE" | "PUT",
     options?: RequestOptions,
@@ -42,18 +42,18 @@ const request = async <Data extends {}>(
                 Accept: "application/json",
                 ...getContentTypeHeader(options),
                 "Authorization": authService.getAuthHeader(),
-                // 'Access-Control-Allow-Origin': "http://localhost:9100",
             },
             method,
         });
     } catch (error) {
         // TODO client logging
+        console.error(error);
         throw error;
     } finally {
         toggleLoading(false, options?.silent);
     }
 
-    return handleResponse<Data>(response);
+    return handleResponse<T>(response);
 };
 
 const getBody = (options?: RequestOptions) => {
@@ -66,7 +66,7 @@ const getBody = (options?: RequestOptions) => {
     return JSON.stringify(options.body);
 };
 
-const getContentTypeHeader = (options?: RequestOptions): { "Content-Type": string } | {} => {
+const getContentTypeHeader = (options?: RequestOptions) => {
     if (options === null || options === undefined) {
         return { "Content-Type": "text/plain" };
     }
@@ -84,7 +84,7 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 };
 
 // TODO implement loading animation on requests
-const toggleLoading = (show: boolean, silent: boolean = false) => {
+const toggleLoading = (show: boolean, silent = false) => {
     if (silent) {
         return;
     }

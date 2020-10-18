@@ -3,18 +3,22 @@ import { useState } from "react";
 import { Button, Form, Card } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 
+interface Props {
+    handleLogin: (email: string, password: string) => void;
+}
+
 export const LoginCardForm = (props: Props) => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const history = useHistory();
 
     const handleEmailChange = (event: React.SyntheticEvent) => {
-        let target = event.target as HTMLInputElement;
+        const target = event.target as HTMLInputElement;
         setEmail(target.value);
     };
 
     const handlePasswordChange = (event: React.SyntheticEvent) => {
-        let target = event.target as HTMLInputElement;
+        const target = event.target as HTMLInputElement;
         setPassword(target.value);
     };
 
@@ -33,7 +37,7 @@ export const LoginCardForm = (props: Props) => {
                         <Form.Label>Email address</Form.Label>
                         <Form.Control type="email" placeholder="Enter email" onChange={handleEmailChange} value={email} />
                         <Form.Text className="text-muted">
-                            We'll never share your email with anyone else.
+                            We&#39ll never share your email with anyone else.
                             </Form.Text>
                     </Form.Group>
 
@@ -50,13 +54,4 @@ export const LoginCardForm = (props: Props) => {
         </Card.Body>
         <Card.Footer className="text-muted">2 days ago</Card.Footer>
     </Card>);
-}
-
-interface Props {
-    handleLogin: (email: string, password: string) => void;
-}
-
-interface State {
-    email: string;
-    password: string;
 }

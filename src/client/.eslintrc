@@ -1,9 +1,12 @@
 {
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "plugins": [
         "react"
     ],
-    "rules": {},
+    "rules": {
+        // disable the rule for all files
+        "@typescript-eslint/explicit-module-boundary-types": 0
+    },
     "extends": [
         "eslint:recommended",
         "plugin:react/recommended",
