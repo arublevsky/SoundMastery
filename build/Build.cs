@@ -29,15 +29,17 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
     [GitRepository] readonly GitRepository GitRepository;
-    [GitVersion] readonly GitVersion GitVersion;
+
+    // TODO requires yaml to be set up, fails on linux actions
+    // [GitVersion] readonly GitVersion GitVersion;
 
     AbsolutePath BackendDirectory => RootDirectory / "src/server";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath FrontendDirectory => RootDirectory / "src/client";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
 
-    [PathExecutable] readonly Tool Npm;
-    [PathExecutable] readonly Tool Git;
+    [PathExecutable("npm")] readonly Tool Npm;
+    [PathExecutable("git")] readonly Tool Git;
 
     Target Default => _ => _
         .DependsOn(CompileBackend)
@@ -79,9 +81,10 @@ class Build : NukeBuild
             DotNetBuild(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                .SetFileVersion(GitVersion.AssemblySemFileVer)
-                .SetInformationalVersion(GitVersion.InformationalVersion)
+                // TODO doesn't work for linux in actions, see GitVersion injection
+                // .SetAssemblyVersion(GitVersion.AssemblySemVer)
+                // .SetFileVersion(GitVersion.AssemblySemFileVer)
+                // .SetInformationalVersion(GitVersion.InformationalVersion)
                 .EnableNoRestore());
         });
 
