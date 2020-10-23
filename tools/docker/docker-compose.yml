@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  api:
+    image: sound-mastery-api:latest
+    build:
+      context: ./../../src/server 
+    ports:
+      - '${API_PORT}:80'
+    depends_on:
+      - db
+    environment:
+        - ASPNETCORE_ENVIRONMENT=Production  
+        - DB_COMMAND=${DB_COMMAND}
+  client:
+    image: sound-mastery-client:latest
+    build:
+      context: ./../../src/client
+    ports:
+      - '${CLIENT_PORT}:80'
+  db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      SA_PASSWORD: ${SA_PASSWORD}
+      ACCEPT_EULA: "Y"
+    volumes:
+      - ./data:/var/opt/mssql/data
+      - ./log:/var/opt/mssql/log
+      - ./secrets:/var/opt/mssql/secrets
+    ports:
+      - '1433:1433'
+    expose:
+      - 1433
