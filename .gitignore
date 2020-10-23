@@ -224,3 +224,7 @@ build/tools/**/
 # client app
 /src/client/dist
 
+# docker local volumes
+/tools/docker/data
+/tools/docker/log
+/tools/docker/secrets
