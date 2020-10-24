@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   api:
-    image: sound-mastery-api:${APP_VERSION:?err}
+    image: docker.pkg.github.com/arublevsky/soundmastery/sound-mastery-api:${APP_VERSION:?err}
     build:
       context: ./../../src/server 
     ports:
@@ -13,7 +13,7 @@ services:
         - ASPNETCORE_ENVIRONMENT=Production  
         - DB_COMMAND=${DB_COMMAND?err}
   client:
-    image: sound-mastery-client:${APP_VERSION:?err}
+    image: docker.pkg.github.com/arublevsky/soundmastery/sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
     ports:

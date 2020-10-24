@@ -16,6 +16,7 @@ namespace SoundMastery.Migration
 
         public static async Task Main(string[] args)
         {
+            // TODO: add logging
             var factory = new DbContextDesignTimeFactory();
             await using var context = factory.CreateDbContext(new string[0]);
 
@@ -34,8 +35,24 @@ namespace SoundMastery.Migration
                 case "update":
                     await Update(context);
                     break;
+                case "check-connection":
+                    await CheckConnection(context);
+                    break;
                 default:
                     throw new ArgumentException($"Unknown command {command}.");
+            }
+        }
+
+        private static async Task CheckConnection(ApplicationDbContext context)
+        {
+            try
+            {
+                await context.Database.EnsureCreatedAsync();
+                await context.Database.ExecuteSqlRawAsync("SELECT 1");
+            }
+            catch
+            {
+                throw new Exception("SQL server is not available...");
             }
         }
 
