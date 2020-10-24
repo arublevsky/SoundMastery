@@ -3,15 +3,22 @@ name: CI
 on:
   pull_request:
     branches: [ develop, master ]
+
+  release:
+    types:
+      - created
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       matrix:
         node-version: [12.x]
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
@@ -21,19 +28,19 @@ jobs:
       - name: RunBuild 
         run: ./build.sh
 
-  push_to_registry:
-    needs: build
+  push_images:
+    needs: build # split into 2 to avoid building on release
     name: Publish Docker images
     runs-on: ubuntu-latest
     env:
-      DB_COMMAND: recreate
+      DB_COMMAND: update
       SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
       GITHUB_ACTOR: ${{ github.actor }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Publish Docker images
-        run: |
-          chmod +x ./push-to-registry.sh
-          ./push-to-registry.sh
+        run: ./build.sh --target PublishImages
