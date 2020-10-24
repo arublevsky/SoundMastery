@@ -1,34 +1,46 @@
 name: CI
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+    branches: [ develop, master ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+  release:
+    types:
+      - created
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    
+    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       matrix:
         node-version: [12.x]
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
-      # Install node
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Runs a single command using the runners shell
       - name: RunBuild 
         run: ./build.sh
-      
+
+  push_images:
+    needs: build # split into 2 to avoid building on release
+    name: Publish Docker images
+    runs-on: ubuntu-latest
+    env:
+      DB_COMMAND: update
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Publish Docker images
+        run: ./build.sh --target PublishImages

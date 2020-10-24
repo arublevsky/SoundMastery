@@ -204,18 +204,6 @@ FakesAssemblies/
 *.plg
 
 *.log
-# Code generated artifacts
-*.generated.cs
-src/SharedAssemblyVersionInfo.cs
-#.generated.ts
-**/*.iml
-src/eVision.PermitVision.Web/.happypack/
-src/eVision.PermitVision.Web/.awcache/
-tools/TestDatabases/visionsuitemdf
-artifacts
-.terraform/
-build/tools/**/
-*.tfstate.backup
 .vscode/**
 
 # nuke tools
