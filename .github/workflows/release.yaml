@@ -1,0 +1,22 @@
+name: Release
+
+on:
+  release:
+    types:
+      - created
+jobs:
+  push_to_registry:
+    name: Publish Docker images
+    runs-on: ubuntu-latest
+    env:
+      DB_COMMAND: update
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Publish Docker images
+        run: |
+          chmod +x ./push-to-registry.sh
+          ./push-to-registry.sh

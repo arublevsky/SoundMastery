@@ -1,11 +1,8 @@
 name: CI
 
 on:
-  push:
-    branches: [ develop, master ]
   pull_request:
     branches: [ develop, master ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +23,7 @@ jobs:
 
   push_to_registry:
     needs: build
-    name: Push Docker images to GitHub Packages
+    name: Publish Docker images
     runs-on: ubuntu-latest
     env:
       DB_COMMAND: recreate
@@ -36,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Push Docker images to GitHub Packages
+      - name: Publish Docker images
         run: |
           chmod +x ./push-to-registry.sh
           ./push-to-registry.sh
