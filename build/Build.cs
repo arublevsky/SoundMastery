@@ -20,7 +20,7 @@ class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    [Solution] readonly Solution Solution;
+    [Solution] readonly Solution Solution = null!;
 
     static AbsolutePath BackendDirectory => RootDirectory / "src/server";
     static AbsolutePath TestsDirectory => RootDirectory / "tests";
@@ -29,10 +29,10 @@ class Build : NukeBuild
     static AbsolutePath DockerDirectory => RootDirectory / "tools/docker";
     static AbsolutePath ConfigDirectory => RootDirectory / ".config";
 
-    [PathExecutable("npm")] readonly Tool Npm;
-    [PathExecutable("git")] readonly Tool Git;
-    [PathExecutable("docker-compose")] readonly Tool DockerCompose;
-    [PathExecutable("docker")] readonly Tool Docker;
+    [PathExecutable("npm")] readonly Tool Npm = null!;
+    [PathExecutable("git")] readonly Tool Git = null!;
+    [PathExecutable("docker-compose")] readonly Tool DockerCompose = null!;
+    [PathExecutable("docker")] readonly Tool Docker = null!;
 
     Target Default => _ => _
         .DependsOn(CompileBackend)
@@ -93,8 +93,7 @@ class Build : NukeBuild
                 SetAppVersionEnvVariable();
                 PrepareDotEnv();
             }
-            var env = File.ReadAllText(DotEnvPath);
-            Console.WriteLine("ENV file contents" + env);
+
             DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} build");
         });
 
@@ -135,7 +134,7 @@ class Build : NukeBuild
     static void SetAppVersionEnvVariable()
     {
         DotNet("tool restore", workingDirectory: RootDirectory);
-        var version = DotNet("minver").Last().Text;
+        var version = DotNet("minver").First(x => x.Type != OutputType.Err).Text;
         Environment.SetEnvironmentVariable("APP_VERSION", version);
     }
 
