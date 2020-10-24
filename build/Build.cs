@@ -1,13 +1,9 @@
-using System.Threading.Tasks;
 using Nuke.Common;
 using Nuke.Common.Execution;
-using Nuke.Common.Git;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
-using Nuke.Common.Tools.GitVersion;
-using Nuke.Common.Tools.Npm;
 using Nuke.Common.Utilities.Collections;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
@@ -16,30 +12,22 @@ using static Nuke.Common.Tools.DotNet.DotNetTasks;
 [UnsetVisualStudioEnvironmentVariables]
 class Build : NukeBuild
 {
-    /// Support plugins are available for:
-    ///   - JetBrains ReSharper        https://nuke.build/resharper
-    ///   - JetBrains Rider            https://nuke.build/rider
-    ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
-    ///   - Microsoft VSCode           https://nuke.build/vscode
-
     public static int Main() => Execute<Build>(x => x.Default);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     [Solution] readonly Solution Solution;
-    [GitRepository] readonly GitRepository GitRepository;
-
-    // TODO requires yaml to be set up, fails on linux actions
-    // [GitVersion] readonly GitVersion GitVersion;
 
     AbsolutePath BackendDirectory => RootDirectory / "src/server";
     AbsolutePath TestsDirectory => RootDirectory / "tests";
     AbsolutePath FrontendDirectory => RootDirectory / "src/client";
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath DockerDirectory => RootDirectory / "tools/docker";
 
     [PathExecutable("npm")] readonly Tool Npm;
     [PathExecutable("git")] readonly Tool Git;
+    [PathExecutable("docker-compose")] readonly Tool DockerCompose;
 
     Target Default => _ => _
         .DependsOn(CompileBackend)
@@ -81,10 +69,6 @@ class Build : NukeBuild
             DotNetBuild(s => s
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                // TODO doesn't work for linux in actions, see GitVersion injection
-                // .SetAssemblyVersion(GitVersion.AssemblySemVer)
-                // .SetFileVersion(GitVersion.AssemblySemFileVer)
-                // .SetInformationalVersion(GitVersion.InformationalVersion)
                 .EnableNoRestore());
         });
 
@@ -94,5 +78,11 @@ class Build : NukeBuild
         {
             Npm("i", workingDirectory: FrontendDirectory);
             Npm("run build", workingDirectory: FrontendDirectory);
+        });
+
+    Target Deploy => _ => _
+        .Executes(() =>
+        {
+            DockerCompose($"--env-file ./../../config/.env.dev up --build -d", workingDirectory: DockerDirectory);
         });
 }
