@@ -2,19 +2,18 @@ using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SoundMastery.Domain;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.Migrations
 {
     public class ApplicationDbContext : DbContext
     {
-        public DbSet<User> Users { get; set; }
+        public DbSet<User>? Users { get; set; }
 
-        public DbSet<Role> Roles { get; set; }
+        public DbSet<Role>? Roles { get; set; }
 
         // https://github.com/aspnet/AspNetCore/issues/5793
-        public DbSet<IdentityUserClaim<Guid>> IdentityUserClaims { get; set; }
+        public DbSet<IdentityUserClaim<Guid>>? IdentityUserClaims { get; set; }
 
         private readonly IConfiguration _configuration;
 

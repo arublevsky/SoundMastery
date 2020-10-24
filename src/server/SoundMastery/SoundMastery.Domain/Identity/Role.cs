@@ -6,6 +6,6 @@ namespace SoundMastery.Domain.Identity
 {
     public class Role : IdentityRole<Guid>
     {
-        public IList<User> Users { get; set; }
+        public IList<User> Users { get; set; } = new List<User>();
     }
 }
