@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Linq;
 using Nuke.Common;
 using Nuke.Common.Execution;
 using Nuke.Common.IO;
@@ -19,15 +22,17 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
 
-    AbsolutePath BackendDirectory => RootDirectory / "src/server";
-    AbsolutePath TestsDirectory => RootDirectory / "tests";
-    AbsolutePath FrontendDirectory => RootDirectory / "src/client";
-    AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
-    AbsolutePath DockerDirectory => RootDirectory / "tools/docker";
+    static AbsolutePath BackendDirectory => RootDirectory / "src/server";
+    static AbsolutePath TestsDirectory => RootDirectory / "tests";
+    static AbsolutePath FrontendDirectory => RootDirectory / "src/client";
+    static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    static AbsolutePath DockerDirectory => RootDirectory / "tools/docker";
+    static AbsolutePath ConfigDirectory => RootDirectory / ".config";
 
     [PathExecutable("npm")] readonly Tool Npm;
     [PathExecutable("git")] readonly Tool Git;
     [PathExecutable("docker-compose")] readonly Tool DockerCompose;
+    [PathExecutable("docker")] readonly Tool Docker;
 
     Target Default => _ => _
         .DependsOn(CompileBackend)
@@ -80,9 +85,64 @@ class Build : NukeBuild
             Npm("run build", workingDirectory: FrontendDirectory);
         });
 
-    Target Deploy => _ => _
+    Target BuildDockerImages => _ => _
         .Executes(() =>
         {
-            DockerCompose($"--env-file ./../../config/.env.dev up --build -d", workingDirectory: DockerDirectory);
+            if (!IsLocalBuild)
+            {
+                SetAppVersionEnvVariable();
+                PrepareDotEnv();
+            }
+            var env = File.ReadAllText(DotEnvPath);
+            Console.WriteLine("ENV file contents" + env);
+            DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} build");
         });
+
+    Target Deploy => _ => _
+        .DependsOn(BuildDockerImages)
+        .Executes(() =>
+        {
+            DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} up -d");
+        });
+
+    Target PublishImages => _ => _
+        .DependsOn(BuildDockerImages)
+        .Executes(() =>
+        {
+            if (IsLocalBuild)
+            {
+                return;
+            }
+
+            string? actor = Environment.GetEnvironmentVariable("GITHUB_ACTOR");
+            string? token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+
+            if (string.IsNullOrWhiteSpace(actor) || string.IsNullOrWhiteSpace(token))
+            {
+                throw new InvalidOperationException("Cannot  publish docker images: missing github credentials");
+            }
+
+            Docker($"login docker.pkg.github.com -u {actor} -p {token}");
+            DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} push");
+        });
+
+    static string Env => IsLocalBuild ? "dev" : "ci";
+
+    static string DotEnvPath => Path.Combine(ConfigDirectory, $"{Env}.env");
+
+    static string DockerComposePath => Path.Combine(DockerDirectory, $"docker-compose.{Env}.yml");
+
+    static void SetAppVersionEnvVariable()
+    {
+        DotNet("tool restore", workingDirectory: RootDirectory);
+        var version = DotNet("minver").Last().Text;
+        Environment.SetEnvironmentVariable("APP_VERSION", version);
+    }
+
+    static void PrepareDotEnv()
+    {
+        var requiredVariables = new[] { "SA_PASSWORD", "DB_COMMAND", "APP_VERSION" };
+        var lines = requiredVariables.Select(key => $"{key}={Environment.GetEnvironmentVariable(key)}");
+        File.AppendAllLines(DotEnvPath, lines);
+    }
 }
