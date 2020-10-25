@@ -29,7 +29,7 @@ jobs:
         run: ./build.sh
 
   push_images:
-    needs: build # split into 2 to avoid building on release
+    needs: build
     name: Publish Docker images
     runs-on: ubuntu-latest
     env:
@@ -43,4 +43,21 @@ jobs:
           fetch-depth: 0
 
       - name: Publish Docker images
+        run: ./build.sh --target PublishImages
+
+  push_images_release:
+    name: Publish Docker images (release)
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    env:
+      DB_COMMAND: update
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Publish Docker images  (release)
         run: ./build.sh --target PublishImages
