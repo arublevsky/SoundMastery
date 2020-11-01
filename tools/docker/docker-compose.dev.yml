@@ -19,16 +19,12 @@ services:
     ports:
       - '${CLIENT_PORT?err}:80'
   db:
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    user: root   
+    image: postgres
     environment:
-      SA_PASSWORD: ${SA_PASSWORD?err}
-      ACCEPT_EULA: "Y"
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${SA_PASSWORD?err}
     volumes:
-      - ./data:/var/opt/mssql/data
-      - ./log:/var/opt/mssql/log
-      - ./secrets:/var/opt/mssql/secrets
+      - ./db-data:/var/lib/postgresql/data
     ports:
-      - '1433:1433'
-    expose:
-      - 1433
+      - 5432:5432
