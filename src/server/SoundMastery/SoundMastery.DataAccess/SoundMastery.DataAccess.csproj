@@ -1,43 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>SoundMastery.Migrations</RootNamespace>
     </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-        <Version>3.1.9</Version>
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.1.9" />
-    </ItemGroup>
-
     <ItemGroup>
       <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
     </ItemGroup>
-
     <ItemGroup>
-      <Folder Include="Migrations" />
+      <PackageReference Include="Dapper" Version="2.0.35" />
+      <PackageReference Include="Npgsql" Version="4.1.5" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
     </ItemGroup>
-
     <ItemGroup>
-      <None Remove="appsettings.json" />
-      <Content Include="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="appsettings.Production.json" />
-      <Content Include="appsettings.Production.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+      <None Remove="Identity\Sql\CreateUser.sql" />
     </ItemGroup>
-
+    <ItemGroup>
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CheckDatabaseExists.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CreateDatabase.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropConnections.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropDatabase.sql" />
+      <EmbeddedResource Include="Sql\Postgres\Users\CreateUser.sql" />
+      <EmbeddedResource Include="Sql\Postgres\Users\FindUserByEmail.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CheckDatabaseExists.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CreateDatabase.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\DropDatabase.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\Users\CreateUser.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\Users\FindUserByEmail.sql" />
+      <None Remove="Sql\Postgres\Users\FindUserByName.sql" />
+      <EmbeddedResource Include="Sql\Postgres\Users\FindUserByName.sql" />
+      <None Remove="Sql\SqlServer\Users\FindUserByName.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\Users\FindUserByName.sql" />
+    </ItemGroup>
     <PropertyGroup>
         <Nullable>enable</Nullable>
     </PropertyGroup>

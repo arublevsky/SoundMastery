@@ -48,17 +48,25 @@ namespace SoundMastery.Api.Controllers
         [AllowAnonymous]
         [Route("register")]
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterUserModel registerModel)
+        public async Task<IActionResult> Register([FromBody] RegisterUserModel model)
         {
+            if (string.IsNullOrWhiteSpace(model.FirstName) ||
+                string.IsNullOrWhiteSpace(model.LastName) ||
+                string.IsNullOrWhiteSpace(model.Email) ||
+                string.IsNullOrWhiteSpace(model.Password))
+            {
+                return BadRequest();
+            }
+
             var user = new User
             {
-                UserName = registerModel.Email,
-                FirstName = registerModel.FirstName,
-                LastName = registerModel.LastName,
-                Email = registerModel.Email
+                UserName = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Email = model.Email
             };
 
-            var identityResult = await _userManager.CreateAsync(user, registerModel.Password);
+            var identityResult = await _userManager.CreateAsync(user, model.Password);
             if (identityResult.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);

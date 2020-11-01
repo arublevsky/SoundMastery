@@ -5,13 +5,15 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using SoundMastery.DataAccess.DatabaseManagement;
+using SoundMastery.DataAccess.DatabaseManagement.Postgres;
+using SoundMastery.DataAccess.DatabaseManagement.SqlServer;
+using SoundMastery.DataAccess.Stores;
 using SoundMastery.Domain.Identity;
-using SoundMastery.Migrations;
 
 namespace SoundMastery.Api
 {
@@ -38,12 +40,11 @@ namespace SoundMastery.Api
                             .AllowCredentials());
                 });
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddTransient<IUserStore<User>, UserStore>();
+            services.AddTransient<IRoleStore<Role>, RoleStore>();
+            RegisterDatabaseSpecificDependencies(services);
 
-            services.AddIdentity<User, Role>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentity<User, Role>().AddDefaultTokenProviders();
 
             // .AddIdentity sets default auth scheme to cookies auth, so .AddAuthentication must go after that.
             services.AddAuthentication(x =>
@@ -106,6 +107,42 @@ namespace SoundMastery.Api
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseEndpoints(endpoints => endpoints.MapControllers());
+        }
+
+        private void RegisterDatabaseSpecificDependencies(IServiceCollection services)
+        {
+            DatabaseEngine engine = GetDatabaseEngine();
+
+            switch (engine)
+            {
+                case DatabaseEngine.Postgres:
+                    EnsureConnectionStringSpecified("PostgresDatabaseConnection");
+                    services.AddTransient<IUserRepository, PgsqlUserRepository>();
+                    break;
+                case DatabaseEngine.SqlServer:
+                    EnsureConnectionStringSpecified("SqlServerDatabaseConnection");
+                    services.AddTransient<IUserRepository, SqlServerUserRepository>();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}");
+            }
+        }
+
+        private DatabaseEngine GetDatabaseEngine()
+        {
+            string engineConfig = Configuration["DatabaseSettings:Engine"];
+            return Enum.TryParse<DatabaseEngine>(engineConfig, ignoreCase: true, out var result)
+                ? result
+                : DatabaseEngine.Postgres;
+        }
+
+        private void EnsureConnectionStringSpecified(string name)
+        {
+            string connectionString = Configuration.GetConnectionString(name);
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException($"Connection string {name} is not configured");
+            }
         }
     }
 }
