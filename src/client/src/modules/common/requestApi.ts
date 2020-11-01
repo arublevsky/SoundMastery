@@ -42,7 +42,6 @@ const request = async <T extends unknown>(
                 Accept: "application/json",
                 ...getContentTypeHeader(options),
                 "Authorization": authService.getAuthHeader(),
-                'Access-Control-Allow-Origin': "http://localhost:9000"
             },
             method,
         });
