@@ -33,7 +33,6 @@ namespace SoundMastery.Tests.DataAccess.Builders
         {
             return new ServiceCollection()
                 .AddSingleton<DatabaseEngineAccessor>(() => engine)
-                .AddLogging(lb => lb.AddFluentMigratorConsole())
                 .AddFluentMigratorCore()
                 .AddSingleton<IConventionSet>(new DefaultConventionSet("SoundMastery", workingDirectory: null))
                 .ConfigureRunner(builder => ConfigureMigrationRunner(configuration, engine, builder))

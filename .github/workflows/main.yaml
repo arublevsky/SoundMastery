@@ -34,6 +34,12 @@ jobs:
           name: test-coverage
           path: ./artifacts
           retention-days: 5
+      - name: Coverage report 
+          uses: 5monkeys/cobertura-action@master
+          with:
+            path: ./artifacts/coverage/coverage.cobertura.xml
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            minimum_coverage: 50
 
   push_images:
     needs: build
