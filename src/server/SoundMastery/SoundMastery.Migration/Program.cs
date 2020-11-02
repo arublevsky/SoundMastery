@@ -6,13 +6,13 @@ using FluentMigrator.Runner.Conventions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SoundMastery.DataAccess.DatabaseManagement;
-using SoundMastery.DataAccess.DatabaseManagement.Postgres;
-using SoundMastery.DataAccess.DatabaseManagement.SqlServer;
+using SoundMastery.DataAccess.Migrations;
+using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Postgres;
+using SoundMastery.DataAccess.Services.SqlServer;
 using SoundMastery.DataAccess.Stores;
 using SoundMastery.Domain.Identity;
-using SoundMastery.Migration.Migrations;
-using SoundMastery.Migration.Services;
+using SoundMastery.Migration.Common;
 
 namespace SoundMastery.Migration
 {
@@ -101,7 +101,7 @@ namespace SoundMastery.Migration
                     await manager.Drop();
                     await manager.EnsureDatabaseCreated();
                     await migrationService.MigrateUp();
-                    await migrationService.ApplySeeds();
+                    await migrationService.ApplySeeds(SeedData.Users);
                     break;
                 case "update":
                     await migrationService.MigrateUp();

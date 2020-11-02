@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using SoundMastery.DataAccess.DatabaseManagement;
+using SoundMastery.DataAccess.Services;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.DataAccess.Stores
@@ -46,7 +46,7 @@ namespace SoundMastery.DataAccess.Stores
             return IdentityResult.Success;
         }
 
-        public Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             return _userRepository.FindByNameAsync(normalizedUserName, cancellationToken);
         }
@@ -61,7 +61,7 @@ namespace SoundMastery.DataAccess.Stores
             return Task.FromResult(user.EmailConfirmed);
         }
 
-        public Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
             return _userRepository.FindByEmailAsync(normalizedEmail, cancellationToken);
         }

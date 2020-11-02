@@ -4,11 +4,10 @@ using System.Threading.Tasks;
 using FluentMigrator.Runner;
 using Microsoft.AspNetCore.Identity;
 using SoundMastery.Domain.Identity;
-using SoundMastery.Migration.Common;
 
-namespace SoundMastery.Migration.Services
+namespace SoundMastery.DataAccess.Services
 {
-    internal class MigrationService : IMigrationService
+    public class MigrationService : IMigrationService
     {
         private readonly IMigrationRunner _migrationRunner;
         private readonly IUserStore<User> _userStore;
@@ -25,9 +24,9 @@ namespace SoundMastery.Migration.Services
             return Task.CompletedTask;
         }
 
-        public Task ApplySeeds()
+        public Task ApplySeeds(User[] users)
         {
-            return Task.WhenAll(SeedData.Users.Select(user => _userStore.CreateAsync(user, CancellationToken.None)));
+            return Task.WhenAll(users.Select(user => _userStore.CreateAsync(user, CancellationToken.None)));
         }
     }
 }

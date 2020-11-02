@@ -77,8 +77,26 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target TestBackend => _ => _
+        .DependsOn(CompileBackend)
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(Solution.GetProject("SoundMastery.Tests"))
+                .SetConfiguration(Configuration)
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetLogger("trx")
+                .SetLogOutput(true)
+                .SetArgumentConfigurator(arguments => arguments.Add("/p:CollectCoverage={0}", true)
+                    .Add("/p:CoverletOutput={0}/", ArtifactsDirectory / "coverage")
+                    .Add("/p:UseSourceLink={0}", "true")
+                    .Add("/p:CoverletOutputFormat={0}", "cobertura"))
+                .SetResultsDirectory(ArtifactsDirectory / "tests"));
+        });
+
     Target CompileFrontend => _ => _
-        .After(CompileBackend)
+        .DependsOn(Restore)
         .Executes(() =>
         {
             Npm("i", workingDirectory: FrontendDirectory);

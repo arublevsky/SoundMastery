@@ -28,6 +28,13 @@ jobs:
       - name: RunBuild 
         run: ./build.sh
 
+      - name: 'Upload artifacts'
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-coverage
+          path: ./artifacts
+          retention-days: 5
+
   push_images:
     needs: build
     name: Publish Docker images
