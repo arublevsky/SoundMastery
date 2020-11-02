@@ -41,6 +41,10 @@ jobs:
           path: ./artifacts/coverage/coverage.cobertura.xml
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           minimum_coverage: 50
+          show_line: true
+          show_branch: true
+          show_class_names: true
+          only_changed_files: true
 
   push_images:
     needs: build
