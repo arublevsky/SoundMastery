@@ -37,6 +37,7 @@ class Build : NukeBuild
     Target Default => _ => _
         .DependsOn(CompileBackend)
         .DependsOn(CompileFrontend)
+        .DependsOn(TestBackend)
         .Executes(() =>
         {
             // do nothing
