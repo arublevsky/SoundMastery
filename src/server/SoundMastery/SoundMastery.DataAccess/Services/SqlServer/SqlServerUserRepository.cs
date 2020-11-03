@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using SoundMastery.DataAccess.Common;
 using SoundMastery.Domain.Identity;
 
-namespace SoundMastery.DataAccess.DatabaseManagement.SqlServer
+namespace SoundMastery.DataAccess.Services.SqlServer
 {
     public class SqlServerUserRepository : IUserRepository
     {
@@ -26,7 +26,7 @@ namespace SoundMastery.DataAccess.DatabaseManagement.SqlServer
             await connection.QueryAsync(sql, user);
         }
 
-        public async Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        public async Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
             await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
@@ -34,7 +34,7 @@ namespace SoundMastery.DataAccess.DatabaseManagement.SqlServer
             return await connection.QuerySingleAsync<User>(sql, new { normalizedUserName });
         }
 
-        public async Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        public async Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
         {
             await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);

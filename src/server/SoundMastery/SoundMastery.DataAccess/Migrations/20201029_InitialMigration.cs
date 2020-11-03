@@ -1,10 +1,10 @@
 using FluentMigrator;
-using SoundMastery.DataAccess.DatabaseManagement;
+using SoundMastery.DataAccess.Services;
 
-namespace SoundMastery.Migration.Migrations
+namespace SoundMastery.DataAccess.Migrations
 {
     [Migration(20201029)]
-    public class InitialMigration : FluentMigrator.Migration
+    public class InitialMigration : Migration
     {
         private readonly DatabaseEngineAccessor _accessor;
 

@@ -1,15 +1,15 @@
 using System.Threading.Tasks;
 
-namespace SoundMastery.DataAccess.DatabaseManagement
+namespace SoundMastery.DataAccess.Services
 {
     public interface IDatabaseManager
     {
         Task EnsureDatabaseCreated();
 
-        Task CreateDatabase();
-
         Task CheckConnection();
 
         Task Drop();
+
+        Task<bool> DatabaseExists();
     }
 }

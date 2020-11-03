@@ -1,11 +1,12 @@
 using System.Threading.Tasks;
+using SoundMastery.Domain.Identity;
 
-namespace SoundMastery.Migration.Services
+namespace SoundMastery.DataAccess.Services
 {
     public interface IMigrationService
     {
         Task MigrateUp();
 
-        Task ApplySeeds();
+        Task ApplySeeds(User[] users);
     }
 }

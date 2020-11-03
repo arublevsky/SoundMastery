@@ -1,4 +1,4 @@
-INSERT INTO "SoundMastery"."Users" (
+INSERT INTO SoundMastery.Users (
      "UserName",
      "NormalizedUserName",
      "Email",

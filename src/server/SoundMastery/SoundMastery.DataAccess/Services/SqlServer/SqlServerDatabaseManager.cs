@@ -4,29 +4,29 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SoundMastery.DataAccess.Common;
 
-namespace SoundMastery.DataAccess.DatabaseManagement.SqlServer
+namespace SoundMastery.DataAccess.Services.SqlServer
 {
     public class SqlServerDatabaseManager : IDatabaseManager
     {
-        private readonly string _serverConnectionString;
+        private readonly string _connectionString;
         private const string SqlPath = "Sql.SqlServer.DatabaseManagement";
 
         public SqlServerDatabaseManager(IConfiguration configuration)
         {
-            _serverConnectionString = configuration.GetConnectionString("SqlServerServerConnection");
+            _connectionString = configuration.GetConnectionString("SqlServerServerConnection");
         }
 
         public async Task EnsureDatabaseCreated()
         {
-            if (!await DbExists())
+            if (!await DatabaseExists())
             {
                 await CreateDatabase();
             }
         }
 
-        public async Task<bool> DbExists()
+        public async Task<bool> DatabaseExists()
         {
-            await using var conn = new SqlConnection(_serverConnectionString);
+            await using var conn = new SqlConnection(_connectionString);
             string sql = EmbeddedResource.GetAsString("CheckDatabaseExists.sql", SqlPath);
 
             await using var command = new SqlCommand(sql, conn);
@@ -45,29 +45,11 @@ namespace SoundMastery.DataAccess.DatabaseManagement.SqlServer
             }
         }
 
-        public async Task CreateDatabase()
-        {
-            await using var conn = new SqlConnection(_serverConnectionString);
-            string sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
-
-            await using SqlCommand command = new SqlCommand(sql, conn);
-            try
-            {
-                await conn.OpenAsync();
-                await command.ExecuteScalarAsync();
-                await conn.CloseAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-        }
-
         public async Task CheckConnection()
         {
             try
             {
-                await using var conn = new SqlConnection(_serverConnectionString);
+                await using var conn = new SqlConnection(_connectionString);
                 await using SqlCommand command = new SqlCommand("SELECT 1", conn);
                 await conn.OpenAsync();
                 await command.ExecuteScalarAsync();
@@ -83,11 +65,30 @@ namespace SoundMastery.DataAccess.DatabaseManagement.SqlServer
         {
             var sql = EmbeddedResource.GetAsString("DropDatabase.sql", SqlPath);
 
-            await using var conn = new SqlConnection(_serverConnectionString);
+            await using var conn = new SqlConnection(_connectionString);
             await using SqlCommand command = new SqlCommand(sql, conn);
             await conn.OpenAsync();
             await command.ExecuteScalarAsync();
             await conn.CloseAsync();
+        }
+
+        private async Task CreateDatabase()
+        {
+            await using var conn = new SqlConnection(_connectionString);
+            string sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
+
+            await using SqlCommand command = new SqlCommand(sql, conn);
+            try
+            {
+                await conn.OpenAsync();
+                await command.ExecuteScalarAsync();
+                await conn.CloseAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
         }
     }
 }

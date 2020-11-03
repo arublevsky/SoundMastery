@@ -9,9 +9,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using SoundMastery.DataAccess.DatabaseManagement;
-using SoundMastery.DataAccess.DatabaseManagement.Postgres;
-using SoundMastery.DataAccess.DatabaseManagement.SqlServer;
+using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Postgres;
+using SoundMastery.DataAccess.Services.SqlServer;
 using SoundMastery.DataAccess.Stores;
 using SoundMastery.Domain.Identity;
 

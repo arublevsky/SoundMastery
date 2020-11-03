@@ -1,4 +1,4 @@
-namespace SoundMastery.DataAccess.DatabaseManagement
+namespace SoundMastery.DataAccess.Services
 {
     public enum DatabaseEngine
     {

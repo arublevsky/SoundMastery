@@ -4,41 +4,23 @@ using Microsoft.Extensions.Configuration;
 using Npgsql;
 using EmbeddedResource = SoundMastery.DataAccess.Common.EmbeddedResource;
 
-namespace SoundMastery.DataAccess.DatabaseManagement.Postgres
+namespace SoundMastery.DataAccess.Services.Postgres
 {
     public class PgsqlDatabaseManager : IDatabaseManager
     {
-        private readonly string _serverConnectionString;
+        private readonly string _connectionString;
         private const string SqlPath = "Sql.Postgres.DatabaseManagement";
 
         public PgsqlDatabaseManager(IConfiguration configuration)
         {
-            _serverConnectionString = configuration.GetConnectionString("PostgresServerConnection");
+            _connectionString = configuration.GetConnectionString("PostgresServerConnection");
         }
 
         public async Task EnsureDatabaseCreated()
         {
-            if (!await DbExists())
+            if (!await DatabaseExists())
             {
                 await CreateDatabase();
-            }
-        }
-
-        public async Task CreateDatabase()
-        {
-            await using var conn = new NpgsqlConnection(_serverConnectionString);
-            string sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
-
-            await using var command = new NpgsqlCommand(sql, conn);
-            try
-            {
-                await conn.OpenAsync();
-                await command.ExecuteScalarAsync();
-                await conn.CloseAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
             }
         }
 
@@ -46,7 +28,7 @@ namespace SoundMastery.DataAccess.DatabaseManagement.Postgres
         {
             try
             {
-                await using var conn = new NpgsqlConnection(_serverConnectionString);
+                await using var conn = new NpgsqlConnection(_connectionString);
                 await using var command = new NpgsqlCommand("SELECT 1", conn);
                 await conn.OpenAsync();
                 await command.ExecuteScalarAsync();
@@ -64,9 +46,9 @@ namespace SoundMastery.DataAccess.DatabaseManagement.Postgres
             await DropDatabase();
         }
 
-        private async Task<bool> DbExists()
+        public async Task<bool> DatabaseExists()
         {
-            await using var conn = new NpgsqlConnection(_serverConnectionString);
+            await using var conn = new NpgsqlConnection(_connectionString);
             string sql = EmbeddedResource.GetAsString("CheckDatabaseExists.sql", SqlPath);
 
             await using var command = new NpgsqlCommand(sql, conn);
@@ -85,13 +67,32 @@ namespace SoundMastery.DataAccess.DatabaseManagement.Postgres
             }
         }
 
+        private async Task CreateDatabase()
+        {
+            await using var conn = new NpgsqlConnection(_connectionString);
+            string sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
+
+            await using var command = new NpgsqlCommand(sql, conn);
+            try
+            {
+                await conn.OpenAsync();
+                await command.ExecuteScalarAsync();
+                await conn.CloseAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
+        }
+
         private async Task DropDatabaseConnections()
         {
             var sql = EmbeddedResource.GetAsString("DropConnections.sql", SqlPath);
 
             try
             {
-                await using var conn = new NpgsqlConnection(_serverConnectionString);
+                await using var conn = new NpgsqlConnection(_connectionString);
                 await conn.OpenAsync();
                 await using var command = new NpgsqlCommand(sql, conn);
                 await command.ExecuteScalarAsync();
@@ -106,7 +107,7 @@ namespace SoundMastery.DataAccess.DatabaseManagement.Postgres
         {
             var sql = EmbeddedResource.GetAsString("DropDatabase.sql", SqlPath);
 
-            await using var conn = new NpgsqlConnection(_serverConnectionString);
+            await using var conn = new NpgsqlConnection(_connectionString);
             await using var command = new NpgsqlCommand(sql, conn);
             await conn.OpenAsync();
             await command.ExecuteScalarAsync();

@@ -28,6 +28,24 @@ jobs:
       - name: RunBuild 
         run: ./build.sh
 
+      - name: 'Upload artifacts'
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-coverage
+          path: ./artifacts
+          retention-days: 5
+
+      - name: Coverage report 
+        uses: 5monkeys/cobertura-action@master
+        with:
+          path: ./artifacts/coverage/coverage.cobertura.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          minimum_coverage: 50
+          show_line: true
+          show_branch: true
+          show_class_names: true
+          only_changed_files: true
+
   push_images:
     needs: build
     name: Publish Docker images
