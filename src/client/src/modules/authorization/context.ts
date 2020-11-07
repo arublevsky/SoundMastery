@@ -1,11 +1,11 @@
 import { createContext, useContext } from "react";
 import { TokenAuthorizationResult } from "./authorizationApi";
 
-export interface AuthorizationContext extends TokenAuthorizationResult {
-    onLogin: (data: TokenAuthorizationResult) => void;
-    onLogout: () => void;
+export interface AuthorizationContext {
+    onLoggedIn: (data: TokenAuthorizationResult) => void;
+    onLoggedOut: () => void;
     isAuthorized: () => boolean;
 }
 
 export const AuthorizationContext = createContext<AuthorizationContext>(null);
-export const useAuthorization = () => useContext(AuthorizationContext);
+export const useAuthContext = () => useContext(AuthorizationContext);

@@ -31,7 +31,7 @@ namespace SoundMastery.DataAccess.Services.SqlServer
             await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
             var sql = EmbeddedResource.GetAsString("FindUserByName.sql", SqlPath);
-            return await connection.QuerySingleAsync<User>(sql, new { normalizedUserName });
+            return await connection.QuerySingleOrDefaultAsync<User>(sql, new { normalizedUserName });
         }
 
         public async Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
@@ -39,7 +39,7 @@ namespace SoundMastery.DataAccess.Services.SqlServer
             await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
             var sql = EmbeddedResource.GetAsString("FindUserByEmail.sql", SqlPath);
-            return await connection.QuerySingleAsync<User>(sql, new { normalizedEmail });
+            return await connection.QuerySingleOrDefaultAsync<User>(sql, new { normalizedEmail });
         }
     }
 }

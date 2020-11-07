@@ -1,6 +1,6 @@
 import { authService } from "../authorization/authtorizationService";
 
-const baseApiRoute = "http://localhost:5000/api/"
+const baseApiRoute = "http://localhost:5000/api/";
 
 interface Options {
     silent?: boolean;
@@ -46,7 +46,7 @@ const request = async <T extends unknown>(
             method,
         });
     } catch (error) {
-        // TODO client logging
+        // TODO client logging https://github.com/arublevsky/SoundMastery/issues/24
         console.error(error);
         throw error;
     } finally {
@@ -80,10 +80,16 @@ const getContentTypeHeader = (options?: RequestOptions) => {
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
     const text = await response.text();
+    if (!response.ok) {
+        // TODO client logging https://github.com/arublevsky/SoundMastery/issues/24
+        throw new Error(text);
+    }
+
     return text ? JSON.parse(text) : {};
 };
 
 // TODO implement loading animation on requests
+// https://github.com/arublevsky/SoundMastery/issues/25
 const toggleLoading = (show: boolean, silent = false) => {
     if (silent) {
         return;
@@ -94,4 +100,4 @@ const toggleLoading = (show: boolean, silent = false) => {
     } else {
         // loading.hide();
     }
-}
+};
