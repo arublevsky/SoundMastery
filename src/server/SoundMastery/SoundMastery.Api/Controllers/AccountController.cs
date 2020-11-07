@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Domain.Identity;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace SoundMastery.Api.Controllers
 {
@@ -31,16 +32,23 @@ namespace SoundMastery.Api.Controllers
         [AllowAnonymous]
         [Route("login")]
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginUserModel loginModel)
+        public async Task<IActionResult> Login([FromBody] LoginUserModel model)
         {
-            var loginResult = await _signInManager.PasswordSignInAsync(loginModel.Username, loginModel.Password, false, false);
-
-            if (!loginResult.Succeeded)
+            if (string.IsNullOrWhiteSpace(model.Username) ||
+                string.IsNullOrWhiteSpace(model.Username))
             {
                 return BadRequest();
             }
 
-            var user = await _userManager.FindByNameAsync(loginModel.Username);
+            SignInResult? result =
+                await _signInManager.PasswordSignInAsync(model.Username, model.Password, false, false);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            var user = await _userManager.FindByNameAsync(model.Username);
 
             return Ok(GetTokenResult(user.UserName));
         }

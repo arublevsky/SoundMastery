@@ -4,14 +4,24 @@
         "react"
     ],
     "rules": {
-        // disable the rule for all files
-        "@typescript-eslint/explicit-module-boundary-types": 0
+        "@typescript-eslint/explicit-module-boundary-types": 0,
+        "@typescript-eslint/no-unused-vars": 2,
+        "react/prop-types": 0,
+        "semi": 2,
+        "react-hooks/exhaustive-deps": 0,
     },
     "extends": [
         "eslint:recommended",
         "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended"
+        "plugin:@typescript-eslint/recommended",
+        "plugin:react-hooks/recommended"
     ],
+    "settings": {
+        "react": {
+            "pragma": "React",
+            "version": "detect"
+        }
+    },
     "env": {
         "browser": true,
         "node": true
