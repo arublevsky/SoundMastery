@@ -34,8 +34,7 @@ namespace SoundMastery.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginUserModel model)
         {
-            if (string.IsNullOrWhiteSpace(model.Username) ||
-                string.IsNullOrWhiteSpace(model.Username))
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
@@ -58,10 +57,7 @@ namespace SoundMastery.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterUserModel model)
         {
-            if (string.IsNullOrWhiteSpace(model.FirstName) ||
-                string.IsNullOrWhiteSpace(model.LastName) ||
-                string.IsNullOrWhiteSpace(model.Email) ||
-                string.IsNullOrWhiteSpace(model.Password))
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
@@ -69,16 +65,17 @@ namespace SoundMastery.Api.Controllers
             var user = new User
             {
                 UserName = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email
+                FirstName = model.FirstName!,
+                LastName = model.LastName!,
+                Email = model.Email,
+                EmailConfirmed = true
             };
 
             var identityResult = await _userManager.CreateAsync(user, model.Password);
             if (identityResult.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok(GetTokenResult(user.Email));
+                return Ok(GetTokenResult(user.Email!));
             }
 
             return BadRequest(identityResult.Errors);
@@ -95,7 +92,7 @@ namespace SoundMastery.Api.Controllers
 
         private TokenAuthorizationResult GetTokenResult(string userName)
         {
-            var expiresIn = double.Parse(_config["Jwt:ExpirationInMinutes"]);
+            var expiresIn = int.Parse(_config["Jwt:ExpirationInMinutes"]);
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -111,8 +108,8 @@ namespace SoundMastery.Api.Controllers
                 expires: DateTime.Now.AddMinutes(expiresIn),
                 signingCredentials: credentials);
 
-            var tokenResult = new JwtSecurityTokenHandler().WriteToken(token);
-            return new TokenAuthorizationResult(tokenResult, expiresIn);
+            var result = new JwtSecurityTokenHandler().WriteToken(token);
+            return new TokenAuthorizationResult(result, expiresIn);
         }
     }
 }

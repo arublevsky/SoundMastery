@@ -1,8 +1,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using SoundMastery.DataAccess.Services;
-using SoundMastery.DataAccess.Services.Postgres;
-using SoundMastery.DataAccess.Services.SqlServer;
 
 namespace SoundMastery.Tests.DataAccess.Builders
 {
@@ -23,12 +21,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
                 throw new InvalidOperationException("Configuration is not specified");
             }
 
-            return engine switch
-            {
-                DatabaseEngine.Postgres => new PgsqlUserRepository(_configuration),
-                DatabaseEngine.SqlServer => new SqlServerUserRepository(_configuration),
-                _ => throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}")
-            };
+            return new UserRepository(() => engine, _configuration);
         }
     }
 }

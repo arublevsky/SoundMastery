@@ -24,11 +24,13 @@
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropDatabase.sql" />
       <EmbeddedResource Include="Sql\Postgres\Users\CreateUser.sql" />
       <EmbeddedResource Include="Sql\Postgres\Users\FindUserByEmail.sql" />
+      <EmbeddedResource Include="Sql\Postgres\Users\UpdateUser.sql" />
       <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CheckDatabaseExists.sql" />
       <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CreateDatabase.sql" />
       <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\DropDatabase.sql" />
       <EmbeddedResource Include="Sql\SqlServer\Users\CreateUser.sql" />
       <EmbeddedResource Include="Sql\SqlServer\Users\FindUserByEmail.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\Users\UpdateUser.sql" />
       <None Remove="Sql\Postgres\Users\FindUserByName.sql" />
       <EmbeddedResource Include="Sql\Postgres\Users\FindUserByName.sql" />
       <None Remove="Sql\SqlServer\Users\FindUserByName.sql" />

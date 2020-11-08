@@ -3,6 +3,7 @@ using DotNet.Testcontainers.Containers.Modules.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using SoundMastery.DataAccess.Services;
+using SoundMastery.Tests.Extensions;
 
 namespace SoundMastery.Tests.DataAccess.Builders
 {
@@ -29,15 +30,13 @@ namespace SoundMastery.Tests.DataAccess.Builders
             if (engine == DatabaseEngine.Postgres)
             {
                 csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
-                csSection.SetupGet(p => p["PostgresServerConnection"])
-                    .Returns(_container.ConnectionString.Replace("Database=soundmastery;", ""));
+                csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
             }
 
             if (engine == DatabaseEngine.SqlServer)
             {
                 csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
-                csSection.SetupGet(p => p["SqlServerServerConnection"])
-                    .Returns(_container.ConnectionString.Replace("Database=soundmastery;", ""));
+                csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
             }
 
             configuration.Setup(config => config.GetSection("ConnectionStrings")).Returns(csSection.Object);

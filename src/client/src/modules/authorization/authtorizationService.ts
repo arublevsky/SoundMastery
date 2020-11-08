@@ -2,8 +2,13 @@ import { TokenAuthorizationResult } from "./authorizationApi";
 
 const localStorageKey = "userTokenKey";
 
+
+export interface UserAuthorizationInfo extends TokenAuthorizationResult {
+    loggedInAt: number;
+}
+
 export class AuthorizationService {
-    public getAuthData = (): TokenAuthorizationResult => {
+    public get = (): UserAuthorizationInfo => {
         const data = localStorage.getItem(localStorageKey);
         if (data) {
             return JSON.parse(data);
@@ -12,12 +17,12 @@ export class AuthorizationService {
         return null;
     }
 
-    public setAuthData = (data: TokenAuthorizationResult) => {
+    public set = (data: UserAuthorizationInfo) => {
         localStorage.setItem(localStorageKey, JSON.stringify(data));
     }
 
     public getAuthHeader = () => {
-        const data = this.getAuthData();
+        const data = this.get();
         if (data && data.token) {
             return `Bearer ${data.token}`;
         }
@@ -25,7 +30,7 @@ export class AuthorizationService {
         return null;
     }
 
-    public removeAuthData = () => {
+    public clear = () => {
         localStorage.removeItem(localStorageKey);
     }
 }

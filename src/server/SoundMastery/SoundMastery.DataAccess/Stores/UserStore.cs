@@ -73,22 +73,26 @@ namespace SoundMastery.DataAccess.Stores
 
         public Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            user.NormalizedEmail = normalizedEmail;
+            return Task.CompletedTask;
         }
 
         public Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            user.PasswordHash = passwordHash;
+            return Task.CompletedTask;
         }
 
         public Task SetEmailAsync(User user, string email, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            user.Email = email;
+            return Task.CompletedTask;
         }
 
-        public Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
+        public async Task<IdentityResult> UpdateAsync(User user, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            await _userRepository.UpdateAsync(user, cancellationToken);
+            return IdentityResult.Success;
         }
 
         public Task<IdentityResult> DeleteAsync(User user, CancellationToken cancellationToken)
@@ -103,17 +107,20 @@ namespace SoundMastery.DataAccess.Stores
 
         public Task SetUserNameAsync(User user, string userName, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            user.UserName = userName;
+            return Task.CompletedTask;
         }
 
         public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            user.NormalizedUserName = normalizedName;
+            return Task.CompletedTask;
         }
 
         public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            user.EmailConfirmed = confirmed;
+            return Task.CompletedTask;
         }
 
         public void Dispose()

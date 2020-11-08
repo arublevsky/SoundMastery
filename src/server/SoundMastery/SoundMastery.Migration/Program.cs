@@ -18,20 +18,20 @@ namespace SoundMastery.Migration
 {
     public class Program
     {
-        public static IConfiguration? Configuration { get; set; }
+        private static IConfiguration? Configuration { get; set; }
 
         public static async Task Main(string[] args)
         {
             var (command, engine) = ParseParameters(args);
 
-            var serviceProvider = CreateServices(engine);
+            var serviceProvider = CreateServices(args, engine);
             using IServiceScope scope = serviceProvider.CreateScope();
             await HandleCommand(command, scope);
         }
 
-        private static IServiceProvider CreateServices(DatabaseEngine engine)
+        private static IServiceProvider CreateServices(string[] args, DatabaseEngine engine)
         {
-            Configuration = ConfigurationFactory.Create();
+            Configuration = ConfigurationFactory.Create(args);
 
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
@@ -74,15 +74,16 @@ namespace SoundMastery.Migration
             {
                 case DatabaseEngine.Postgres:
                     services.AddTransient<IDatabaseManager, PgsqlDatabaseManager>();
-                    services.AddTransient<IUserRepository, PgsqlUserRepository>();
+
                     break;
                 case DatabaseEngine.SqlServer:
                     services.AddTransient<IDatabaseManager, SqlServerDatabaseManager>();
-                    services.AddTransient<IUserRepository, SqlServerUserRepository>();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}");
             }
+
+            services.AddTransient<IUserRepository, UserRepository>();
         }
 
         private static async Task HandleCommand(string command, IServiceScope scope)

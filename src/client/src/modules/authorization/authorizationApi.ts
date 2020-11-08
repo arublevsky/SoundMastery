@@ -1,6 +1,12 @@
 import { httpPost } from "../common/requestApi";
+import { RegisterUserModel } from "./accountService";
 
 const apiController = "account";
+
+export interface TokenAuthorizationResult {
+    expiresInMilliseconds: number;
+    token: string;
+}
 
 export const login = async (username: string, password: string) => {
     return httpPost<TokenAuthorizationResult>(`${apiController}/login`, {
@@ -8,7 +14,8 @@ export const login = async (username: string, password: string) => {
     });
 };
 
-export interface TokenAuthorizationResult {
-    expiresInMilliseconds: number;
-    token: string;
-}
+export const register = async (body: RegisterUserModel) => {
+    return httpPost<TokenAuthorizationResult>(`${apiController}/register`, {
+        body: body
+    });
+};
