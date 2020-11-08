@@ -6,7 +6,11 @@ import {
     Container,
     makeStyles
 } from '@material-ui/core';
-import RegisterForm from './registerForm';
+import RegisterForm, { RegisterFormData } from './registerForm';
+import { registerUser } from '../../modules/authorization/accountService';
+import { useErrorHandling } from '../errors/useErrorHandling';
+import { ErrorAlert } from '../errors/errorAlert';
+import { useAuthContext } from '../../modules/authorization/context';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,17 +24,23 @@ const useStyles = makeStyles((theme) => ({
 const RegisterView = () => {
     const classes = useStyles();
     const navigate = useNavigate();
+    const { onLoggedIn } = useAuthContext();
 
-    const handleRegister = () => {
-        navigate('/admin/dashboard', { replace: true });
-        return Promise.resolve();
+    const [showError, _, errors, asyncHandler] = useErrorHandling();
+
+    const handleRegister = async (data: RegisterFormData) => {
+        await asyncHandler(async () => {
+            const result = await registerUser(data);
+            onLoggedIn(result);
+            navigate('/admin/dashboard');
+        });
     };
 
     return (
         <Page className={classes.root} title="Register">
-            <Box
-                display="flex" flexDirection="column" height="100%" justifyContent="center">
+            <Box display="flex" flexDirection="column" height="100%" justifyContent="center">
                 <Container maxWidth="sm">
+                    <ErrorAlert show={showError} errors={errors} title={"Registration failed"} />
                     <RegisterForm handleRegister={handleRegister} />
                 </Container>
             </Box>

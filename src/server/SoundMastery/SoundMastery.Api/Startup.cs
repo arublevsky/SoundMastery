@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using SoundMastery.Application.Profile;
+using SoundMastery.Application.Validation;
 using SoundMastery.DataAccess.Services;
 using SoundMastery.DataAccess.Services.Postgres;
 using SoundMastery.DataAccess.Services.SqlServer;
@@ -41,7 +44,9 @@ namespace SoundMastery.Api
                 });
 
             services.AddTransient<IUserStore<User>, UserStore>();
+            services.AddTransient<IUserEmailStore<User>, UserStore>();
             services.AddTransient<IRoleStore<Role>, RoleStore>();
+            services.AddTransient<IUserProfileService, UserProfileService>();
             RegisterDatabaseSpecificDependencies(services);
 
             services.AddIdentity<User, Role>().AddDefaultTokenProviders();
@@ -91,7 +96,13 @@ namespace SoundMastery.Api
                 options.SignIn.RequireConfirmedEmail = true;
             });
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddMvc()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining<UserProfileValidator>();
+                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,5 +11,7 @@ namespace SoundMastery.DataAccess.Services
         Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken);
 
         Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken);
+
+        Task UpdateAsync(User user, CancellationToken cancellationToken);
     }
 }

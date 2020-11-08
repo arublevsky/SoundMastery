@@ -1,22 +1,21 @@
 import React from "react";
 import { ThemeProvider } from '@material-ui/core/styles';
 import { useRoutes } from "react-router-dom";
-import { AuthorizationContext } from "./modules/authorization/context";
-import { authRoutes, publicRoutes } from "./routes";
-import { useAuthorization } from "./modules/authorization/useAuthorization";
+import { publicRoutes, protectedRoutes } from "./routes";
 import theme from './theme';
+import { useAuthContext } from "./modules/authorization/context";
+import AppContentLoader from "./components/appContentLoader";
 
 export const App = () => {
-    const { onLoggedIn, onLoggedOut, isAuthorized } = useAuthorization();
-    const authRouting = useRoutes(authRoutes);
-    const publicRouting = useRoutes(publicRoutes);
-
-    const routes = isAuthorized() ? authRouting : publicRouting;
+    const { isAuthenticated, isLoading } = useAuthContext();
+    const routing = isLoading ? [] : (isAuthenticated ? protectedRoutes : publicRoutes);
+    const routes = useRoutes(routing);
 
     return (
-        <AuthorizationContext.Provider value={{ onLoggedIn, onLoggedOut, isAuthorized }}>
-            <ThemeProvider theme={theme}>
-                {routes}
-            </ThemeProvider>
-        </AuthorizationContext.Provider>);
+        <ThemeProvider theme={theme}>
+            {isLoading && <AppContentLoader />}
+            {routes}
+        </ThemeProvider>
+    );
 };
+

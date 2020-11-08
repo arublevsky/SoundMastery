@@ -1,15 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Box,
-    Container,
-    makeStyles
-} from '@material-ui/core';
+import { Box, Container, makeStyles } from '@material-ui/core';
 import Page from '../../components/page';
 import LoginForm from './loginForm';
 import { login } from '../../modules/authorization/authorizationApi';
 import { useAuthContext } from '../../modules/authorization/context';
-import { Alert, AlertTitle } from '@material-ui/lab';
+import { useErrorHandling } from '../errors/useErrorHandling';
+import { ErrorAlert } from '../errors/errorAlert';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,17 +21,14 @@ const LoginView = () => {
     const classes = useStyles();
     const navigate = useNavigate();
     const { onLoggedIn } = useAuthContext();
-    const [error, setError] = useState(false);
+    const [showError, _, errors, asyncHandler] = useErrorHandling(false);
 
     const handleFormLogin = async (email: string, password: string) => {
-        try {
+        await asyncHandler(async () => {
             const result = await login(email, password);
             onLoggedIn(result);
             navigate("/admin/dashboard");
-        } catch (error) {
-            // https://github.com/arublevsky/SoundMastery/issues/24
-            setError(true);
-        }
+        });
     };
 
     const handleFacebookLogin = () => Promise.resolve();
@@ -44,11 +38,7 @@ const LoginView = () => {
         <Page className={classes.root} title="Login">
             <Box display="flex" flexDirection="column" height="100%" justifyContent="center">
                 <Container maxWidth="sm">
-                    {error &&
-                        <Alert severity="error">
-                            <AlertTitle>Login attempt failed</AlertTitle>
-                                Invalid credentials, please try again.
-                        </Alert>}
+                    <ErrorAlert show={showError} errors={errors} title={"Login failed"} />
                     <LoginForm
                         handleFormLogin={handleFormLogin}
                         handleFacebookLogin={handleFacebookLogin}

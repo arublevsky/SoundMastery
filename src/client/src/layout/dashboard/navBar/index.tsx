@@ -14,6 +14,7 @@ import {
 
 import NavItem from './navItem';
 import navItems from './navItems';
+import { useAuthContext } from '../../../modules/authorization/context';
 
 const currentUser = {
     avatar: '/static/images/avatars/avatar_6.png',
@@ -46,6 +47,7 @@ interface Props {
 const NavBar = ({ onMobileClose, openMobile }: Props) => {
     const classes = useStyles();
     const location = useLocation();
+    const { userProfile } = useAuthContext();
 
     useEffect(() => {
         if (openMobile && onMobileClose) {
@@ -68,7 +70,7 @@ const NavBar = ({ onMobileClose, openMobile }: Props) => {
                     to="/admin/account"
                 />
                 <Typography className={classes.avatar} color="textPrimary" variant="h5">
-                    {currentUser.name}
+                    {userProfile.firstName} {userProfile.lastName}
                 </Typography>
                 <Typography color="textSecondary" variant="body2">
                     {currentUser.jobTitle}

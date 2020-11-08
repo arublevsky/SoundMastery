@@ -6,15 +6,16 @@ import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
+import { Link as RouterLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
-import { useAuthorization } from '../../modules/authorization/useAuthorization';
 import { useNavigate } from 'react-router-dom';
 import { footers, tiers } from './content';
 import Tiers from './tiers';
 import Footer from './footer';
 import Copyright from './copyright';
+import { useAuthContext } from '../../modules/authorization/context';
 
 const useStyles = makeStyles((theme) => ({
     '@global': {
@@ -54,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 const Public = () => {
     const classes = useStyles();
     const navigate = useNavigate();
-    const { onLoggedOut, isAuthorized } = useAuthorization();
+    const { isAuthenticated, onLoggedOut } = useAuthContext();
 
     const handleLogout = () => {
         onLoggedOut();
@@ -80,15 +81,16 @@ const Public = () => {
                         <Link variant="button" color="textPrimary" href="#" className={classes.link}>
                             Enterprise
                         </Link>
-                        <Link variant="button" color="textPrimary" href="#" className={classes.link}>
-                            Support
-                        </Link>
+                        {isAuthenticated &&
+                            <Link component={RouterLink} to="/admin" variant="button" color="textPrimary" className={classes.link}>
+                                Administration
+                            </Link>}
                     </nav>
-                    {!isAuthorized() &&
+                    {!isAuthenticated &&
                         <Button color="primary" className={classes.link} onClick={handleLogin}>
                             Login
                         </Button>}
-                    {isAuthorized() &&
+                    {isAuthenticated &&
                         <Button color="primary" className={classes.link} onClick={handleLogout}>
                             Logout
                         </Button>}

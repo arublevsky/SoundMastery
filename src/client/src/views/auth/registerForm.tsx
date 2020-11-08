@@ -12,7 +12,7 @@ import {
     Typography
 } from '@material-ui/core';
 
-interface FormData {
+export interface RegisterFormData {
     email: string;
     firstName: string;
     lastName: string;
@@ -21,11 +21,11 @@ interface FormData {
 }
 
 interface Props {
-    handleRegister: (formData: FormData) => Promise<void>
+    handleRegister: (formData: RegisterFormData) => Promise<void>
 }
 
 const RegisterForm = ({ handleRegister }: Props) => (
-    <Formik<FormData>
+    <Formik<RegisterFormData>
         initialValues={{
             email: '',
             firstName: '',
@@ -150,8 +150,7 @@ const RegisterForm = ({ handleRegister }: Props) => (
                         </Button>
                     </Box>
                     <Typography color="textSecondary" variant="body1">
-                        Have an account?
-                                        {' '}
+                        Have an account?{' '}
                         <Link component={RouterLink} to="/login" variant="h6">
                             Sign in
                         </Link>

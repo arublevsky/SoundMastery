@@ -18,28 +18,40 @@ namespace SoundMastery.DataAccess.Services.SqlServer
             _connectionString = configuration.GetConnectionString("SqlServerDatabaseConnection");
         }
 
-        public async Task CreateAsync(User user, CancellationToken cancellationToken)
+        public Task CreateAsync(User user, CancellationToken cancellationToken)
+        {
+            return ExecuteUserQuery("CreateUser.sql", user, cancellationToken);
+        }
+
+        public Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        {
+            return ExecuteUserSingleQuery("FindUserByName.sql", new { normalizedUserName }, cancellationToken);
+        }
+
+        public Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            return ExecuteUserSingleQuery("FindUserByEmail.sql", new { normalizedEmail }, cancellationToken);
+        }
+
+        public Task UpdateAsync(User user, CancellationToken cancellationToken)
+        {
+            return ExecuteUserQuery("UpdateUser.sql", user, cancellationToken);
+        }
+
+        private async Task ExecuteUserQuery(string sqlName, User user, CancellationToken cancellationToken)
         {
             await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
-            var sql = EmbeddedResource.GetAsString("CreateUser.sql", SqlPath);
+            var sql = EmbeddedResource.GetAsString(sqlName, SqlPath);
             await connection.QueryAsync(sql, user);
         }
 
-        public async Task<User?> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
+        private async Task<User?> ExecuteUserSingleQuery(string sqlName, object options, CancellationToken cancellationToken)
         {
             await using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync(cancellationToken);
-            var sql = EmbeddedResource.GetAsString("FindUserByName.sql", SqlPath);
-            return await connection.QuerySingleOrDefaultAsync<User>(sql, new { normalizedUserName });
-        }
-
-        public async Task<User?> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
-        {
-            await using var connection = new SqlConnection(_connectionString);
-            await connection.OpenAsync(cancellationToken);
-            var sql = EmbeddedResource.GetAsString("FindUserByEmail.sql", SqlPath);
-            return await connection.QuerySingleOrDefaultAsync<User>(sql, new { normalizedEmail });
+            var sql = EmbeddedResource.GetAsString(sqlName, SqlPath);
+            return await connection.QuerySingleOrDefaultAsync<User>(sql, options);
         }
     }
 }
