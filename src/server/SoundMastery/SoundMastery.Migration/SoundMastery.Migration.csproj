@@ -25,10 +25,6 @@
       </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services" />
-    </ItemGroup>
-
     <PropertyGroup>
         <Nullable>enable</Nullable>
     </PropertyGroup>
