@@ -1,21 +1,23 @@
 using FluentMigrator;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Common;
+using SoundMastery.DataAccess.Services.Common;
 
 namespace SoundMastery.DataAccess.Migrations
 {
     [Migration(20201029)]
     public class InitialMigration : Migration
     {
-        private readonly DatabaseEngineAccessor _accessor;
+        private readonly IDatabaseConnectionService _connectionService;
 
-        public InitialMigration(DatabaseEngineAccessor accessor)
+        public InitialMigration(IDatabaseConnectionService connectionService)
         {
-            _accessor = accessor;
+            _connectionService = connectionService;
         }
 
         public override void Up()
         {
-            if (_accessor() == DatabaseEngine.Postgres)
+            var engine = _connectionService.GetDatabaseEngine();
+            if (engine == DatabaseEngine.Postgres)
             {
                 Execute.Sql(@"CREATE EXTENSION IF NOT EXISTS ""uuid-ossp""");
             }

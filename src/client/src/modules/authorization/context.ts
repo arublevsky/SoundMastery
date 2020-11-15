@@ -3,7 +3,7 @@ import { UserProfile } from "../profile/profileApi";
 import { TokenAuthorizationResult } from "./authorizationApi";
 
 export interface AuthorizationContext {
-    onLoggedIn: (data: TokenAuthorizationResult) => void;
+    onLoggedIn: (data: TokenAuthorizationResult) => Promise<void>;
     onLoggedOut: () => void;
     isAuthenticated: boolean;
     isLoading: boolean;
@@ -14,7 +14,7 @@ export const initialState: AuthorizationContext = {
     isAuthenticated: false,
     isLoading: true,
     userProfile: null,
-    onLoggedIn: () => { /* not initialized */ },
+    onLoggedIn: () => Promise.reject("Authorization context state is not initialized yet"),
     onLoggedOut: () => { /* not initialized */ },
 };
 

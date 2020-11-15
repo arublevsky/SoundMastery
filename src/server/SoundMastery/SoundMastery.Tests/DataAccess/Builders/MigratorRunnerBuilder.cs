@@ -3,14 +3,16 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Conventions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SoundMastery.DataAccess.Common;
 using SoundMastery.DataAccess.Migrations;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Common;
+using SoundMastery.Domain.Services;
 
 namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class MigratorRunnerBuilder
     {
-        private IConfiguration _configuration;
+        private IConfiguration? _configuration;
 
         public MigratorRunnerBuilder With(IConfiguration configuration)
         {
@@ -32,8 +34,10 @@ namespace SoundMastery.Tests.DataAccess.Builders
         private static ServiceProvider CreateServiceProvider(IConfiguration configuration, DatabaseEngine engine)
         {
             return new ServiceCollection()
-                .AddSingleton<DatabaseEngineAccessor>(() => engine)
                 .AddFluentMigratorCore()
+                .AddSingleton(configuration)
+                .AddTransient<ISystemConfigurationService, SystemConfigurationService>()
+                .AddTransient<IDatabaseConnectionService, DatabaseConnectionService>()
                 .AddSingleton<IConventionSet>(new DefaultConventionSet("SoundMastery", workingDirectory: null))
                 .ConfigureRunner(builder => ConfigureMigrationRunner(configuration, engine, builder))
                 .BuildServiceProvider();

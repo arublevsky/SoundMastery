@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Common;
 using SoundMastery.Tests.DataAccess.Builders;
 using Xunit;
 

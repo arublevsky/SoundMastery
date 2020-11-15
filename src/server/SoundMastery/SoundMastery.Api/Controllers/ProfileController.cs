@@ -1,4 +1,3 @@
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,32 +11,32 @@ namespace SoundMastery.Api.Controllers
     [ApiController]
     public class ProfileController : ControllerBase
     {
-        private readonly IUserProfileService _profileService;
+        private readonly IUserService _service;
 
-        public ProfileController(IUserProfileService profileService)
+        public ProfileController(IUserService service)
         {
-            _profileService = profileService;
+            _service = service;
         }
 
         [Route("get-profile")]
         [HttpGet]
-        public async Task<ActionResult<UserProfile>> GetUserProfile(CancellationToken token)
+        public async Task<ActionResult<UserProfile>> GetUserProfile()
         {
             string email = User.GetEmail();
-            UserProfile profile = await _profileService.GetUserProfile(email, token);
+            UserProfile profile = await _service.GetUserProfile(email);
             return Ok(profile);
         }
 
         [Route("save-profile")]
         [HttpPost]
-        public async Task<ActionResult<UserProfile>> SaveUserProfile([FromBody] UserProfile profile, CancellationToken token)
+        public async Task<ActionResult<UserProfile>> SaveUserProfile([FromBody] UserProfile profile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            await _profileService.SaveUserProfile(profile, token);
+            await _service.SaveUserProfile(profile);
             return Ok();
         }
     }

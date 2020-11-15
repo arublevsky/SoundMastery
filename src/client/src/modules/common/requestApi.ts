@@ -1,7 +1,7 @@
-import { authService } from "../authorization/authtorizationService";
+import { authorizationService } from "../authorization/authorizationService";
 import { ApiError } from "./apiErrors";
 
-const baseApiRoute = "http://localhost:5000/api/";
+const baseApiRoute = "https://localhost:5001/api/";
 
 interface Options {
     silent?: boolean;
@@ -38,11 +38,11 @@ const request = async <T extends unknown>(
         toggleLoading(true);
         response = await fetch(baseApiRoute + url, {
             body: getBody(options),
-
+            credentials: 'include',
             headers: {
                 Accept: "application/json",
                 ...getContentTypeHeader(options),
-                "Authorization": authService.getAuthHeader(),
+                "Authorization": authorizationService.getAuthHeader(),
             },
             method,
         });

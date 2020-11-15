@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Npgsql;
+using SoundMastery.DataAccess.Services.Common;
 using EmbeddedResource = SoundMastery.DataAccess.Common.EmbeddedResource;
 
 namespace SoundMastery.DataAccess.Services.Postgres

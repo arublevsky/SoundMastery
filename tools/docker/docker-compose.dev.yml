@@ -6,18 +6,25 @@ services:
     build:
       context: ./../../src/server 
     ports:
-      - '${API_PORT?err}:80'
+      - '${API_PORT?err}:443'
     volumes:
       - ./app/api/Logs:/app/api/Logs
+      - ./../../src/server/https:/https
     environment:
-        - ASPNETCORE_ENVIRONMENT=Production  
         - DB_COMMAND=${DB_COMMAND?err}
+        - ASPNETCORE_ENVIRONMENT=Production
+        - ASPNETCORE_URLS=https://+:443;http://+:80
+        - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_PASSWORD?err}
+        - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
   client:
     image: sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
     ports:
-      - '${CLIENT_PORT?err}:80'
+      - '${CLIENT_PORT?err}:443'    
+    volumes: 
+      - ./../../src/client/ssl:/etc/nginx/certs
+      - ./app/client/Logs:/var/log/nginx/
   db:
     image: postgres
     environment:
