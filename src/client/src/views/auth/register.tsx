@@ -31,7 +31,7 @@ const RegisterView = () => {
     const handleRegister = async (data: RegisterFormData) => {
         await asyncHandler(async () => {
             const result = await registerUser(data);
-            onLoggedIn(result);
+            await onLoggedIn(result);
             navigate('/admin/dashboard');
         });
     };

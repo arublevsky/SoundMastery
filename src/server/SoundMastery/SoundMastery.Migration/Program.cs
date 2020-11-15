@@ -6,12 +6,15 @@ using FluentMigrator.Runner.Conventions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SoundMastery.DataAccess.Common;
+using SoundMastery.DataAccess.IdentityStores;
 using SoundMastery.DataAccess.Migrations;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Postgres;
 using SoundMastery.DataAccess.Services.SqlServer;
-using SoundMastery.DataAccess.Stores;
+using SoundMastery.DataAccess.Services.Users;
 using SoundMastery.Domain.Identity;
+using SoundMastery.Domain.Services;
 using SoundMastery.Migration.Common;
 
 namespace SoundMastery.Migration
@@ -22,16 +25,15 @@ namespace SoundMastery.Migration
 
         public static async Task Main(string[] args)
         {
-            var (command, engine) = ParseParameters(args);
-
-            var serviceProvider = CreateServices(args, engine);
-            using IServiceScope scope = serviceProvider.CreateScope();
-            await HandleCommand(command, scope);
+            using IServiceScope scope = CreateServices(args).CreateScope();
+            await HandleCommand(args.First(), scope);
         }
 
-        private static IServiceProvider CreateServices(string[] args, DatabaseEngine engine)
+        private static IServiceProvider CreateServices(string[] args)
         {
             Configuration = ConfigurationFactory.Create(args);
+
+            DatabaseEngine engine = GetDatabaseEngine();
 
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
@@ -40,7 +42,9 @@ namespace SoundMastery.Migration
                 .AddSingleton(Configuration)
                 .AddSingleton<IConventionSet>(new DefaultConventionSet("SoundMastery", workingDirectory: null))
                 .AddTransient<IUserStore<User>, UserStore>()
-                .AddTransient<IMigrationService, MigrationService>();
+                .AddTransient<IDatabaseConnectionService, DatabaseConnectionService>()
+                .AddTransient<IMigrationService, MigrationService>()
+                .AddTransient<ISystemConfigurationService, SystemConfigurationService>();
 
             RegisterDatabaseSpecificDependencies(engine, services);
 
@@ -68,8 +72,6 @@ namespace SoundMastery.Migration
 
         private static void RegisterDatabaseSpecificDependencies(DatabaseEngine engine, IServiceCollection services)
         {
-            services.AddSingleton<DatabaseEngineAccessor>(() => engine);
-
             switch (engine)
             {
                 case DatabaseEngine.Postgres:
@@ -115,14 +117,12 @@ namespace SoundMastery.Migration
             }
         }
 
-        private static (string command, DatabaseEngine engine) ParseParameters(string[] args)
+        private static DatabaseEngine GetDatabaseEngine()
         {
-            var command = args.FirstOrDefault();
-            var engine = Enum.TryParse<DatabaseEngine>(args[1], ignoreCase: true, out var result)
+            var engine = Configuration?.GetSection("DatabaseSettings:Engine").Value;
+            return Enum.TryParse<DatabaseEngine>(engine, ignoreCase: true, out var result)
                 ? result
                 : DatabaseEngine.Postgres;
-
-            return (command, engine);
         }
 
         private static string GetConnectionString(string name)

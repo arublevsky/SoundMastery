@@ -7,7 +7,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SoundMastery.Application\SoundMastery.Application.csproj" />
     <ProjectReference Include="..\SoundMastery.DataAccess\SoundMastery.DataAccess.csproj" />
-    <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

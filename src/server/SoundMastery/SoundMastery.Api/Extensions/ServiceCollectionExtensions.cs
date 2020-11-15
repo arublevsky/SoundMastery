@@ -5,12 +5,34 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.Application.Authorization;
+using SoundMastery.Application.Common;
+using SoundMastery.Application.Identity;
+using SoundMastery.Application.Profile;
+using SoundMastery.DataAccess.IdentityStores;
+using SoundMastery.DataAccess.Services.Common;
+using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.Domain.Identity;
+using SoundMastery.Domain.Services;
 
 namespace SoundMastery.Api.Extensions
 {
     public static class ServiceCollectionExtensions
     {
+        public static void RegisterDependencies(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddTransient<IUserStore<User>, UserStore>();
+            services.AddTransient<IUserEmailStore<User>, UserStore>();
+            services.AddTransient<IRoleStore<Role>, RoleStore>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
+            services.AddTransient<IDatabaseConnectionService, DatabaseConnectionService>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
+            services.AddTransient<IIdentityManager, IdentityManager>();
+            services.AddTransient<IDateTimeProvider, DateTimeProvider>();
+        }
+
         public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(x =>
@@ -61,46 +83,21 @@ namespace SoundMastery.Api.Extensions
             });
         }
 
-        public static void AddDatabaseServices(this IServiceCollection services, IConfiguration configuration)
+        public static void ConfigureCors(this IServiceCollection services)
         {
-            DatabaseEngine engine = GetDatabaseEngine(configuration);
-
-            ValidateDatabaseSettings(engine, configuration);
-
-            services.AddSingleton<DatabaseEngineAccessor>(() => engine);
-            services.AddTransient<IUserRepository, UserRepository>();
-        }
-
-        private static void ValidateDatabaseSettings(DatabaseEngine engine, IConfiguration configuration)
-        {
-            switch (engine)
-            {
-                case DatabaseEngine.Postgres:
-                    EnsureConnectionStringSpecified("PostgresDatabaseConnection", configuration);
-                    break;
-                case DatabaseEngine.SqlServer:
-                    EnsureConnectionStringSpecified("SqlServerDatabaseConnection", configuration);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}");
-            }
-        }
-
-        private static DatabaseEngine GetDatabaseEngine(IConfiguration configuration)
-        {
-            string engineConfig = configuration["DatabaseSettings:Engine"];
-            return Enum.TryParse<DatabaseEngine>(engineConfig, ignoreCase: true, out var result)
-                ? result
-                : DatabaseEngine.Postgres;
-        }
-
-        private static void EnsureConnectionStringSpecified(string name, IConfiguration configuration)
-        {
-            string connectionString = configuration.GetConnectionString(name);
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new InvalidOperationException($"Connection string {name} is not configured");
-            }
+            services.AddCors(
+                options =>
+                {
+                    options.AddPolicy(CorsPolicyName.FrontendApp,
+                        builder =>
+                        {
+                            builder
+                                .WithOrigins("https://localhost:9000")
+                                .AllowAnyMethod()
+                                .AllowAnyHeader()
+                                .AllowCredentials();
+                        });
+                });
         }
     }
 }

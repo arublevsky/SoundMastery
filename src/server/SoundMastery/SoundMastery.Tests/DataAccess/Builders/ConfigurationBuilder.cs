@@ -2,14 +2,14 @@ using System;
 using DotNet.Testcontainers.Containers.Modules.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Common;
 using SoundMastery.Tests.Extensions;
 
 namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class ConfigurationBuilder
     {
-        private TestcontainerDatabase _container;
+        private TestcontainerDatabase? _container;
 
         public ConfigurationBuilder For(TestcontainerDatabase container)
         {
@@ -25,22 +25,34 @@ namespace SoundMastery.Tests.DataAccess.Builders
             }
 
             var configuration = new Mock<IConfiguration>();
+
+            // configure ConnectionStrings settings
+            configuration.Setup(config => config.GetSection("ConnectionStrings"))
+                .Returns(ConfigureConnectionStringSection(engine).Object);
+
+            // other settings
+            configuration.SetupGet(p => p["DatabaseSettings:Engine"]).Returns(engine.ToString);
+
+            return configuration.Object;
+        }
+
+        private Mock<IConfigurationSection> ConfigureConnectionStringSection(DatabaseEngine engine)
+        {
             var csSection = new Mock<IConfigurationSection>();
 
             if (engine == DatabaseEngine.Postgres)
             {
-                csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
+                csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container!.ConnectionString);
                 csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
             }
 
             if (engine == DatabaseEngine.SqlServer)
             {
-                csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
+                csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container!.ConnectionString);
                 csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
             }
 
-            configuration.Setup(config => config.GetSection("ConnectionStrings")).Returns(csSection.Object);
-            return configuration.Object;
+            return csSection;
         }
     }
 }

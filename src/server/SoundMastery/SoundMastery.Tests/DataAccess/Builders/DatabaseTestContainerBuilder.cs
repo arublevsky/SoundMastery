@@ -3,7 +3,7 @@ using DotNet.Testcontainers.Containers.Builders;
 using DotNet.Testcontainers.Containers.Configurations.Databases;
 using DotNet.Testcontainers.Containers.Modules.Abstractions;
 using DotNet.Testcontainers.Containers.Modules.Databases;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Common;
 
 namespace SoundMastery.Tests.DataAccess.Builders
 {

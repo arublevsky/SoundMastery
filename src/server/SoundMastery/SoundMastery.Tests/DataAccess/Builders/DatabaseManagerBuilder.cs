@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.Configuration;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Common;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Postgres;
 using SoundMastery.DataAccess.Services.SqlServer;
 
@@ -8,7 +9,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class DatabaseManagerBuilder
     {
-        private IConfiguration _configuration;
+        private IConfiguration? _configuration;
 
         public DatabaseManagerBuilder With(IConfiguration configuration)
         {

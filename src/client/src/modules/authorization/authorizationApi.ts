@@ -1,4 +1,4 @@
-import { httpPost } from "../common/requestApi";
+import { httpGet, httpPost } from "../common/requestApi";
 import { RegisterUserModel } from "./accountService";
 
 const apiController = "account";
@@ -18,4 +18,8 @@ export const register = async (body: RegisterUserModel) => {
     return httpPost<TokenAuthorizationResult>(`${apiController}/register`, {
         body: body
     });
+};
+
+export const refreshToken = async () => {
+    return httpGet<TokenAuthorizationResult>(`${apiController}/refresh-token`);
 };

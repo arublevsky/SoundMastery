@@ -7,9 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SoundMastery.Api.Extensions;
-using SoundMastery.Application.Profile;
 using SoundMastery.Application.Validation;
-using SoundMastery.DataAccess.Stores;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.Api
@@ -25,26 +23,12 @@ namespace SoundMastery.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(
-                options =>
-                {
-                    options.AddPolicy(
-                        CorsPolicyName.FrontendApp,
-                        builder => builder.WithOrigins("http://localhost:9000")
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .AllowCredentials());
-                });
-
-            services.AddTransient<IUserStore<User>, UserStore>();
-            services.AddTransient<IUserEmailStore<User>, UserStore>();
-            services.AddTransient<IRoleStore<Role>, RoleStore>();
-            services.AddTransient<IUserProfileService, UserProfileService>();
-            services.AddDatabaseServices(Configuration);
-
+            services.ConfigureCors();
+            services.RegisterDependencies(Configuration);
+            services.AddHttpContextAccessor();
             services.AddIdentity<User, Role>().AddDefaultTokenProviders();
-
-            // .AddIdentity sets default auth scheme to cookies auth, so .AddAuthentication must go after that.
+            // ^services.AddIdentity sets default auth scheme to the cookies authentication,
+            // so .AddAuthentication must go after this line to override the default to use JWT.
             services.ConfigureAuthentication(Configuration);
 
             services.ConfigureIdentityOptions();

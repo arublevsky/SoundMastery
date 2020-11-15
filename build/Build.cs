@@ -116,7 +116,7 @@ class Build : NukeBuild
             DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} build");
         });
 
-    Target Deploy => _ => _
+    Target DeployDocker => _ => _
         .DependsOn(BuildDockerImages)
         .Executes(() =>
         {

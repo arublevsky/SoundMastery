@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../common/apiErrors";
 import { getProfile, UserProfile } from "../profile/profileApi";
-import { TokenAuthorizationResult } from "./authorizationApi";
-import { authService, UserAuthorizationInfo } from "./authtorizationService";
+import { refreshToken, TokenAuthorizationResult } from "./authorizationApi";
+import { authorizationService, UserAuthorizationInfo } from "./authorizationService";
 import { AuthorizationContext, initialState } from "./context";
 
 export interface AuthorizationProviderProps {
@@ -15,59 +15,75 @@ const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(initialState.isLoading);
     const [profile, setProfile] = useState<UserProfile>(initialState.userProfile);
-    const [info, setInfo] = useState<UserAuthorizationInfo>(authService.get());
+    const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo>(authorizationService.get());
 
     useEffect(() => {
-        (async () => {
-            if (!info) {
-                setIsLoading(false);
-            } else if (!profile) {
+        authorizationService.registerLogoutHandler(() => navigate("/login"));
+
+        async function initialize() {
+            const isAuthenticated = getIsAuthenticated();
+            if (isAuthenticated) {
                 await loadProfile();
+            } else {
+                await tryRefreshToken();
             }
-        })();
+        }
+
+        initialize();
     }, []);
 
-    const onLoggedIn = (data: TokenAuthorizationResult) => {
-        (async () => {
-            const info = {
-                ...data,
-                loggedInAt: new Date().getMilliseconds(),
-            };
+    const onLoggedIn = async (data: TokenAuthorizationResult) => {
+        const info = {
+            ...data,
+            loggedInAt: new Date().getTime(),
+        };
 
-            authService.set(info);
-            setInfo(info);
-            await loadProfile();
-        })();
+        authorizationService.set(info);
+        setAuthorizationInfo(info);
+        await loadProfile();
     };
 
     const onLoggedOut = () => {
-        authService.clear();
-        setInfo(null);
+        setAuthorizationInfo(null);
+        window.localStorage.setItem('logout', Date.now().toString());
     };
 
+    async function tryRefreshToken() {
+        await executeWithLoading(async () => {
+            const token = await refreshToken();
+            await onLoggedIn(token);
+        });
+    }
+
     async function loadProfile() {
-        try {
-            setIsLoading(true);
+        await executeWithLoading(async () => {
             const response = await getProfile();
             setProfile(response);
-        } catch (e) {
-            if (e instanceof ApiError && e.isUnauthenticated()) {
-                onLoggedOut();
-                navigate("/login");
-            }
-        } finally {
-            setIsLoading(false);
-        }
+        });
     }
 
     const getIsAuthenticated = () => {
-        const data = authService.get();
-        if (data) {
-            const expiresAt = data.loggedInAt + data.expiresInMilliseconds;
-            return !!profile && expiresAt > new Date().getMilliseconds();
+        if (authorizationInfo) {
+            const expiresAt = authorizationInfo.loggedInAt + authorizationInfo.expiresInMilliseconds;
+            return !!profile && expiresAt > new Date().getTime();
         }
 
         return false;
+    };
+
+    const executeWithLoading = async (action: () => Promise<unknown>) => {
+        try {
+            setIsLoading(true);
+            await action();
+        } catch (e) {
+            if (e instanceof ApiError && e.isUnauthenticated()) {
+                navigate("/login");
+            }
+            throw e;
+        }
+        finally {
+            setIsLoading(false);
+        }
     };
 
     return (

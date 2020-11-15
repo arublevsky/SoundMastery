@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using SoundMastery.DataAccess.Common;
+using SoundMastery.DataAccess.Services.Common;
 
 namespace SoundMastery.DataAccess.Services.SqlServer
 {

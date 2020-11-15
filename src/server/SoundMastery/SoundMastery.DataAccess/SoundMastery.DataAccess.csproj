@@ -3,9 +3,6 @@
         <TargetFramework>netcoreapp3.1</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-      <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
-    </ItemGroup>
-    <ItemGroup>
       <PackageReference Include="Dapper" Version="2.0.35" />
       <PackageReference Include="Npgsql" Version="4.1.5" />
       <PackageReference Include="System.Data.SqlClient" Version="4.4.3" />
@@ -18,23 +15,26 @@
       <None Remove="Identity\Sql\CreateUser.sql" />
     </ItemGroup>
     <ItemGroup>
+      <EmbeddedResource Include="Sql\Generic\Users\CreateUser.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\FindUserByEmail.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\FindUserByName.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\InsertRefreshToken.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\RemoveRefreshToken.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\UpdateUser.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\UserCollections.sql" />
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CheckDatabaseExists.sql" />
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CreateDatabase.sql" />
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropConnections.sql" />
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropDatabase.sql" />
-      <EmbeddedResource Include="Sql\Postgres\Users\CreateUser.sql" />
-      <EmbeddedResource Include="Sql\Postgres\Users\FindUserByEmail.sql" />
-      <EmbeddedResource Include="Sql\Postgres\Users\UpdateUser.sql" />
       <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CheckDatabaseExists.sql" />
       <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CreateDatabase.sql" />
       <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\DropDatabase.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\Users\CreateUser.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\Users\FindUserByEmail.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\Users\UpdateUser.sql" />
-      <None Remove="Sql\Postgres\Users\FindUserByName.sql" />
-      <EmbeddedResource Include="Sql\Postgres\Users\FindUserByName.sql" />
-      <None Remove="Sql\SqlServer\Users\FindUserByName.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\Users\FindUserByName.sql" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Sql\Generic" />
     </ItemGroup>
     <PropertyGroup>
         <Nullable>enable</Nullable>

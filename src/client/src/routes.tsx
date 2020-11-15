@@ -1,7 +1,7 @@
 import React from "react";
-import MainLayout from './layout/main/index';
+import PublicLayout from './layout/public/index';
 import DashboardLayout from './layout/dashboard/index';
-import LoginView from './views/auth/login';
+import LoginView from './views/auth/loginView';
 import RegisterView from './views/auth/register';
 import NotFoundView from "./views/errors/notFoundView";
 import DashboardView from './views/dashboard';
@@ -15,7 +15,7 @@ import { Navigate } from "react-router-dom";
 export const publicRoutes = [
     {
         path: '/',
-        element: <MainLayout />,
+        element: <PublicLayout />,
         children: [
             { path: 'public', element: <PublicView /> },
             { path: 'login', element: <LoginView /> },
