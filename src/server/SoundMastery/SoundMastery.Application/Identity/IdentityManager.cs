@@ -20,7 +20,7 @@ namespace SoundMastery.Application.Identity
             return _signInManager.PasswordSignInAsync(username, password, false, false);
         }
 
-        public Task<IdentityResult> CreateAsync(User user, string password)
+        public Task<IdentityResult> CreateAsync(User user, string? password)
         {
             return _userManager.CreateAsync(user, password);
         }

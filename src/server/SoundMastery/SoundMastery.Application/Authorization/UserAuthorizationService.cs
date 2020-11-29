@@ -57,14 +57,14 @@ namespace SoundMastery.Application.Authorization
 
         public async Task<TokenAuthorizationResult?> RefreshToken()
         {
-            var cookies = _httpContextAccessor.HttpContext.Request.Cookies;
-            if (!cookies.TryGetValue(RefreshTokenCookieKey, out var value))
+            var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
+            if (cookies == null || !cookies.TryGetValue(RefreshTokenCookieKey, out var value) || string.IsNullOrEmpty(value))
             {
                 return null;
             }
 
             var model = JsonSerializer.Deserialize<RefreshTokenModel>(value);
-            if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.RefreshToken))
+            if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.RefreshToken))
             {
                 return null;
             }
@@ -133,7 +133,7 @@ namespace SoundMastery.Application.Authorization
                 RefreshToken = refreshToken
             });
 
-            _httpContextAccessor.HttpContext.Response.Cookies.Append(RefreshTokenCookieKey, cookieValue,
+            _httpContextAccessor.HttpContext?.Response.Cookies.Append(RefreshTokenCookieKey, cookieValue,
                 new CookieOptions
                 {
                     HttpOnly = true,

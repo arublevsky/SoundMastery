@@ -3,7 +3,7 @@
 Portfolio project. 
 
 * React SPA
-* ASP.NET Core 3.1 Web API
+* ASP.NET 5.0 Web API
 * Multi database engine support: SQL Server and Postgress.
 * Dapper
 * ASP.NET Identity with JWT-based authentication
@@ -13,7 +13,7 @@ Portfolio project.
 
 ## Prerequsites
 
-1. .NET Core 3.1.2
+1. .NET 5.0.100 SDK
 2. SQL Server 2017 or Postgres 13
 3. NodeJS 10+
 

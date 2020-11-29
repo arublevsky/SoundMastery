@@ -9,13 +9,13 @@ services:
       - '${API_PORT?err}:443'
     volumes:
       - ./app/api/Logs:/app/api/Logs
-      - ./../../src/server/https:/https
+      - ./ssl/server:/https
     environment:
-        - DB_COMMAND=${DB_COMMAND?err}
-        - ASPNETCORE_ENVIRONMENT=Production
-        - ASPNETCORE_URLS=https://+:443;http://+:80
-        - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_PASSWORD?err}
-        - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+      - DB_COMMAND=${DB_COMMAND?err}
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_PASSWORD?err}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
   client:
     image: sound-mastery-client:${APP_VERSION:?err}
     build:
@@ -23,8 +23,8 @@ services:
     ports:
       - '${CLIENT_PORT?err}:443'    
     volumes: 
-      - ./../../src/client/ssl:/etc/nginx/certs
       - ./app/client/Logs:/var/log/nginx/
+      - ./ssl/client:/etc/nginx/certs
   db:
     image: postgres
     environment:
