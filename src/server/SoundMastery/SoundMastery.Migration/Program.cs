@@ -93,8 +93,6 @@ namespace SoundMastery.Migration
             var manager = scope.ServiceProvider.GetService<IDatabaseManager>()!;
             var migrationService = scope.ServiceProvider.GetService<IMigrationService>()!;
 
-            await manager.EnsureDatabaseCreated();
-
             switch (command)
             {
                 case "drop":
@@ -107,6 +105,7 @@ namespace SoundMastery.Migration
                     await migrationService.ApplySeeds(SeedData.Users);
                     break;
                 case "update":
+                    await manager.EnsureDatabaseCreated();
                     await migrationService.MigrateUp();
                     break;
                 case "check-connection":

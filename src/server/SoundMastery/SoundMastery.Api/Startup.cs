@@ -54,7 +54,6 @@ namespace SoundMastery.Api
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors(CorsPolicyName.FrontendApp);
             app.UseAuthentication();

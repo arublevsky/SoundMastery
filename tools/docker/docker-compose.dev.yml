@@ -12,6 +12,9 @@ services:
       - ./ssl/server:/https
     environment:
       - DB_COMMAND=${DB_COMMAND?err}
+      - DatabaseSettings__Engine=Postgres
+      - ConnectionStrings__PostgresServerConnection=Host=${DB_HOST?err};Username=${DB_USERNAME?err};Password=${SA_PASSWORD?err};
+      - ConnectionStrings__PostgresDatabaseConnection=Host=${DB_HOST?err};Username=${DB_USERNAME?err};Password=${SA_PASSWORD?err};Database=soundmastery
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=https://+:443;http://+:80
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_PASSWORD?err}
