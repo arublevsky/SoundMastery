@@ -1,10 +1,11 @@
+# for local development use
 version: "3.8"
 
 services:
   api:
     image: sound-mastery-api:${APP_VERSION:?err}
     build:
-      context: ./../../src/server 
+      context: ./../../src/server
     ports:
       - '${API_PORT?err}:443'
     volumes:
@@ -13,6 +14,7 @@ services:
     environment:
       - DB_COMMAND=${DB_COMMAND?err}
       - DatabaseSettings__Engine=Postgres
+      - ClientUrl=https://localhost:9000
       - ConnectionStrings__PostgresServerConnection=Host=${DB_HOST?err};Username=${DB_USERNAME?err};Password=${SA_PASSWORD?err};
       - ConnectionStrings__PostgresDatabaseConnection=Host=${DB_HOST?err};Username=${DB_USERNAME?err};Password=${SA_PASSWORD?err};Database=soundmastery
       - ASPNETCORE_ENVIRONMENT=Production
@@ -23,11 +25,12 @@ services:
     image: sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
+      dockerfile: Dockerfile-dev
     ports:
       - '${CLIENT_PORT?err}:443'    
     volumes: 
       - ./app/client/Logs:/var/log/nginx/
-      - ./ssl/client:/etc/nginx/certs
+      - ./ssl/client:/etc/nginx/certs/
   db:
     image: postgres
     environment:
@@ -35,6 +38,6 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${SA_PASSWORD?err}
     volumes:
-      - ./db-data:/var/lib/postgresql/data
+      - ./app/db:/var/lib/postgresql/data
     ports:
       - 5432:5432

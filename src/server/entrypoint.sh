@@ -33,5 +33,5 @@ fi
 
 echo "Database migration finished successfully."
 cd ./../api
-echo "Srarting API server..."
+echo "Starting API server..."
 dotnet SoundMastery.Api.dll

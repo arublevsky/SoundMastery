@@ -1,38 +1,13 @@
+# CI images build configuration
 version: "3.8"
 
 services:
   api:
     image: docker.pkg.github.com/arublevsky/soundmastery/sound-mastery-api:${APP_VERSION:?err}
     build:
-      context: ./../../src/server 
-    ports:
-      - '${API_PORT?err}:443'
-    volumes:
-      - ./app/api/Logs:/app/api/Logs
-      - ./ssl/server:/https
-    environment:
-      - DB_COMMAND=${DB_COMMAND?err}
-      - DatabaseSettings__Engine=SqlServer
-      - ConnectionStrings__SqlServerServerConnection=Server=${DB_HOST?err};User=sa;Password=${SA_PASSWORD?err};
-      - ConnectionStrings__SqlServerDatabaseConnection=Server=${DB_HOST?err};User=sa;Password=${SA_PASSWORD?err};Database=soundmastery
-      - ASPNETCORE_ENVIRONMENT=Production  
-      - ASPNETCORE_URLS=https://+:443;http://+:80
+      context: ./../../src/server  
   client:
     image: docker.pkg.github.com/arublevsky/soundmastery/sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
-    ports:
-      - '${CLIENT_PORT?err}:443'
-    volumes:
-      - ./app/client/Logs:/var/log/nginx/
-      - ./ssl/client:/etc/nginx/certs
-  db:
-    image: postgres
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=${SA_PASSWORD?err}
-    volumes:
-      - ./db-data:/var/lib/postgresql/data
-    ports:
-      - 5432:5432     
+      dockerfile: Dockerfile-ci

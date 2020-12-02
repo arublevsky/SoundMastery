@@ -1,3 +1,5 @@
+import { ApiError } from "./apiErrors";
+
 export interface ApplicationError extends IdentityError {
 }
 
@@ -10,12 +12,15 @@ export interface ValidationErrors {
     [key: string]: string[];
 }
 
-export const parseErrors = (error: Error, showFallback = true) => {
+export const parseErrors = async (error: ApiError, showFallback = true) => {
     try {
-        const response = JSON.parse(error.message);
+        const json = error.response.body ? await error.response.text() : error.message;
+        const response = JSON.parse(json);
+
         if (response && response.length && isIdentityError(response[0])) {
             return response as IdentityError[];
         }
+
         if (response && response.errors && isValidationError(response.errors)) {
             // validation errors should be prevented by the client side validation
             const properties = Object.keys(response.errors).join(", ");

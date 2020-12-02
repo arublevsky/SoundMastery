@@ -1,7 +1,9 @@
 import { authorizationService } from "../authorization/authorizationService";
 import { ApiError } from "./apiErrors";
 
-const baseApiRoute = "https://localhost:5001/api/";
+declare const __API_BASE_URL__: string;
+
+const baseApiRoute = `${__API_BASE_URL__}/api/`;
 
 interface Options {
     silent?: boolean;
@@ -80,12 +82,12 @@ const getContentTypeHeader = (options?: RequestOptions) => {
 };
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
-    const text = await response.text();
     if (!response.ok) {
         // TODO client logging https://github.com/arublevsky/SoundMastery/issues/24
         processFailedResponse(response);
     }
 
+    const text = await response.text();
     return text ? JSON.parse(text) : {};
 };
 

@@ -212,7 +212,6 @@ FakesAssemblies/
 /src/client/dist
 
 # docker local volumes
-/tools/docker/data
-/tools/docker/db-data
-/tools/docker/log
-/tools/docker/secrets
+/tools/docker/app
+
+

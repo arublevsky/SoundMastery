@@ -141,7 +141,7 @@ class Build : NukeBuild
             }
 
             Docker($"login docker.pkg.github.com -u {actor} -p {token}");
-            DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} push");
+            DockerCompose($"-f {DockerComposePath} push");
         });
 
     static string Env => IsLocalBuild ? "dev" : "ci";
@@ -150,11 +150,14 @@ class Build : NukeBuild
 
     static string DockerComposePath => Path.Combine(DockerDirectory, $"docker-compose.{Env}.yml");
 
-    static void SetAppVersionEnvVariable()
+    void SetAppVersionEnvVariable()
     {
         DotNet("tool restore", workingDirectory: RootDirectory);
         var version = DotNet("minver").First(x => x.Type != OutputType.Err).Text;
-        Environment.SetEnvironmentVariable("APP_VERSION", version);
+
+        // TODO exclude sha if commit is tagged
+        var sha = Git("rev-parse HEAD").Single().Text;
+        Environment.SetEnvironmentVariable("APP_VERSION", $"{version}-{sha.Substring(0, 5)}");
     }
 
     static void PrepareDotEnv()

@@ -1,3 +1,4 @@
+const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const path = require('path');
@@ -17,4 +18,9 @@ module.exports = merge(common, {
         cert: fs.readFileSync(path.resolve(__dirname, './../../tools/docker/ssl/client/private.crt')),
         ca: fs.readFileSync(path.resolve(__dirname, './../../tools/docker/ssl/client/private.pem')),
     },
+    plugins: [
+        new webpack.DefinePlugin({
+            __API_BASE_URL__: JSON.stringify("https://localhost:5001")
+        })
+    ]
 });
