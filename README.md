@@ -34,7 +34,8 @@ For example
 
 3a. Run `run.ps1` to start webpack dev server with API host.
 
-3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine)
+3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine).
+Note: docker deploy uses production webpack configuration, adjust server URL to point to the local server. See `webpack.prod.js`.
 
 4. Setup SSL certificate
 
@@ -43,3 +44,10 @@ In Powershell, execute the following command:
 `Import-Certificate -FilePath "C:/<path-to-project>SoundMastery/tools/ssl/private.crt" -CertStoreLocation Cert:\LocalMachine\Root`
 
 To generate a new certificate use [this](https://gist.github.com/pgilad/63ddb94e0691eebd502deee207ff62bd) guide.
+
+# Cloud Deployments
+
+## Azure
+
+Client: https://soundmastery-client.azurewebsites.net/
+API: https://soundmastery.azurewebsites.net/

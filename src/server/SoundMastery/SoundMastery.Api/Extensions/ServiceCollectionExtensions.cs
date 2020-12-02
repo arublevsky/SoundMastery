@@ -83,7 +83,7 @@ namespace SoundMastery.Api.Extensions
             });
         }
 
-        public static void ConfigureCors(this IServiceCollection services)
+        public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddCors(
                 options =>
@@ -92,7 +92,7 @@ namespace SoundMastery.Api.Extensions
                         builder =>
                         {
                             builder
-                                .WithOrigins("https://localhost:9000")
+                                .WithOrigins(configuration.GetValue<string>("ClientUrl"))
                                 .AllowAnyMethod()
                                 .AllowAnyHeader()
                                 .AllowCredentials();

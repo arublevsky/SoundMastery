@@ -141,7 +141,7 @@ class Build : NukeBuild
             }
 
             Docker($"login docker.pkg.github.com -u {actor} -p {token}");
-            DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} push");
+            DockerCompose($"-f {DockerComposePath} push");
         });
 
     static string Env => IsLocalBuild ? "dev" : "ci";
@@ -157,7 +157,7 @@ class Build : NukeBuild
 
         // TODO exclude sha if commit is tagged
         var sha = Git("rev-parse HEAD").Single().Text;
-        Environment.SetEnvironmentVariable("APP_VERSION", $"{version}-{sha.Take(6)}");
+        Environment.SetEnvironmentVariable("APP_VERSION", $"{version}-{sha.Substring(0, 5)}");
     }
 
     static void PrepareDotEnv()

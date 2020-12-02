@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ApiError } from "../../modules/common/apiErrors";
 import { ApplicationError, parseErrors } from "../../modules/common/errorHandling";
 
 type ReturnType = [
@@ -14,8 +15,8 @@ export const useErrorHandling = (showFallback = true): ReturnType => {
     const [showError, setShowError] = useState(false);
     const [errors, setErrors] = useState<ApplicationError[]>(null);
 
-    const handleError = (error: Error) => {
-        const errors = parseErrors(error, showFallback);
+    const handleError = async (error: ApiError) => {
+        const errors = await parseErrors(error, showFallback);
         setErrors(errors);
         setShowError(true);
     };

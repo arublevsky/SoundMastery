@@ -104,6 +104,10 @@ namespace SoundMastery.Migration
                     await migrationService.MigrateUp();
                     await migrationService.ApplySeeds(SeedData.Users);
                     break;
+                case "seeds":
+                    await manager.EnsureDatabaseCreated();
+                    await migrationService.ApplySeeds(SeedData.Users);
+                    break;
                 case "update":
                     await manager.EnsureDatabaseCreated();
                     await migrationService.MigrateUp();

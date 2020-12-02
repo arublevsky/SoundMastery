@@ -23,7 +23,7 @@ namespace SoundMastery.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.ConfigureCors();
+            services.ConfigureCors(Configuration);
             services.RegisterDependencies(Configuration);
             services.AddHttpContextAccessor();
             services.AddIdentity<User, Role>().AddDefaultTokenProviders();
