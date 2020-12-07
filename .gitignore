@@ -172,7 +172,6 @@ ClientBin/
 *.publishsettings
 node_modules/
 bower_components/
-launchSettings.json
 
 # RIA/Silverlight projects
 Generated_Code/
@@ -213,6 +212,6 @@ FakesAssemblies/
 /src/client/dist
 
 # docker local volumes
-/tools/docker/data
-/tools/docker/log
-/tools/docker/secrets
+/tools/docker/app
+
+

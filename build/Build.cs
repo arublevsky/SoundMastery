@@ -37,6 +37,7 @@ class Build : NukeBuild
     Target Default => _ => _
         .DependsOn(CompileBackend)
         .DependsOn(CompileFrontend)
+        .DependsOn(TestBackend)
         .Executes(() =>
         {
             // do nothing
@@ -77,8 +78,26 @@ class Build : NukeBuild
                 .EnableNoRestore());
         });
 
+    Target TestBackend => _ => _
+        .DependsOn(CompileBackend)
+        .Executes(() =>
+        {
+            DotNetTest(s => s
+                .SetProjectFile(Solution.GetProject("SoundMastery.Tests"))
+                .SetConfiguration(Configuration)
+                .EnableNoBuild()
+                .EnableNoRestore()
+                .SetLogger("trx")
+                .SetLogOutput(true)
+                .SetArgumentConfigurator(arguments => arguments.Add("/p:CollectCoverage={0}", true)
+                    .Add("/p:CoverletOutput={0}/", ArtifactsDirectory / "coverage")
+                    .Add("/p:UseSourceLink={0}", "true")
+                    .Add("/p:CoverletOutputFormat={0}", "cobertura"))
+                .SetResultsDirectory(ArtifactsDirectory / "tests"));
+        });
+
     Target CompileFrontend => _ => _
-        .After(CompileBackend)
+        .DependsOn(Restore)
         .Executes(() =>
         {
             Npm("i", workingDirectory: FrontendDirectory);
@@ -97,7 +116,7 @@ class Build : NukeBuild
             DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} build");
         });
 
-    Target Deploy => _ => _
+    Target DeployDocker => _ => _
         .DependsOn(BuildDockerImages)
         .Executes(() =>
         {
@@ -122,7 +141,7 @@ class Build : NukeBuild
             }
 
             Docker($"login docker.pkg.github.com -u {actor} -p {token}");
-            DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} push");
+            DockerCompose($"-f {DockerComposePath} push");
         });
 
     static string Env => IsLocalBuild ? "dev" : "ci";
@@ -131,11 +150,14 @@ class Build : NukeBuild
 
     static string DockerComposePath => Path.Combine(DockerDirectory, $"docker-compose.{Env}.yml");
 
-    static void SetAppVersionEnvVariable()
+    void SetAppVersionEnvVariable()
     {
         DotNet("tool restore", workingDirectory: RootDirectory);
         var version = DotNet("minver").First(x => x.Type != OutputType.Err).Text;
-        Environment.SetEnvironmentVariable("APP_VERSION", version);
+
+        // TODO exclude sha if commit is tagged
+        var sha = Git("rev-parse HEAD").Single().Text;
+        Environment.SetEnvironmentVariable("APP_VERSION", $"{version}-{sha.Substring(0, 5)}");
     }
 
     static void PrepareDotEnv()

@@ -1,6 +1,9 @@
-import { authService } from "../authorization/authtorizationService";
+import { authorizationService } from "../authorization/authorizationService";
+import { ApiError } from "./apiErrors";
 
-const baseApiRoute = "http://localhost:5000/api/"
+declare const __API_BASE_URL__: string;
+
+const baseApiRoute = `${__API_BASE_URL__}/api/`;
 
 interface Options {
     silent?: boolean;
@@ -37,16 +40,16 @@ const request = async <T extends unknown>(
         toggleLoading(true);
         response = await fetch(baseApiRoute + url, {
             body: getBody(options),
-
+            credentials: 'include',
             headers: {
                 Accept: "application/json",
                 ...getContentTypeHeader(options),
-                "Authorization": authService.getAuthHeader(),
+                "Authorization": authorizationService.getAuthHeader(),
             },
             method,
         });
     } catch (error) {
-        // TODO client logging
+        // TODO client logging https://github.com/arublevsky/SoundMastery/issues/24
         console.error(error);
         throw error;
     } finally {
@@ -79,11 +82,25 @@ const getContentTypeHeader = (options?: RequestOptions) => {
 };
 
 const handleResponse = async <T>(response: Response): Promise<T> => {
+    if (!response.ok) {
+        // TODO client logging https://github.com/arublevsky/SoundMastery/issues/24
+        processFailedResponse(response);
+    }
+
     const text = await response.text();
     return text ? JSON.parse(text) : {};
 };
 
+const processFailedResponse = (response: Response) => {
+    // TODO send data from server to enrich UI errors
+    // const errorCode = response.headers.get(apiConstants.headers.errorCode) as string;
+    // const errorId = response.headers.get(apiConstants.headers.errorId) as string;
+    // const payloadError = response.headers.get(apiConstants.headers.payloadError);
+    throw new ApiError(response, '');
+};
+
 // TODO implement loading animation on requests
+// https://github.com/arublevsky/SoundMastery/issues/25
 const toggleLoading = (show: boolean, silent = false) => {
     if (silent) {
         return;
@@ -94,4 +111,4 @@ const toggleLoading = (show: boolean, silent = false) => {
     } else {
         // loading.hide();
     }
-}
+};

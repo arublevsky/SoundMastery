@@ -1,45 +1,21 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import { AdminPage } from "./components/adminPage";
-import { HomePage } from "./components/homePage";
-import { TopNavBar } from "./components/layout/navbar";
-import { Login } from "./components/login/login";
-import { Logout } from "./components/login/logout";
-import { TokenAuthorizationResult } from "./modules/authorization/authorizationApi";
-import { authService } from "./modules/authorization/authtorizationService";
-import { AuthorizationContext } from "./modules/authorization/context";
-import { PrivateRoute } from "./privateRoute";
+import React from "react";
+import { ThemeProvider } from '@material-ui/core/styles';
+import { useRoutes } from "react-router-dom";
+import { publicRoutes, protectedRoutes } from "./routes";
+import theme from './theme';
+import { useAuthContext } from "./modules/authorization/context";
+import AppContentLoader from "./components/appContentLoader";
 
 export const App = () => {
-    const [authData, setAuthData] = useState<TokenAuthorizationResult>(null);
-
-    useEffect(() => {
-        const data = authService.getAuthData();
-        setAuthData(data);
-    }, []);
-
-    const onLogin = (data: TokenAuthorizationResult) => {
-        authService.setAuthData(data);
-        setAuthData(data);
-    }
-
-    const onLogout = () => {
-        authService.removeAuthData();
-        setAuthData(null);
-    }
-
-    const isAuthorized = () => authData && !!authData.token;
+    const { isAuthenticated, isLoading } = useAuthContext();
+    const routing = isLoading ? [] : (isAuthenticated ? protectedRoutes : publicRoutes);
+    const routes = useRoutes(routing);
 
     return (
-        <AuthorizationContext.Provider value={{ ...authData, onLogin, onLogout, isAuthorized }}>
-            <Router>
-                <TopNavBar />
-                <Route path="/" exact component={HomePage} />
-                <Route path="/home" exact component={HomePage} />
-                <PrivateRoute path="/admin" component={AdminPage} />
-                <Route path="/login" component={Login} />
-                <Route path="/logout" component={Logout} />
-            </Router>
-        </AuthorizationContext.Provider>);
-}
+        <ThemeProvider theme={theme}>
+            {isLoading && <AppContentLoader />}
+            {routes}
+        </ThemeProvider>
+    );
+};
+

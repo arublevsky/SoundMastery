@@ -3,30 +3,21 @@ using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using SoundMastery.Api.Extensions;
 
 namespace SoundMastery.Api
 {
     public class Program
     {
-        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json", true, true)
-            .AddEnvironmentVariables()
-            .Build();
-
         public static void Main(string[] args)
         {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .Enrich.WithProperty("App Name", "Serilog Web App Sample")
-                .CreateLogger();
-
             try
             {
-                CreateWebHostBuilder(args).Build().Run();
-                return;
+                var webHost = CreateWebHostBuilder(args).Build();
+                ConfigureLogger(webHost);
+                webHost.Run();
             }
             catch (Exception ex)
             {
@@ -40,11 +31,20 @@ namespace SoundMastery.Api
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .ConfigureLogging(logging =>
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .ConfigureLogging(logging => logging.AddSerilog())
+                .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    logging.AddSerilog();
+                    config.AddCustomConfiguration(hostingContext.HostingEnvironment, args);
                 })
                 .UseStartup<Startup>()
                 .UseSerilog();
+
+        private static void ConfigureLogger(IWebHost webHost)
+        {
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(webHost.Services.GetRequiredService<IConfiguration>())
+                .CreateLogger();
+        }
     }
 }

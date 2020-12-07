@@ -1,43 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <RootNamespace>SoundMastery.Migrations</RootNamespace>
+        <TargetFramework>net5.0</TargetFramework>
     </PropertyGroup>
-
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-        <Version>3.1.9</Version>
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="3.1.9" />
+      <PackageReference Include="Dapper" Version="2.0.78" />
+      <PackageReference Include="Npgsql" Version="5.0.0" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+      <PackageReference Include="FluentMigrator" Version="3.2.9" />
+      <PackageReference Include="FluentMigrator.Runner" Version="3.2.9" />
+      <PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.2.9" />
+      <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="3.2.9" />
     </ItemGroup>
-
+    <ItemGroup>
+      <None Remove="Identity\Sql\CreateUser.sql" />
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="Sql\Generic\Users\CreateUser.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\FindUserByEmail.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\FindUserByName.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\InsertRefreshToken.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\RemoveRefreshToken.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\UpdateUser.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\UserCollections.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CheckDatabaseExists.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CreateDatabase.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropConnections.sql" />
+      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropDatabase.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CheckDatabaseExists.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CreateDatabase.sql" />
+      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\DropDatabase.sql" />
+    </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
     </ItemGroup>
-
     <ItemGroup>
-      <Folder Include="Migrations" />
+      <Folder Include="Sql\Generic" />
     </ItemGroup>
-
-    <ItemGroup>
-      <None Remove="appsettings.json" />
-      <Content Include="appsettings.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="appsettings.Production.json" />
-      <Content Include="appsettings.Production.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-    </ItemGroup>
-
     <PropertyGroup>
         <Nullable>enable</Nullable>
     </PropertyGroup>

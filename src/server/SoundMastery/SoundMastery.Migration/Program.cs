@@ -1,102 +1,142 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Conventions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using SoundMastery.DataAccess.Common;
+using SoundMastery.DataAccess.IdentityStores;
+using SoundMastery.DataAccess.Migrations;
+using SoundMastery.DataAccess.Services.Common;
+using SoundMastery.DataAccess.Services.Postgres;
+using SoundMastery.DataAccess.Services.SqlServer;
+using SoundMastery.DataAccess.Services.Users;
 using SoundMastery.Domain.Identity;
-using SoundMastery.Migrations;
+using SoundMastery.Domain.Services;
+using SoundMastery.Migration.Common;
 
 namespace SoundMastery.Migration
 {
     public class Program
     {
-        /// <summary>
-        ///     Default password for all seed users. Value: UserPass123
-        /// </summary>
-        private const string DefaultPassword = "AQAAAAEAACcQAAAAEEV/ceGE2f6GymUVfyWgT+45KabCWswea5/vO8R36iR9fs6LpbIodlXRme4nBqFgUQ==";
+        private static IConfiguration? Configuration { get; set; }
 
         public static async Task Main(string[] args)
         {
-            // TODO: add logging
-            var factory = new DbContextDesignTimeFactory();
-            await using var context = factory.CreateDbContext(new string[0]);
+            using IServiceScope scope = CreateServices(args).CreateScope();
+            await HandleCommand(args.First(), scope);
+        }
 
-            var command = args.First();
-            switch (command)
+        private static IServiceProvider CreateServices(string[] args)
+        {
+            Configuration = ConfigurationFactory.Create(args);
+
+            DatabaseEngine engine = GetDatabaseEngine();
+
+            var services = new ServiceCollection()
+                .AddFluentMigratorCore()
+                .ConfigureRunner(runnerBuilder => ConfigureMigrationRunner(engine, runnerBuilder))
+                .AddLogging(lb => lb.AddFluentMigratorConsole())
+                .AddSingleton(Configuration)
+                .AddSingleton<IConventionSet>(new DefaultConventionSet("SoundMastery", workingDirectory: null))
+                .AddTransient<IUserStore<User>, UserStore>()
+                .AddTransient<IDatabaseConnectionService, DatabaseConnectionService>()
+                .AddTransient<IMigrationService, MigrationService>()
+                .AddTransient<ISystemConfigurationService, SystemConfigurationService>();
+
+            RegisterDatabaseSpecificDependencies(engine, services);
+
+            return services.BuildServiceProvider(false);
+        }
+
+        private static void ConfigureMigrationRunner(DatabaseEngine engine, IMigrationRunnerBuilder runnerBuilder)
+        {
+            switch (engine)
             {
-                case "seeds":
-                    await ApplySeeds(context);
+                case DatabaseEngine.Postgres:
+                    runnerBuilder.AddPostgres()
+                        .WithGlobalConnectionString(GetConnectionString("PostgresDatabaseConnection"));
                     break;
-                case "drop":
-                    await Drop(context);
-                    break;
-                case "recreate":
-                    await Recreate(context);
-                    break;
-                case "update":
-                    await Update(context);
-                    break;
-                case "check-connection":
-                    await CheckConnection(context);
+                case DatabaseEngine.SqlServer:
+                    runnerBuilder.AddSqlServer()
+                        .WithGlobalConnectionString(GetConnectionString("SqlServerDatabaseConnection"));
                     break;
                 default:
-                    throw new ArgumentException($"Unknown command {command}.");
+                    throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}");
             }
+
+            runnerBuilder.ScanIn(typeof(InitialMigration).Assembly).For.Migrations();
         }
 
-        private static async Task CheckConnection(ApplicationDbContext context)
+        private static void RegisterDatabaseSpecificDependencies(DatabaseEngine engine, IServiceCollection services)
         {
-            try
+            switch (engine)
             {
-                await context.Database.EnsureCreatedAsync();
-                await context.Database.ExecuteSqlRawAsync("SELECT 1");
+                case DatabaseEngine.Postgres:
+                    services.AddTransient<IDatabaseManager, PgsqlDatabaseManager>();
+
+                    break;
+                case DatabaseEngine.SqlServer:
+                    services.AddTransient<IDatabaseManager, SqlServerDatabaseManager>();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}");
             }
-            catch
+
+            services.AddTransient<IUserRepository, UserRepository>();
+        }
+
+        private static async Task HandleCommand(string command, IServiceScope scope)
+        {
+            var manager = scope.ServiceProvider.GetService<IDatabaseManager>()!;
+            var migrationService = scope.ServiceProvider.GetService<IMigrationService>()!;
+
+            switch (command)
             {
-                throw new Exception("SQL server is not available...");
+                case "drop":
+                    await manager.Drop();
+                    break;
+                case "recreate":
+                    await manager.Drop();
+                    await manager.EnsureDatabaseCreated();
+                    await migrationService.MigrateUp();
+                    await migrationService.ApplySeeds(SeedData.Users);
+                    break;
+                case "seeds":
+                    await manager.EnsureDatabaseCreated();
+                    await migrationService.ApplySeeds(SeedData.Users);
+                    break;
+                case "update":
+                    await manager.EnsureDatabaseCreated();
+                    await migrationService.MigrateUp();
+                    break;
+                case "check-connection":
+                    await manager.CheckConnection();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(command), command, $"Unknown command {command}");
             }
         }
 
-        private static async Task Recreate(ApplicationDbContext context)
+        private static DatabaseEngine GetDatabaseEngine()
         {
-            await Drop(context);
-            await Update(context);
-            await ApplySeeds(context);
+            var engine = Configuration?.GetSection("DatabaseSettings:Engine").Value;
+            return Enum.TryParse<DatabaseEngine>(engine, ignoreCase: true, out var result)
+                ? result
+                : DatabaseEngine.Postgres;
         }
 
-        private static async Task Update(DbContext context)
+        private static string GetConnectionString(string name)
         {
-            await context.Database.MigrateAsync();
-        }
-
-        private static async Task Drop(DbContext context)
-        {
-            await context.Database.EnsureDeletedAsync();
-        }
-
-        private static async Task ApplySeeds(ApplicationDbContext context)
-        {
-            await context.Database.EnsureCreatedAsync();
-
-            var admin = context.Users.FirstOrDefault(b => b.UserName == "admin@gmail.com");
-            if (admin == null)
+            var connectionString = Configuration?.GetConnectionString(name);
+            if (string.IsNullOrWhiteSpace(connectionString))
             {
-                const string username = "admin@gmail.com";
-                await context.Users.AddAsync(new User
-                {
-                    Id = default,
-                    UserName = username,
-                    NormalizedUserName = username.ToUpperInvariant(),
-                    Email = username,
-                    NormalizedEmail = username.ToUpperInvariant(),
-                    EmailConfirmed = true,
-                    PasswordHash = DefaultPassword,
-                    FirstName = "Aleksey",
-                    LastName = "Rublevsky",
-                    SecurityStamp = Guid.NewGuid().ToString()
-                });
+                throw new InvalidOperationException($"Connection string {name} is not configured");
             }
 
-            await context.SaveChangesAsync();
+            return connectionString;
         }
     }
 }

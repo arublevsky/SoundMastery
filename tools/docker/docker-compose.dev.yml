@@ -1,34 +1,43 @@
+# for local development use
 version: "3.8"
 
 services:
   api:
     image: sound-mastery-api:${APP_VERSION:?err}
     build:
-      context: ./../../src/server 
+      context: ./../../src/server
     ports:
-      - '${API_PORT?err}:80'
+      - '${API_PORT?err}:443'
     volumes:
       - ./app/api/Logs:/app/api/Logs
+      - ./ssl/server:/https
     environment:
-        - ASPNETCORE_ENVIRONMENT=Production  
-        - DB_COMMAND=${DB_COMMAND?err}
+      - DB_COMMAND=${DB_COMMAND?err}
+      - DatabaseSettings__Engine=Postgres
+      - ClientUrl=https://localhost:9000
+      - ConnectionStrings__PostgresServerConnection=Host=${DB_HOST?err};Username=${DB_USERNAME?err};Password=${SA_PASSWORD?err};
+      - ConnectionStrings__PostgresDatabaseConnection=Host=${DB_HOST?err};Username=${DB_USERNAME?err};Password=${SA_PASSWORD?err};Database=soundmastery
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${SSL_PASSWORD?err}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
   client:
     image: sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
+      dockerfile: Dockerfile-dev
     ports:
-      - '${CLIENT_PORT?err}:80'
+      - '${CLIENT_PORT?err}:443'    
+    volumes: 
+      - ./app/client/Logs:/var/log/nginx/
+      - ./ssl/client:/etc/nginx/certs/
   db:
-    image: "mcr.microsoft.com/mssql/server:2019-latest"
-    user: root   
+    image: postgres
     environment:
-      SA_PASSWORD: ${SA_PASSWORD?err}
-      ACCEPT_EULA: "Y"
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${SA_PASSWORD?err}
     volumes:
-      - ./data:/var/opt/mssql/data
-      - ./log:/var/opt/mssql/log
-      - ./secrets:/var/opt/mssql/secrets
+      - ./app/db:/var/lib/postgresql/data
     ports:
-      - '1433:1433'
-    expose:
-      - 1433
+      - 5432:5432

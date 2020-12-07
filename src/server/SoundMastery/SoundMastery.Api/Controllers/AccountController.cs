@@ -1,15 +1,8 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using SoundMastery.Application.Authorization;
-using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.Api.Controllers
 {
@@ -17,86 +10,66 @@ namespace SoundMastery.Api.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IConfiguration _config;
-        private readonly SignInManager<User> _signInManager;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserAuthorizationService _authorizationService;
 
-        public AccountController(IConfiguration config, SignInManager<User> signInManager, UserManager<User> userManager)
+        public AccountController(IUserAuthorizationService authorizationService)
         {
-            _config = config;
-            _signInManager = signInManager;
-            _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         [AllowAnonymous]
         [Route("login")]
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] LoginUserModel loginModel)
+        public async Task<IActionResult> Login([FromBody] LoginUserModel model)
         {
-            var loginResult = await _signInManager.PasswordSignInAsync(loginModel.Username, loginModel.Password, false, false);
-
-            if (!loginResult.Succeeded)
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var user = await _userManager.FindByNameAsync(loginModel.Username);
+            TokenAuthorizationResult? result = await _authorizationService.Login(model);
 
-            return Ok(GetTokenResult(user.UserName));
+            if (result == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(result);
         }
 
         [AllowAnonymous]
         [Route("register")]
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterUserModel registerModel)
+        public async Task<IActionResult> Register([FromBody] RegisterUserModel model)
         {
-            var user = new User
+            if (!ModelState.IsValid)
             {
-                UserName = registerModel.Email,
-                FirstName = registerModel.FirstName,
-                LastName = registerModel.LastName,
-                Email = registerModel.Email
-            };
-
-            var identityResult = await _userManager.CreateAsync(user, registerModel.Password);
-            if (identityResult.Succeeded)
-            {
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return Ok(GetTokenResult(user.Email));
+                return BadRequest();
             }
 
-            return BadRequest(identityResult.Errors);
+            IdentityResult result = await _authorizationService.Register(model);
+
+            if (result.Succeeded)
+            {
+                return Ok(_authorizationService.GetAccessToken(model.Email!));
+            }
+
+            return BadRequest(result.Errors);
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [Route("refresh-token")]
-        [HttpPost]
+        [HttpGet]
         public async Task<IActionResult> RefreshToken()
         {
-            var user = await _userManager.FindByNameAsync(User.Identity.Name);
-            return Ok(GetTokenResult(user.Email));
-        }
+            TokenAuthorizationResult? result = await _authorizationService.RefreshToken();
 
-        private TokenAuthorizationResult GetTokenResult(string userName)
-        {
-            var expiresIn = double.Parse(_config["Jwt:ExpirationInMinutes"]);
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+            if (result == null)
+            {
+                return Unauthorized();
+            }
 
-            var claims = new[] {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, userName),
-                new Claim(JwtRegisteredClaimNames.Email, userName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-                _config["Jwt:Issuer"],
-                claims,
-                expires: DateTime.Now.AddMinutes(expiresIn),
-                signingCredentials: credentials);
-
-            var tokenResult = new JwtSecurityTokenHandler().WriteToken(token);
-            return new TokenAuthorizationResult(tokenResult, expiresIn);
+            return Ok(result);
         }
     }
 }
