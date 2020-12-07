@@ -140,7 +140,7 @@ class Build : NukeBuild
                 throw new InvalidOperationException("Cannot  publish docker images: missing github credentials");
             }
 
-            Docker($"login docker.pkg.github.com -u {actor} -p {token}");
+            Docker($"login ghcr.io -u {actor} -p {token}");
             DockerCompose($"-f {DockerComposePath} push");
         });
 
