@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Nuke.Common;
@@ -107,12 +108,7 @@ class Build : NukeBuild
     Target BuildDockerImages => _ => _
         .Executes(() =>
         {
-            if (!IsLocalBuild)
-            {
-                SetAppVersionEnvVariable();
-                PrepareDotEnv();
-            }
-
+            SetAppVersionInternal();
             DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} build");
         });
 
@@ -144,26 +140,47 @@ class Build : NukeBuild
             DockerCompose($"-f {DockerComposePath} push");
         });
 
+    Target SetAppVersion => _ => _.Executes(SetAppVersionInternal);
+
     static string Env => IsLocalBuild ? "dev" : "ci";
 
     static string DotEnvPath => Path.Combine(ConfigDirectory, $"{Env}.env");
 
     static string DockerComposePath => Path.Combine(DockerDirectory, $"docker-compose.{Env}.yml");
 
-    void SetAppVersionEnvVariable()
+    void SetAppVersionInternal()
     {
-        DotNet("tool restore", workingDirectory: RootDirectory);
-        var version = DotNet("minver").First(x => x.Type != OutputType.Err).Text;
-
-        // TODO exclude sha if commit is tagged
-        var sha = Git("rev-parse HEAD").Single().Text;
-        Environment.SetEnvironmentVariable("APP_VERSION", $"{version}-{sha.Substring(0, 5)}");
+        var version = GetVersionInternal();
+        Environment.SetEnvironmentVariable("APP_VERSION", version);
+        File.AppendAllLines(DotEnvPath, new[] { Environment.NewLine, $"APP_VERSION={version}" });
     }
 
-    static void PrepareDotEnv()
+    string GetVersionInternal()
     {
-        var requiredVariables = new[] { "SA_PASSWORD", "DB_COMMAND", "APP_VERSION" };
-        var lines = requiredVariables.Select(key => $"{key}={Environment.GetEnvironmentVariable(key)}");
-        File.AppendAllLines(DotEnvPath, lines);
+        DotNet("tool restore", workingDirectory: RootDirectory);
+        var minverVersion = DotNet("minver", logOutput: false, logInvocation: false).First(x => x.Type != OutputType.Err).Text;
+        return IsTaggedCommit() ? minverVersion : $"{minverVersion}-{GetCommitSha().Substring(0, 5)}";
+    }
+
+    bool IsTaggedCommit()
+    {
+        var isTagged = false;
+        try
+        {
+            var sha = GetCommitSha();
+            var tag = Git($"describe --exact-match {sha}", logOutput: false, logInvocation: false).Single().Text;
+            isTagged = !string.IsNullOrEmpty(tag);
+        }
+        catch
+        {
+            // no tag, ignore
+        }
+
+        return isTagged;
+    }
+
+    string GetCommitSha()
+    {
+        return Git("rev-parse HEAD").Single().Text;
     }
 }
