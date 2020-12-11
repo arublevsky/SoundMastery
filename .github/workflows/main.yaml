@@ -4,13 +4,9 @@ on:
   pull_request:
     branches: [ develop, master ]
 
-  release:
-    types:
-      - created
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       matrix:
         node-version: [12.x]
@@ -51,7 +47,6 @@ jobs:
     name: Publish Docker images
     runs-on: ubuntu-latest
     env:
-      DB_COMMAND: update
       GITHUB_ACTOR: ${{ github.actor }}
       GITHUB_TOKEN: ${{ secrets.CR_PAT }}
     steps:
@@ -60,21 +55,4 @@ jobs:
           fetch-depth: 0
 
       - name: Publish Docker images
-        run: ./build.sh --target PublishImages
-
-  push_images_release:
-    name: Publish Docker images (release)
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    env:
-      DB_COMMAND: update
-      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
-      GITHUB_ACTOR: ${{ github.actor }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Publish Docker images  (release)
         run: ./build.sh --target PublishImages

@@ -45,9 +45,17 @@ In Powershell, execute the following command:
 
 To generate a new certificate use [this](https://gist.github.com/pgilad/63ddb94e0691eebd502deee207ff62bd) guide.
 
-# Cloud Deployments
+## Cloud Deployments
 
-## Azure
+### Azure
+
+Two pre-configured app services:
 
 Client: https://soundmastery-client.azurewebsites.net/
 API: https://soundmastery.azurewebsites.net/
+
+Pull-request deployments:
+
+1. Create a pull request and wait for the required checks to complete (so the app is built and images are published)
+2. Add `azure-deploy-pull-request` label to run deploy action.
+3. When the `AzureDeploy / Deploy PR package (pull_request)` completes, navigate to https://soundmastery-client.azurewebsites.net/ 

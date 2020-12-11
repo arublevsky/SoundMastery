@@ -1,0 +1,42 @@
+name: AzureDeploy
+
+on:
+  pull_request:
+    branches: [develop]
+    types: [labeled]
+jobs:
+  azure-pr-deploy:
+    name: Deploy PR package
+    runs-on: ubuntu-latest
+    if: ${{ github.event.label.name == 'azure-deploy-pull-request' }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Azure Login
+        uses: azure/login@v1
+        env:
+          CREDENTIALS: ${{ secrets.AZURE_AUTH }}
+        with:
+          creds: ${{ env.CREDENTIALS }}
+      
+      - name: Set app version
+        id: get_version
+        run: |
+          ./build.sh --target SetAppVersion --verbosity quiet
+          echo "::set-output name=app-version::$(grep APP_VERSION ./.config/ci.env | cut -d '=' -f 2)"
+
+      - name: Deploy API
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'soundmastery'
+          publish-profile: ${{ secrets.API_PUBLISH_PROFILE }}
+          images: 'ghcr.io/arublevsky/sound-mastery-api:${{ steps.get_version.outputs.app-version }}'
+
+      - name: Deploy Client
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'soundmastery-client'
+          publish-profile: ${{ secrets.CLIENT_PUBLISH_PROFILE }}
+          images: 'ghcr.io/arublevsky/sound-mastery-client:${{ steps.get_version.outputs.app-version }}'
