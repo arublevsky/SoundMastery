@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,7 @@ using SoundMastery.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using SoundMastery.Application.Profile;
 using Microsoft.AspNetCore.Identity;
+using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -25,19 +27,22 @@ namespace SoundMastery.Application.Authorization
         private readonly IIdentityManager _identityManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IFacebookService _facebookService;
 
         public UserAuthorizationService(
             ISystemConfigurationService configurationService,
             IHttpContextAccessor httpContextAccessor,
             IUserService userService,
             IIdentityManager identityManager,
-            IDateTimeProvider dateTimeProvider)
+            IDateTimeProvider dateTimeProvider,
+            IFacebookService facebookService)
         {
             _configurationService = configurationService;
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _identityManager = identityManager;
             _dateTimeProvider = dateTimeProvider;
+            _facebookService = facebookService;
         }
 
         public async Task<TokenAuthorizationResult?> Login(LoginUserModel model)
@@ -53,6 +58,35 @@ namespace SoundMastery.Application.Authorization
             User? user = await _userService.FindByNameAsync(model.Username!);
             await SetRefreshTokenCookie(user!);
             return GetAccessToken(user!.UserName);
+        }
+
+        public async Task<TokenAuthorizationResult?> ExternalLogin(ExternalLoginModel model)
+        {
+            await _facebookService.ValidateAccessToken(model.AccessToken);
+
+            var userData = await _facebookService.GetUserDataFromFacebook(model.AccessToken);
+
+            // SMELL: user needs to specify its own password later on to use form login
+            var externalPassword = $"External-{Guid.NewGuid()}";
+
+            User user = await _userService.FindByNameAsync(userData.Email)
+                ?? await CreateNewUser(userData, externalPassword);
+
+            await SetRefreshTokenCookie(user);
+            return GetAccessToken(user.UserName);
+        }
+
+        private async Task<User> CreateNewUser(User user, string password)
+        {
+            var result = await _identityManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(x => $"{x.Code}{x.Description}"));
+                throw new InvalidOperationException($"Could not create a new user from external system. Details: {errors}");
+            }
+
+            return (await _userService.FindByNameAsync(user.Email))!;
         }
 
         public async Task<TokenAuthorizationResult?> RefreshToken()

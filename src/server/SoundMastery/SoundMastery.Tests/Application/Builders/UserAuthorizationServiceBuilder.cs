@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Moq;
 using SoundMastery.Application.Authorization;
+using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -15,6 +16,7 @@ namespace SoundMastery.Tests.Application.Builders
         private IIdentityManager? _identityManager;
         private IHttpContextAccessor? _httpContextAccessor;
         private IDateTimeProvider? _dateTimeProvider;
+        private IFacebookService? _facebookService;
 
         public UserAuthorizationServiceBuilder With(ISystemConfigurationService configuration)
         {
@@ -46,6 +48,12 @@ namespace SoundMastery.Tests.Application.Builders
             return this;
         }
 
+        public UserAuthorizationServiceBuilder With(IFacebookService facebookService)
+        {
+            _facebookService = facebookService;
+            return this;
+        }
+
         public IUserAuthorizationService Build()
         {
             return new UserAuthorizationService(
@@ -53,7 +61,8 @@ namespace SoundMastery.Tests.Application.Builders
                 _httpContextAccessor ?? new Mock<IHttpContextAccessor>().Object,
                 _userService ?? new Mock<IUserService>().Object,
                 _identityManager ?? new Mock<IIdentityManager>().Object,
-                _dateTimeProvider ?? new Mock<IDateTimeProvider>().Object);
+                _dateTimeProvider ?? new Mock<IDateTimeProvider>().Object,
+                _facebookService ?? new Mock<IFacebookService>().Object);
         }
     }
 }

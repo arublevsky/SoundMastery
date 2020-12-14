@@ -3,22 +3,22 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../common/apiErrors";
 import { getProfile, UserProfile } from "../profile/profileApi";
-import { refreshToken, TokenAuthorizationResult } from "./authorizationApi";
-import { authorizationService, UserAuthorizationInfo } from "./authorizationService";
+import { externalLogin, refreshToken, TokenAuthorizationResult } from "./authorizationApi";
+import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
 import { AuthorizationContext, initialState } from "./context";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
 }
 
-const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
+const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(initialState.isLoading);
     const [profile, setProfile] = useState<UserProfile>(initialState.userProfile);
-    const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo>(authorizationService.get());
+    const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo>(authenticationService.get());
 
     useEffect(() => {
-        authorizationService.registerLogoutHandler(() => navigate("/login"));
+        authenticationService.registerLogoutHandler(() => navigate("/login"));
 
         async function initialize() {
             const isAuthenticated = getIsAuthenticated();
@@ -33,12 +33,22 @@ const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
     }, []);
 
     const onLoggedIn = async (data: TokenAuthorizationResult) => {
+        const getNow = () => new Date().getTime();
+
         const info = {
             ...data,
-            loggedInAt: new Date().getTime(),
+            loggedInAt: getNow(),
         };
 
-        authorizationService.set(info);
+        if (data.isExternal) {
+            const result = await externalLogin(data.token);
+
+            info.expiresInMilliseconds = result.expiresInMilliseconds;
+            info.token = result.token;
+            info.loggedInAt = getNow();
+        }
+
+        authenticationService.set(info);
         setAuthorizationInfo(info);
         await loadProfile();
     };
@@ -99,4 +109,4 @@ const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
     );
 };
 
-export default AuthorizationProvider;
+export default AuthenticationProvider;

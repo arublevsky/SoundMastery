@@ -1,4 +1,4 @@
-import { authorizationService } from "../authorization/authorizationService";
+import { authenticationService } from "../authorization/authenticationService";
 import { ApiError } from "./apiErrors";
 
 declare const __API_BASE_URL__: string;
@@ -44,7 +44,7 @@ const request = async <T extends unknown>(
             headers: {
                 Accept: "application/json",
                 ...getContentTypeHeader(options),
-                "Authorization": authorizationService.getAuthHeader(),
+                "Authorization": authenticationService.getAuthHeader(),
             },
             method,
         });

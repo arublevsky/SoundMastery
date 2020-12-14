@@ -1,11 +1,13 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SoundMastery.Application.Authorization;
+using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -31,6 +33,13 @@ namespace SoundMastery.Api.Extensions
             services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
             services.AddTransient<IIdentityManager, IdentityManager>();
             services.AddTransient<IDateTimeProvider, DateTimeProvider>();
+            services.AddTransient<IFacebookService, FacebookService>();
+
+            services.AddHttpClient<IFacebookService, FacebookService>(
+                client =>
+                {
+                    client.BaseAddress = new Uri("https://graph.facebook.com");
+                });
         }
 
         public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)

@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter } from 'react-router-dom';
-import AuthorizationProvider from "./modules/authorization/authorizationProvider";
+import AuthenticationProvider from "./modules/authorization/authenticationProvider";
 import { App } from "./app";
 
 ReactDOM.render(
     <BrowserRouter>
-        <AuthorizationProvider>
+        <AuthenticationProvider>
             <App />
-        </AuthorizationProvider>
+        </AuthenticationProvider>
     </BrowserRouter>,
     document.getElementById("app"));

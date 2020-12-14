@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using SoundMastery.Application.Authorization;
+using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -124,6 +125,45 @@ namespace SoundMastery.Tests.Application.Authorization
                     Expires = now + TimeSpan.FromMinutes(100),
                 }
             });
+        }
+
+        [Fact]
+        public async Task when_singing_in_a_new_user_with_facebook_it_should_create_a_new_user()
+        {
+            // Arrange
+            var identityManager = new Mock<IIdentityManager>();
+            var userService = new Mock<IUserService>();
+            var facebookService = new Mock<IFacebookService>();
+
+            var facebookAccessToken = "facebook_access_token";
+            User facebookUser = new UserBuilder().WithUsername("TheNewUser@facebook.com").Build();
+
+            identityManager.Setup(x => x.CreateAsync(It.Is<User>(u => u == facebookUser), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Success);
+
+            facebookService.Setup(x => x.GetUserDataFromFacebook(It.Is<string>(u => u == facebookAccessToken)))
+                .ReturnsAsync(facebookUser);
+
+            userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == facebookUser.UserName)))
+                .ReturnsAsync((User?)null);
+
+            userService.SetupSequence(m => m.FindByNameAsync(It.Is<string>(u => u == facebookUser.UserName)))
+                .ReturnsAsync((User?) null) // user is not created yet
+                .ReturnsAsync(facebookUser); // user has been created
+
+            var sut = new UserAuthorizationServiceBuilder()
+                .With(identityManager.Object)
+                .With(userService.Object)
+                .With(new SystemConfigurationServiceBuilder().BuildWithJwtConfigured())
+                .With(facebookService.Object)
+                .Build();
+
+            // Act
+            await sut.ExternalLogin(new ExternalLoginModel { AccessToken = facebookAccessToken });
+
+            // Assert
+            facebookService.Verify(x => x.ValidateAccessToken(It.Is<string>(u => u == facebookAccessToken)), Times.Once);
+            identityManager.Verify(x => x.CreateAsync(It.Is<User>(u => u == facebookUser), It.IsAny<string>()), Times.Once);
         }
     }
 }

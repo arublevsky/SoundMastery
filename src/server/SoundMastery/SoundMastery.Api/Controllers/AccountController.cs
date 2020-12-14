@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SoundMastery.Application.Authorization;
+using SoundMastery.Application.Authorization.ExternalProviders;
 
 namespace SoundMastery.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -28,13 +30,16 @@ namespace SoundMastery.Api.Controllers
             }
 
             TokenAuthorizationResult? result = await _authorizationService.Login(model);
+            return result != null ? Ok(result) : (IActionResult) BadRequest();
+        }
 
-            if (result == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(result);
+        [AllowAnonymous]
+        [Route("external-login")]
+        [HttpPost]
+        public async Task<IActionResult> ExternalLogin([FromBody] ExternalLoginModel model)
+        {
+            TokenAuthorizationResult? result = await _authorizationService.ExternalLogin(model);
+            return result != null ? Ok(result) : (IActionResult) BadRequest();
         }
 
         [AllowAnonymous]
@@ -49,12 +54,9 @@ namespace SoundMastery.Api.Controllers
 
             IdentityResult result = await _authorizationService.Register(model);
 
-            if (result.Succeeded)
-            {
-                return Ok(_authorizationService.GetAccessToken(model.Email!));
-            }
-
-            return BadRequest(result.Errors);
+            return result.Succeeded
+                ? Ok(_authorizationService.GetAccessToken(model.Email!))
+                : (IActionResult) BadRequest(result.Errors);
         }
 
         [AllowAnonymous]
@@ -63,13 +65,7 @@ namespace SoundMastery.Api.Controllers
         public async Task<IActionResult> RefreshToken()
         {
             TokenAuthorizationResult? result = await _authorizationService.RefreshToken();
-
-            if (result == null)
-            {
-                return Unauthorized();
-            }
-
-            return Ok(result);
+            return result != null ? Ok(result) : (IActionResult) Unauthorized();
         }
     }
 }

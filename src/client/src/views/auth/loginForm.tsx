@@ -20,7 +20,7 @@ interface FormProps {
 
 interface Props {
     handleFormLogin: (email: string, password: string) => Promise<void>;
-    handleFacebookLogin: () => Promise<void>;
+    handleFacebookLogin: () => void;
     handleGoogleLogin: () => Promise<void>;
 }
 
