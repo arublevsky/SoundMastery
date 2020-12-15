@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
-namespace SoundMastery.Application.Authorization.ExternalProviders
+namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
 {
     public class FacebookService : IFacebookService
     {
@@ -18,22 +18,10 @@ namespace SoundMastery.Application.Authorization.ExternalProviders
             _configurationService = configurationService;
         }
 
-        public async Task ValidateAccessToken(string accessToken)
+        public async Task<User> GetUserData(string accessToken)
         {
-            var appId = _configurationService.GetSetting<string>("Authentication:Facebook:AppId");
-            var appSecret = _configurationService.GetSetting<string>("Authentication:Facebook:AppSecret");
+            await ValidateAccessToken(accessToken);
 
-            var result = await CallFacebookApi<InspectTokenResponse>(
-                $"debug_token?input_token={accessToken}&access_token={appId}|{appSecret}");
-
-            if (result?.Data == null || result.Data.IsValid == false)
-            {
-                throw new InvalidOperationException("Invalid Facebook token provided.");
-            }
-        }
-
-        public async Task<User> GetUserDataFromFacebook(string accessToken)
-        {
             var model = await CallFacebookApi<MeFacebookModel>(
                 $"me?fields=first_name,last_name,email&access_token={accessToken}");
 
@@ -50,6 +38,21 @@ namespace SoundMastery.Application.Authorization.ExternalProviders
                 UserName = model.Email,
             };
         }
+
+        private async Task ValidateAccessToken(string accessToken)
+        {
+            var appId = _configurationService.GetSetting<string>("Authentication:Facebook:AppId");
+            var appSecret = _configurationService.GetSetting<string>("Authentication:Facebook:AppSecret");
+
+            var result = await CallFacebookApi<InspectTokenResponse>(
+                $"debug_token?input_token={accessToken}&access_token={appId}|{appSecret}");
+
+            if (result?.Data == null || result.Data.IsValid == false)
+            {
+                throw new InvalidOperationException("Invalid Facebook token provided.");
+            }
+        }
+
 
         private async Task<T?> CallFacebookApi<T>(string query)
             where T: class

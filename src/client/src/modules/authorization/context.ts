@@ -1,9 +1,9 @@
 import { createContext, useContext } from "react";
 import { UserProfile } from "../profile/profileApi";
-import { TokenAuthorizationResult } from "./authorizationApi";
+import { ExternalAuthenticationResult, TokenAuthenticationResult } from "./authorizationApi";
 
 export interface AuthorizationContext {
-    onLoggedIn: (data: TokenAuthorizationResult) => Promise<void>;
+    onLoggedIn: (data: TokenAuthenticationResult | ExternalAuthenticationResult) => Promise<void>;
     onLoggedOut: () => void;
     isAuthenticated: boolean;
     isLoading: boolean;

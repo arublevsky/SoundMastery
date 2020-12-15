@@ -1,11 +1,11 @@
-import { TokenAuthorizationResult } from "./authorizationApi";
+import { TokenAuthenticationResult } from "./authorizationApi";
 
 export interface RefreshTokenData {
     refreshToken: string;
     username: string;
 }
 
-export interface UserAuthorizationInfo extends TokenAuthorizationResult {
+export interface UserAuthorizationInfo extends TokenAuthenticationResult {
     loggedInAt: number;
 }
 

@@ -27,7 +27,7 @@ namespace SoundMastery.Application.Authorization
         private readonly IIdentityManager _identityManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IFacebookService _facebookService;
+        private readonly IExternalAuthProviderResolver _authProviderResolver;
 
         public UserAuthorizationService(
             ISystemConfigurationService configurationService,
@@ -35,17 +35,17 @@ namespace SoundMastery.Application.Authorization
             IUserService userService,
             IIdentityManager identityManager,
             IDateTimeProvider dateTimeProvider,
-            IFacebookService facebookService)
+            IExternalAuthProviderResolver authProviderResolver)
         {
             _configurationService = configurationService;
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _identityManager = identityManager;
             _dateTimeProvider = dateTimeProvider;
-            _facebookService = facebookService;
+            _authProviderResolver = authProviderResolver;
         }
 
-        public async Task<TokenAuthorizationResult?> Login(LoginUserModel model)
+        public async Task<TokenAuthenticationResult?> Login(LoginUserModel model)
         {
             SignInResult result =
                 await _identityManager.PasswordSignInAsync(model.Username, model.Password);
@@ -60,17 +60,15 @@ namespace SoundMastery.Application.Authorization
             return GetAccessToken(user!.UserName);
         }
 
-        public async Task<TokenAuthorizationResult?> ExternalLogin(ExternalLoginModel model)
+        public async Task<TokenAuthenticationResult?> ExternalLogin(ExternalLoginModel model)
         {
-            await _facebookService.ValidateAccessToken(model.AccessToken);
+            IExternalAuthProviderService service = _authProviderResolver.Resolve(model.Type!.Value);
 
-            var userData = await _facebookService.GetUserDataFromFacebook(model.AccessToken);
-
-            // SMELL: user needs to specify its own password later on to use form login
-            var externalPassword = $"External-{Guid.NewGuid()}";
+            User userData = await service.GetUserData(model.AccessToken);
 
             User user = await _userService.FindByNameAsync(userData.Email)
-                ?? await CreateNewUser(userData, externalPassword);
+                // SMELL: user needs to specify its own password later on to use form login
+                ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
 
             await SetRefreshTokenCookie(user);
             return GetAccessToken(user.UserName);
@@ -89,7 +87,7 @@ namespace SoundMastery.Application.Authorization
             return (await _userService.FindByNameAsync(user.Email))!;
         }
 
-        public async Task<TokenAuthorizationResult?> RefreshToken()
+        public async Task<TokenAuthenticationResult?> RefreshToken()
         {
             var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
             if (cookies == null || !cookies.TryGetValue(RefreshTokenCookieKey, out var value) || string.IsNullOrEmpty(value))
@@ -130,7 +128,7 @@ namespace SoundMastery.Application.Authorization
             return _identityManager.CreateAsync(user, model.Password);
         }
 
-        public TokenAuthorizationResult GetAccessToken(string username)
+        public TokenAuthenticationResult GetAccessToken(string username)
         {
             var expiresIn = _configurationService.GetSetting<int>("Jwt:AccessTokenExpirationInMinutes");
             var jwtKey = _configurationService.GetSetting<string>("Jwt:Key");
@@ -154,7 +152,7 @@ namespace SoundMastery.Application.Authorization
                 signingCredentials: credentials);
 
             var result = new JwtSecurityTokenHandler().WriteToken(token);
-            return new TokenAuthorizationResult(result, expiresIn);
+            return new TokenAuthenticationResult(result, expiresIn);
         }
 
         private async Task SetRefreshTokenCookie(User user)

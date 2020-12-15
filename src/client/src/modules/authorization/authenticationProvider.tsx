@@ -3,13 +3,18 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../common/apiErrors";
 import { getProfile, UserProfile } from "../profile/profileApi";
-import { externalLogin, refreshToken, TokenAuthorizationResult } from "./authorizationApi";
+import { ExternalAuthenticationResult, externalLogin, refreshToken, TokenAuthenticationResult } from "./authorizationApi";
 import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
 import { AuthorizationContext, initialState } from "./context";
+import { logoutExternal } from "./externalAuthentication";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
 }
+
+const isExternalAuth = (
+    object: TokenAuthenticationResult | ExternalAuthenticationResult
+): object is ExternalAuthenticationResult => 'type' in object;
 
 const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
     const navigate = useNavigate();
@@ -32,21 +37,15 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
         initialize();
     }, []);
 
-    const onLoggedIn = async (data: TokenAuthorizationResult) => {
-        const getNow = () => new Date().getTime();
+    const onLoggedIn = async (data: TokenAuthenticationResult | ExternalAuthenticationResult) => {
+        if (isExternalAuth(data)) {
+            data = await externalLogin(data.token, data.type);
+        }
 
         const info = {
             ...data,
-            loggedInAt: getNow(),
+            loggedInAt: new Date().getTime(),
         };
-
-        if (data.isExternal) {
-            const result = await externalLogin(data.token);
-
-            info.expiresInMilliseconds = result.expiresInMilliseconds;
-            info.token = result.token;
-            info.loggedInAt = getNow();
-        }
 
         authenticationService.set(info);
         setAuthorizationInfo(info);
@@ -55,6 +54,7 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
 
     const onLoggedOut = () => {
         setAuthorizationInfo(null);
+        logoutExternal();
         window.localStorage.setItem('logout', Date.now().toString());
     };
 

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace SoundMastery.Application.Authorization.ExternalProviders
+namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
 {
     public class InspectTokenResponse
     {

@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Authorization.ExternalProviders;
+using SoundMastery.Application.Authorization.ExternalProviders.Facebook;
+using SoundMastery.Application.Authorization.ExternalProviders.Google;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -17,6 +19,7 @@ namespace SoundMastery.Tests.Application.Builders
         private IHttpContextAccessor? _httpContextAccessor;
         private IDateTimeProvider? _dateTimeProvider;
         private IFacebookService? _facebookService;
+        private IGoogleService? _googleService;
 
         public UserAuthorizationServiceBuilder With(ISystemConfigurationService configuration)
         {
@@ -54,15 +57,25 @@ namespace SoundMastery.Tests.Application.Builders
             return this;
         }
 
+        public UserAuthorizationServiceBuilder With(IGoogleService googleService)
+        {
+            _googleService = googleService;
+            return this;
+        }
+
         public IUserAuthorizationService Build()
         {
+            var externalAuthResolver = new ExternalAuthProviderResolver(
+                _facebookService ?? new Mock<IFacebookService>().Object,
+                _googleService ?? new Mock<IGoogleService>().Object);
+
             return new UserAuthorizationService(
                 _configurationService ?? new Mock<ISystemConfigurationService>().Object,
                 _httpContextAccessor ?? new Mock<IHttpContextAccessor>().Object,
                 _userService ?? new Mock<IUserService>().Object,
                 _identityManager ?? new Mock<IIdentityManager>().Object,
                 _dateTimeProvider ?? new Mock<IDateTimeProvider>().Object,
-                _facebookService ?? new Mock<IFacebookService>().Object);
+                externalAuthResolver);
         }
     }
 }

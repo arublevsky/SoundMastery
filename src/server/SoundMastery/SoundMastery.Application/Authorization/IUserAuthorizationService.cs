@@ -6,14 +6,14 @@ namespace SoundMastery.Application.Authorization
 {
     public interface IUserAuthorizationService
     {
-        Task<TokenAuthorizationResult?> Login(LoginUserModel model);
+        Task<TokenAuthenticationResult?> Login(LoginUserModel model);
 
-        Task<TokenAuthorizationResult?> ExternalLogin(ExternalLoginModel model);
+        Task<TokenAuthenticationResult?> ExternalLogin(ExternalLoginModel model);
 
-        Task<TokenAuthorizationResult?> RefreshToken();
+        Task<TokenAuthenticationResult?> RefreshToken();
 
         Task<IdentityResult> Register(RegisterUserModel model);
 
-        TokenAuthorizationResult GetAccessToken(string username);
+        TokenAuthenticationResult GetAccessToken(string username);
     }
 }
