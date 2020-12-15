@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Container, makeStyles } from '@material-ui/core';
 import Page from '../../components/page';
@@ -7,7 +7,7 @@ import { login } from '../../modules/authorization/authorizationApi';
 import { useAuthContext } from '../../modules/authorization/context';
 import { useErrorHandling } from '../errors/useErrorHandling';
 import { ErrorAlert } from '../errors/errorAlert';
-import { facebookLogin } from '../../modules/authorization/externalAuthentication';
+import { facebookLogin, googleLogin, initExternalProviders } from '../../modules/authorization/externalAuthentication';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -24,6 +24,10 @@ const LoginView = () => {
     const { onLoggedIn } = useAuthContext();
     const [showError, _, errors, asyncHandler] = useErrorHandling(false);
 
+    useEffect(() => {
+        initExternalProviders();
+    }, []);
+
     const handleFormLogin = async (email: string, password: string) => {
         await asyncHandler(async () => {
             const result = await login(email, password);
@@ -33,15 +37,22 @@ const LoginView = () => {
     };
 
     const handleFacebookLogin = () => {
-        facebookLogin((token) => {
+        facebookLogin((result) => {
             asyncHandler(async () => {
-                await onLoggedIn(token);
+                await onLoggedIn(result);
                 navigate("/admin/dashboard");
             });
         });
     };
 
-    const handleGoogleLogin = () => Promise.resolve();
+    const handleGoogleLogin = async () => {
+        await googleLogin((result) => {
+            asyncHandler(async () => {
+                await onLoggedIn(result);
+                navigate("/admin/dashboard");
+            });
+        });
+    };
 
     return (
         <Page className={classes.root} title="Login">

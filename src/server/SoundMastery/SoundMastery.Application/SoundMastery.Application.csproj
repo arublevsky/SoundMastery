@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <PackageReference Include="FluentValidation" Version="9.3.0" />
+      <PackageReference Include="Google.Apis.Auth" Version="1.49.0" />
       <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
       <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.0" />
       <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.8.0" />

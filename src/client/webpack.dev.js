@@ -20,7 +20,9 @@ module.exports = merge(common, {
     },
     plugins: [
         new webpack.DefinePlugin({
-            __API_BASE_URL__: JSON.stringify("https://localhost:5001")
+            __API_BASE_URL__: JSON.stringify("https://localhost:5001"),
+            __FACEBOOK_APP_ID__: JSON.stringify("186246619844260"),
+            __GOOGLE_CLIENT_ID__: JSON.stringify("48645631284-1m423c8ltmcg6cn6npi8bggmg172p215.apps.googleusercontent.com"),
         })
     ]
 });

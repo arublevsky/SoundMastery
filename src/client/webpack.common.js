@@ -28,7 +28,10 @@ module.exports = {
                 { from: 'src/static', to: 'static' },
             ],
         }),
-        new HtmlWebpackPlugin({ template: 'src/index.html' }),
+        new HtmlWebpackPlugin({
+            template: 'src/index.html',
+            favicon: "./src/static/favicon.gif"
+        }),
     ],
     output: {
         path: path.resolve(__dirname, 'dist'),

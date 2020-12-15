@@ -24,12 +24,7 @@ namespace SoundMastery.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginUserModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            TokenAuthorizationResult? result = await _authorizationService.Login(model);
+            TokenAuthenticationResult? result = await _authorizationService.Login(model);
             return result != null ? Ok(result) : (IActionResult) BadRequest();
         }
 
@@ -38,7 +33,7 @@ namespace SoundMastery.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> ExternalLogin([FromBody] ExternalLoginModel model)
         {
-            TokenAuthorizationResult? result = await _authorizationService.ExternalLogin(model);
+            TokenAuthenticationResult? result = await _authorizationService.ExternalLogin(model);
             return result != null ? Ok(result) : (IActionResult) BadRequest();
         }
 
@@ -64,7 +59,7 @@ namespace SoundMastery.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> RefreshToken()
         {
-            TokenAuthorizationResult? result = await _authorizationService.RefreshToken();
+            TokenAuthenticationResult? result = await _authorizationService.RefreshToken();
             return result != null ? Ok(result) : (IActionResult) Unauthorized();
         }
     }

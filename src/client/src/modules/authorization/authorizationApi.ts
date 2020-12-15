@@ -3,30 +3,39 @@ import { RegisterUserModel } from "./accountService";
 
 const apiController = "account";
 
-export interface TokenAuthorizationResult {
+export enum ExternalAuthProviderType {
+    Facebook = 1,
+    Google = 2,
+}
+
+export interface TokenAuthenticationResult {
     expiresInMilliseconds: number;
     token: string;
-    isExternal: boolean;
+}
+
+export interface ExternalAuthenticationResult {
+    token: string;
+    type: ExternalAuthProviderType;
 }
 
 export const login = async (username: string, password: string) => {
-    return httpPost<TokenAuthorizationResult>(`${apiController}/login`, {
+    return httpPost<TokenAuthenticationResult>(`${apiController}/login`, {
         body: { username, password }
     });
 };
 
-export const externalLogin = async (accessToken: string) => {
-    return httpPost<TokenAuthorizationResult>(`${apiController}/external-login`, {
-        body: { accessToken }
+export const externalLogin = async (accessToken: string, type: ExternalAuthProviderType) => {
+    return httpPost<TokenAuthenticationResult>(`${apiController}/external-login`, {
+        body: { accessToken, type }
     });
 };
 
 export const register = async (body: RegisterUserModel) => {
-    return httpPost<TokenAuthorizationResult>(`${apiController}/register`, {
+    return httpPost<TokenAuthenticationResult>(`${apiController}/register`, {
         body: body
     });
 };
 
 export const refreshToken = async () => {
-    return httpGet<TokenAuthorizationResult>(`${apiController}/refresh-token`);
+    return httpGet<TokenAuthenticationResult>(`${apiController}/refresh-token`);
 };
