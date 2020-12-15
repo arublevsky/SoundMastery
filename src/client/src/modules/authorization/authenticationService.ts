@@ -9,7 +9,7 @@ export interface UserAuthorizationInfo extends TokenAuthorizationResult {
     loggedInAt: number;
 }
 
-export class AuthorizationService {
+export class AuthenticationService {
     private accessTokenInfo?: UserAuthorizationInfo = null;
 
     public set = (data: UserAuthorizationInfo) => {
@@ -42,4 +42,4 @@ export class AuthorizationService {
     }
 }
 
-export const authorizationService = new AuthorizationService();
+export const authenticationService = new AuthenticationService();

@@ -7,6 +7,7 @@ import { login } from '../../modules/authorization/authorizationApi';
 import { useAuthContext } from '../../modules/authorization/context';
 import { useErrorHandling } from '../errors/useErrorHandling';
 import { ErrorAlert } from '../errors/errorAlert';
+import { facebookLogin } from '../../modules/authorization/externalAuthentication';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,7 +32,15 @@ const LoginView = () => {
         });
     };
 
-    const handleFacebookLogin = () => Promise.resolve();
+    const handleFacebookLogin = () => {
+        facebookLogin((token) => {
+            asyncHandler(async () => {
+                await onLoggedIn(token);
+                navigate("/admin/dashboard");
+            });
+        });
+    };
+
     const handleGoogleLogin = () => Promise.resolve();
 
     return (

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Nuke.Common;
@@ -133,7 +132,7 @@ class Build : NukeBuild
 
             if (string.IsNullOrWhiteSpace(actor) || string.IsNullOrWhiteSpace(token))
             {
-                throw new InvalidOperationException("Cannot  publish docker images: missing github credentials");
+                throw new InvalidOperationException("Cannot publish docker images: missing github credentials");
             }
 
             Docker($"login ghcr.io -u {actor} -p {token}");
@@ -158,8 +157,12 @@ class Build : NukeBuild
     string GetVersionInternal()
     {
         DotNet("tool restore", workingDirectory: RootDirectory);
-        var minverVersion = DotNet("minver", logOutput: false, logInvocation: false).First(x => x.Type != OutputType.Err).Text;
-        return IsTaggedCommit() ? minverVersion : $"{minverVersion}-{GetCommitSha().Substring(0, 5)}";
+
+        var version = DotNet("minver", logOutput: false, logInvocation: false)
+            .First(x => x.Type != OutputType.Err)
+            .Text;
+
+        return IsTaggedCommit() ? version : $"{version}-{GetCommitSha().Substring(0, 5)}";
     }
 
     bool IsTaggedCommit()
@@ -181,6 +184,9 @@ class Build : NukeBuild
 
     string GetCommitSha()
     {
-        return Git("rev-parse HEAD").Single().Text;
+        // github does merge into target branch during checkout
+        // so to have a deterministic version for the pull request, the 2nd parent of merge commit is taken
+        var commitPath = IsLocalBuild ? "HEAD" : "HEAD^2";
+        return Git($"rev-parse {commitPath}").Single().Text;
     }
 }
