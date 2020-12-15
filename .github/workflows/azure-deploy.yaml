@@ -24,7 +24,7 @@ jobs:
       - name: Set app version
         id: get_version
         run: |
-          ./build.sh --target SetAppVersion --verbosity quiet
+          ./build.sh --target SetAppVersion
           echo "::set-output name=app-version::$(grep APP_VERSION ./.config/ci.env | cut -d '=' -f 2)"
 
       - name: Deploy API
