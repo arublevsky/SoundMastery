@@ -12,6 +12,8 @@ import {
 } from '@material-ui/core';
 import Facebook from '../../icons/facebook';
 import Google from '../../icons/google';
+import Microsoft from './../../icons/microsoft';
+import Twitter from '../../icons/twitter';
 
 interface FormProps {
     email: string;
@@ -20,11 +22,19 @@ interface FormProps {
 
 interface Props {
     handleFormLogin: (email: string, password: string) => Promise<void>;
-    handleFacebookLogin: () => void;
+    handleFacebookLogin: () => Promise<void>;
     handleGoogleLogin: () => Promise<void>;
+    handleMicrosoftLogin: () => Promise<void>;
+    handleTwitterLogin: () => Promise<void>;
 }
 
-const LoginForm = ({ handleFormLogin, handleFacebookLogin, handleGoogleLogin }: Props) => (
+const LoginForm = ({
+    handleFormLogin,
+    handleFacebookLogin,
+    handleGoogleLogin,
+    handleMicrosoftLogin,
+    handleTwitterLogin,
+}: Props) => (
     <Formik<FormProps>
         initialValues={{
             email: 'admin@gmail.com',
@@ -45,91 +55,115 @@ const LoginForm = ({ handleFormLogin, handleFacebookLogin, handleGoogleLogin }: 
             touched,
             values,
         }) => (
-                <form onSubmit={handleSubmit}>
-                    <Box mb={3}>
-                        <Typography color="textPrimary" variant="h2">
-                            Sign in
-                        </Typography>
-                        <Typography color="textSecondary" gutterBottom variant="body2">
-                            Sign in on the internal platform
-                        </Typography>
-                    </Box>
-                    <Grid container spacing={3}>
-                        <Grid item xs={12} md={6}>
-                            <Button
-                                color="primary"
-                                fullWidth
-                                startIcon={<Facebook />}
-                                onClick={handleFacebookLogin}
-                                size="large"
-                                variant="contained"
-                            >
-                                Login with Facebook
-                    </Button>
-                        </Grid>
-                        <Grid item xs={12} md={6}>
-                            <Button
-                                fullWidth
-                                startIcon={<Google />}
-                                onClick={handleGoogleLogin}
-                                size="large"
-                                variant="contained"
-                            >
-                                Login with Google
-                            </Button>
-                        </Grid>
-                    </Grid>
-                    <Box mt={3} mb={1}>
-                        <Typography align="center" color="textSecondary" variant="body1">
-                            or login with email address
-                        </Typography>
-                    </Box>
-                    <TextField
-                        error={Boolean(touched.email && errors.email)}
-                        fullWidth
-                        helperText={touched.email && errors.email}
-                        label="Email Address"
-                        margin="normal"
-                        name="email"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="email"
-                        value={values.email}
-                        variant="outlined"
-                    />
-                    <TextField
-                        error={Boolean(touched.password && errors.password)}
-                        fullWidth
-                        helperText={touched.password && errors.password}
-                        label="Password"
-                        margin="normal"
-                        name="password"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="password"
-                        value={values.password}
-                        variant="outlined"
-                    />
-                    <Box my={2}>
+            <form onSubmit={handleSubmit}>
+                <Box mb={3}>
+                    <Typography color="textPrimary" variant="h2">
+                        Sign in
+                    </Typography>
+                    <Typography color="textSecondary" gutterBottom variant="body2">
+                        Sign in on the internal platform
+                    </Typography>
+                </Box>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
                         <Button
                             color="primary"
-                            disabled={isSubmitting}
                             fullWidth
+                            startIcon={<Facebook />}
+                            onClick={handleFacebookLogin}
                             size="large"
-                            type="submit"
                             variant="contained"
                         >
-                            Sign in now
+                            Login with Facebook
                         </Button>
-                    </Box>
-                    <Typography color="textSecondary" variant="body1">
-                        Don&apos;t have an account?{' '}
-                        <Link component={RouterLink} to="/register" variant="h6">
-                            Sign up
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Button
+                            fullWidth
+                            startIcon={<Google />}
+                            onClick={handleGoogleLogin}
+                            size="large"
+                            variant="contained"
+                        >
+                            Login with Google
+                        </Button>
+                    </Grid>
+                </Grid>
+                <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <Button
+                            fullWidth
+                            startIcon={<Microsoft />}
+                            onClick={handleMicrosoftLogin}
+                            size="large"
+                            variant="contained"
+                        >
+                            Login with Microsoft
+                            </Button>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <Button
+                            fullWidth
+                            startIcon={<Twitter />}
+                            onClick={handleTwitterLogin}
+                            size="large"
+                            variant="contained"
+                        >
+                            Login with Twitter
+                        </Button>
+                    </Grid>
+                </Grid>
+                <Box mt={3} mb={1}>
+                    <Typography align="center" color="textSecondary" variant="body1">
+                        or login with email address
+                        </Typography>
+                </Box>
+                <TextField
+                    error={Boolean(touched.email && errors.email)}
+                    fullWidth
+                    helperText={touched.email && errors.email}
+                    label="Email Address"
+                    margin="normal"
+                    name="email"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="email"
+                    value={values.email}
+                    variant="outlined"
+                />
+                <TextField
+                    error={Boolean(touched.password && errors.password)}
+                    fullWidth
+                    helperText={touched.password && errors.password}
+                    label="Password"
+                    margin="normal"
+                    name="password"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="password"
+                    value={values.password}
+                    variant="outlined"
+                />
+                <Box my={2}>
+                    <Button
+                        color="primary"
+                        disabled={isSubmitting}
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        variant="contained"
+                    >
+                        Sign in now
+                        </Button>
+                </Box>
+                <Typography color="textSecondary" variant="body1">
+                    Don&apos;t have an account?{' '}
+                    <Link component={RouterLink} to="/register" variant="h6">
+                        Sign up
                         </Link>
-                    </Typography>
-                </form>
-            )}
+                </Typography>
+            </form>
+        )}
     </Formik>);
 
 export default LoginForm;
