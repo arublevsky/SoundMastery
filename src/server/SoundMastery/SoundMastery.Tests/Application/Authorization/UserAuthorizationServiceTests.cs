@@ -10,6 +10,7 @@ using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Authorization.ExternalProviders.Facebook;
 using SoundMastery.Application.Authorization.ExternalProviders.Google;
+using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -132,7 +133,10 @@ namespace SoundMastery.Tests.Application.Authorization
         [Theory]
         [InlineData(ExternalAuthProviderType.Facebook)]
         [InlineData(ExternalAuthProviderType.Google)]
-        public async Task when_singing_in_a_new_user_with_external_provider_it_should_create_a_new_user_and_return_token_result(ExternalAuthProviderType type)
+        [InlineData(ExternalAuthProviderType.Microsoft)]
+        public async Task
+            when_singing_in_a_new_user_with_external_provider_it_should_create_a_new_user_and_return_token_result(
+                ExternalAuthProviderType type)
         {
             // Arrange
             // Arrange
@@ -140,6 +144,7 @@ namespace SoundMastery.Tests.Application.Authorization
             var userService = new Mock<IUserService>();
             var googleService = new Mock<IGoogleService>();
             var facebookService = new Mock<IFacebookService>();
+            var microsoftService = new Mock<IMicrosoftService>();
 
             var accessToken = "access_token";
             User user = new UserBuilder().WithUsername($"TheNewUser@email.com").Build();
@@ -149,7 +154,10 @@ namespace SoundMastery.Tests.Application.Authorization
 
             googleService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
             facebookService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
-            userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == user.UserName))).ReturnsAsync((User?)null);
+            microsoftService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
+
+            userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
+                .ReturnsAsync((User?) null);
 
             userService.SetupSequence(m => m.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
                 .ReturnsAsync((User?) null) // user is not created yet
@@ -161,6 +169,7 @@ namespace SoundMastery.Tests.Application.Authorization
                 .With(new SystemConfigurationServiceBuilder().BuildWithJwtConfigured())
                 .With(googleService.Object)
                 .With(facebookService.Object)
+                .With(microsoftService.Object)
                 .Build();
 
             // Act

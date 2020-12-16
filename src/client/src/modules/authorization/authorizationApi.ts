@@ -6,6 +6,7 @@ const apiController = "account";
 export enum ExternalAuthProviderType {
     Facebook = 1,
     Google = 2,
+    Microsoft = 3,
 }
 
 export interface TokenAuthenticationResult {

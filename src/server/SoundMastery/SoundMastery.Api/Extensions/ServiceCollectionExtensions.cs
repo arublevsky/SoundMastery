@@ -10,6 +10,7 @@ using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Authorization.ExternalProviders.Facebook;
 using SoundMastery.Application.Authorization.ExternalProviders.Google;
+using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -38,6 +39,7 @@ namespace SoundMastery.Api.Extensions
             services.AddTransient<IExternalAuthProviderResolver, ExternalAuthProviderResolver>();
             services.AddTransient<IFacebookService, FacebookService>();
             services.AddTransient<IGoogleService, GoogleService>();
+            services.AddTransient<IMicrosoftService, MicrosoftService>();
 
             services.AddHttpClient<IFacebookService, FacebookService>(
                 client =>

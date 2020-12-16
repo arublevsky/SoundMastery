@@ -9,6 +9,7 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
 {
     public class FacebookService : IFacebookService
     {
+        // SMELL: replace with official SDK library https://github.com/facebook-csharp-sdk/facebook-csharp-sdk
         private readonly HttpClient _httpClient;
         private readonly ISystemConfigurationService _configurationService;
 

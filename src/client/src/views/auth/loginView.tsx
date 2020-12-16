@@ -3,11 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Container, makeStyles } from '@material-ui/core';
 import Page from '../../components/page';
 import LoginForm from './loginForm';
-import { login } from '../../modules/authorization/authorizationApi';
+import { ExternalAuthenticationResult, login } from '../../modules/authorization/authorizationApi';
 import { useAuthContext } from '../../modules/authorization/context';
 import { useErrorHandling } from '../errors/useErrorHandling';
 import { ErrorAlert } from '../errors/errorAlert';
-import { facebookLogin, googleLogin, initExternalProviders } from '../../modules/authorization/externalAuthentication';
+import {
+    facebookLogin,
+    googleLogin,
+    initExternalProviders,
+    microsoftLogin,
+    twitterLogin
+} from '../../modules/authorization/externalAuthentication';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,17 +42,10 @@ const LoginView = () => {
         });
     };
 
-    const handleFacebookLogin = () => {
-        facebookLogin((result) => {
-            asyncHandler(async () => {
-                await onLoggedIn(result);
-                navigate("/admin/dashboard");
-            });
-        });
-    };
-
-    const handleGoogleLogin = async () => {
-        await googleLogin((result) => {
+    const handleExternalLogin = async (
+        externalLoginHandler: (onSuccess: (result: ExternalAuthenticationResult) => void) => Promise<void>
+    ) => {
+        await externalLoginHandler((result) => {
             asyncHandler(async () => {
                 await onLoggedIn(result);
                 navigate("/admin/dashboard");
@@ -61,8 +60,10 @@ const LoginView = () => {
                     <ErrorAlert show={showError} errors={errors} title={"Login failed"} />
                     <LoginForm
                         handleFormLogin={handleFormLogin}
-                        handleFacebookLogin={handleFacebookLogin}
-                        handleGoogleLogin={handleGoogleLogin}
+                        handleFacebookLogin={() => handleExternalLogin(facebookLogin)}
+                        handleGoogleLogin={() => handleExternalLogin(googleLogin)}
+                        handleMicrosoftLogin={() => handleExternalLogin(microsoftLogin)}
+                        handleTwitterLogin={() => handleExternalLogin(twitterLogin)}
                     />
                 </Container>
             </Box>
