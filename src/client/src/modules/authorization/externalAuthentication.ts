@@ -1,6 +1,7 @@
 import { ExternalAuthenticationResult, ExternalAuthProviderType } from './authorizationApi';
 import { PublicClientApplication, Configuration } from "@azure/msal-browser";
 
+declare const __CLIENT_APP_BASE_URL__: string;
 declare const __FACEBOOK_APP_ID__: string;
 declare const __GOOGLE_CLIENT_ID__: string;
 declare const __MICROSOFT_CLIENT_ID__: string;
@@ -8,7 +9,7 @@ declare const __MICROSOFT_CLIENT_ID__: string;
 const msalConfig: Configuration = {
     auth: {
         clientId: __MICROSOFT_CLIENT_ID__,
-        redirectUri: "https://localhost:9000"
+        redirectUri: __CLIENT_APP_BASE_URL__,
     }
 };
 
