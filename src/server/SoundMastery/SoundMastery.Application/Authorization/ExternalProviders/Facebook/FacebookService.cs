@@ -1,7 +1,7 @@
 using System;
-using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Facebook;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
@@ -9,22 +9,20 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
 {
     public class FacebookService : IFacebookService
     {
-        // SMELL: replace with official SDK library https://github.com/facebook-csharp-sdk/facebook-csharp-sdk
-        private readonly HttpClient _httpClient;
         private readonly ISystemConfigurationService _configurationService;
 
-        public FacebookService(HttpClient httpClient, ISystemConfigurationService configurationService)
+        public FacebookService(ISystemConfigurationService configurationService)
         {
-            _httpClient = httpClient;
             _configurationService = configurationService;
         }
 
         public async Task<User> GetUserData(string accessToken)
         {
-            await ValidateAccessToken(accessToken);
+            FacebookClient client = CreateFacebookClient(accessToken);
 
-            var model = await CallFacebookApi<MeFacebookModel>(
-                $"me?fields=first_name,last_name,email&access_token={accessToken}");
+            await ValidateAccessToken(client);
+
+            var model = await client.GetTaskAsync<MeFacebookModel>($"me?fields=first_name,last_name,email");
 
             if (model == null || !model.IsValid())
             {
@@ -40,32 +38,29 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
             };
         }
 
-        private async Task ValidateAccessToken(string accessToken)
+        private static FacebookClient CreateFacebookClient(string accessToken)
+        {
+            var client = new FacebookClient(accessToken);
+
+            client.SetJsonSerializers(
+                value => JsonSerializer.Serialize(value),
+                (value, type) => type != null ? JsonSerializer.Deserialize(value, type) : null);
+
+            return client;
+        }
+
+        private async Task ValidateAccessToken(FacebookClient client)
         {
             var appId = _configurationService.GetSetting<string>("Authentication:Facebook:AppId");
             var appSecret = _configurationService.GetSetting<string>("Authentication:Facebook:AppSecret");
 
-            var result = await CallFacebookApi<InspectTokenResponse>(
-                $"debug_token?input_token={accessToken}&access_token={appId}|{appSecret}");
+            var result = await client.GetTaskAsync<InspectTokenResponse>(
+                $"debug_token?input_token={client.AccessToken}&access_token={appId}|{appSecret}");
 
             if (result?.Data == null || result.Data.IsValid == false)
             {
                 throw new InvalidOperationException("Invalid Facebook token provided.");
             }
-        }
-
-
-        private async Task<T?> CallFacebookApi<T>(string query)
-            where T: class
-        {
-            var response = await _httpClient.GetAsync(query);
-            if (!response.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var result = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<T>(result);
         }
     }
 }
