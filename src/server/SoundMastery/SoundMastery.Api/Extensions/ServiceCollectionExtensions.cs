@@ -40,12 +40,6 @@ namespace SoundMastery.Api.Extensions
             services.AddTransient<IFacebookService, FacebookService>();
             services.AddTransient<IGoogleService, GoogleService>();
             services.AddTransient<IMicrosoftService, MicrosoftService>();
-
-            services.AddHttpClient<IFacebookService, FacebookService>(
-                client =>
-                {
-                    client.BaseAddress = new Uri("https://graph.facebook.com");
-                });
         }
 
         public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
