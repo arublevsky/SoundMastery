@@ -5,6 +5,6 @@ namespace SoundMastery.Application.Authorization.ExternalProviders
 {
     public interface IExternalAuthProviderService
     {
-        Task<User> GetUserData(string accessToken);
+        Task<User> GetUserData(string token);
     }
 }

@@ -1,4 +1,4 @@
-import { ExternalAuthenticationResult, ExternalAuthProviderType } from './authorizationApi';
+import { ExternalAuthenticationResult, ExternalAuthProviderType, acquireTwitterRequestToken } from './accountApi';
 import { PublicClientApplication, Configuration } from "@azure/msal-browser";
 
 declare const __CLIENT_APP_BASE_URL__: string;
@@ -71,8 +71,23 @@ export const microsoftLogin = async (onSuccess: (result: ExternalAuthenticationR
 /** 
  * Twitter login handler.
  */
-export const twitterLogin = async (onSuccess: (result: ExternalAuthenticationResult) => void) => {
-    console.log(onSuccess);
+export const twitterLogin = async () => {
+    const token = await acquireTwitterRequestToken();
+
+    // Sign-in process will continue on the specific callback URL, 
+    // which is set by the server due to Twitter API CORS limitation.
+    // Opening in pop-up is possible but requires extra logic that tracks popup state
+    // and reports message back to opener, see https://github.com/alexandrtovmach/react-twitter-login
+    window.location.replace(`https://api.twitter.com/oauth/authorize?oauth_token=${token}`);
+};
+
+export const isTwitterRedirectUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('oauth_token');
+    const verifier = params.get('oauth_verifier');
+    const requestId = params.get('tweetinvi_auth_request_id');
+
+    return token && verifier && requestId;
 };
 
 export const initExternalProviders = () => {

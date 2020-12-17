@@ -7,11 +7,11 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Microsoft
 {
     public class MicrosoftService : IMicrosoftService
     {
-        public async Task<User> GetUserData(string accessToken)
+        public async Task<User> GetUserData(string token)
         {
             var provider = new DelegateAuthenticationProvider(request =>
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 return Task.CompletedTask;
             });
 

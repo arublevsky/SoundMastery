@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SoundMastery.Api.Extensions;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Authorization.ExternalProviders;
 
@@ -38,6 +39,15 @@ namespace SoundMastery.Api.Controllers
         }
 
         [AllowAnonymous]
+        [Route("twitter-request-token")]
+        [HttpGet]
+        public async Task<IActionResult> GetTwitterRequestToken()
+        {
+            var token =  await _authorizationService.GetTwitterRequestToken();
+            return token != null ? Ok(token) : (IActionResult) BadRequest();
+        }
+
+        [AllowAnonymous]
         [Route("register")]
         [HttpPost]
         public async Task<IActionResult> Register([FromBody] RegisterUserModel model)
@@ -61,6 +71,14 @@ namespace SoundMastery.Api.Controllers
         {
             TokenAuthenticationResult? result = await _authorizationService.RefreshToken();
             return result != null ? Ok(result) : (IActionResult) Unauthorized();
+        }
+
+        [Route("logout")]
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _authorizationService.Logout(User.GetEmail());
+            return Ok();
         }
     }
 }

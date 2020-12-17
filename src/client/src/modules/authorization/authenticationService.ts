@@ -1,4 +1,4 @@
-import { TokenAuthenticationResult } from "./authorizationApi";
+import { TokenAuthenticationResult } from "./accountApi";
 
 export interface RefreshTokenData {
     refreshToken: string;

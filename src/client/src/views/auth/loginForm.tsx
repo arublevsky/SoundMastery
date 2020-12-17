@@ -13,7 +13,7 @@ import {
 import Facebook from '../../icons/facebook';
 import Google from '../../icons/google';
 import Microsoft from './../../icons/microsoft';
-import Twitter from '../../icons/twitter';
+import Twitter from './../../icons/twitter';
 
 interface FormProps {
     email: string;

@@ -73,9 +73,9 @@ namespace SoundMastery.Application.Profile
             return existing != null && IsValidToken(existing);
         }
 
-        public Task RemoveRefreshToken(User user, string token)
+        public Task ClearRefreshToken(User user)
         {
-            return _userRepository.RemoveRefreshToken(token, user);
+            return _userRepository.ClearRefreshToken(user);
         }
 
         private bool IsValidToken(RefreshToken token)

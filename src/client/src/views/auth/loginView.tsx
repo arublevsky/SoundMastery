@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Box, Container, makeStyles } from '@material-ui/core';
 import Page from '../../components/page';
 import LoginForm from './loginForm';
-import { ExternalAuthenticationResult, login } from '../../modules/authorization/authorizationApi';
+import { ExternalAuthenticationResult, login } from '../../modules/authorization/accountApi';
 import { useAuthContext } from '../../modules/authorization/context';
 import { useErrorHandling } from '../errors/useErrorHandling';
 import { ErrorAlert } from '../errors/errorAlert';

@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../common/apiErrors";
 import { getProfile, UserProfile } from "../profile/profileApi";
-import { ExternalAuthenticationResult, externalLogin, refreshToken, TokenAuthenticationResult } from "./authorizationApi";
+import { ExternalAuthenticationResult, externalLogin, logout, refreshToken, TokenAuthenticationResult } from "./accountApi";
 import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
 import { AuthorizationContext, initialState } from "./context";
-import { logoutExternal } from "./externalAuthentication";
+import { isTwitterRedirectUrl, logoutExternal } from "./externalAuthentication";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
@@ -52,10 +52,11 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
         await loadProfile();
     };
 
-    const onLoggedOut = () => {
+    const onLoggedOut = async () => {
         setAuthorizationInfo(null);
         logoutExternal();
         window.localStorage.setItem('logout', Date.now().toString());
+        await logout();
     };
 
     async function tryRefreshToken() {
@@ -86,7 +87,7 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
             setIsLoading(true);
             await action();
         } catch (e) {
-            if (e instanceof ApiError && e.isUnauthenticated()) {
+            if (e instanceof ApiError && e.isUnauthenticated() && !isTwitterRedirectUrl()) {
                 navigate("/login");
             }
             throw e;

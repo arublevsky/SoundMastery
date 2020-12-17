@@ -7,7 +7,7 @@ import {
     makeStyles
 } from '@material-ui/core';
 import RegisterForm, { RegisterFormData } from './registerForm';
-import { registerUser } from '../../modules/authorization/accountService';
+import { registerUser } from '../../modules/authorization/accountApi';
 import { useErrorHandling } from '../errors/useErrorHandling';
 import { ErrorAlert } from '../errors/errorAlert';
 import { useAuthContext } from '../../modules/authorization/context';

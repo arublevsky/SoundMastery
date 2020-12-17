@@ -16,9 +16,9 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
             _configurationService = configurationService;
         }
 
-        public async Task<User> GetUserData(string accessToken)
+        public async Task<User> GetUserData(string token)
         {
-            FacebookClient client = CreateFacebookClient(accessToken);
+            FacebookClient client = CreateFacebookClient(token);
 
             await ValidateAccessToken(client);
 

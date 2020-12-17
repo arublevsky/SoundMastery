@@ -19,7 +19,7 @@
       <EmbeddedResource Include="Sql\Generic\Users\FindUserByEmail.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\FindUserByName.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\InsertRefreshToken.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\RemoveRefreshToken.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\ClearRefreshToken.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\UpdateUser.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\UserCollections.sql" />
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CheckDatabaseExists.sql" />

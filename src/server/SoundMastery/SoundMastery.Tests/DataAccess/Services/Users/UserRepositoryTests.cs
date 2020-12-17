@@ -129,7 +129,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
             await sut.AssignRefreshToken("some_token", user!);
 
             // Act
-            await sut.RemoveRefreshToken("some_token", user!);
+            await sut.ClearRefreshToken(user!);
 
             // Assert
             var result = await sut.FindByNameAsync(username);
