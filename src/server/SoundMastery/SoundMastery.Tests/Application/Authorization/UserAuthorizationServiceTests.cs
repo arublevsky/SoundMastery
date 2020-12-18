@@ -11,6 +11,7 @@ using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Authorization.ExternalProviders.Facebook;
 using SoundMastery.Application.Authorization.ExternalProviders.Google;
 using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
+using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -134,6 +135,7 @@ namespace SoundMastery.Tests.Application.Authorization
         [InlineData(ExternalAuthProviderType.Facebook)]
         [InlineData(ExternalAuthProviderType.Google)]
         [InlineData(ExternalAuthProviderType.Microsoft)]
+        [InlineData(ExternalAuthProviderType.Twitter)]
         public async Task
             when_singing_in_a_new_user_with_external_provider_it_should_create_a_new_user_and_return_token_result(
                 ExternalAuthProviderType type)
@@ -145,6 +147,7 @@ namespace SoundMastery.Tests.Application.Authorization
             var googleService = new Mock<IGoogleService>();
             var facebookService = new Mock<IFacebookService>();
             var microsoftService = new Mock<IMicrosoftService>();
+            var twitterService = new Mock<ITwitterService>();
 
             var accessToken = "access_token";
             User user = new UserBuilder().WithUsername($"TheNewUser@email.com").Build();
@@ -155,6 +158,7 @@ namespace SoundMastery.Tests.Application.Authorization
             googleService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
             facebookService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
             microsoftService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
+            twitterService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
 
             userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
                 .ReturnsAsync((User?) null);
@@ -170,6 +174,7 @@ namespace SoundMastery.Tests.Application.Authorization
                 .With(googleService.Object)
                 .With(facebookService.Object)
                 .With(microsoftService.Object)
+                .With(twitterService.Object)
                 .Build();
 
             // Act

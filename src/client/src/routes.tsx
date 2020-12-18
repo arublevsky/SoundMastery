@@ -11,6 +11,7 @@ import CustomerListView from './views/customers';
 import PublicView from './views/public/index';
 import SettingsView from './views/settings';
 import { Navigate } from "react-router-dom";
+import TwitterAuthenticationView from "./views/auth/twitterAuthenticationView";
 
 export const publicRoutes = [
     {
@@ -19,6 +20,7 @@ export const publicRoutes = [
         children: [
             { path: 'public', element: <PublicView /> },
             { path: 'login', element: <LoginView /> },
+            { path: 'twitter-sign-in-success', element: <TwitterAuthenticationView /> },
             { path: 'register', element: <RegisterView /> },
             { path: '404', element: <NotFoundView /> },
             { path: '/', element: <Navigate to="/public" /> },

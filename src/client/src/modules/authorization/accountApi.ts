@@ -1,5 +1,4 @@
 import { httpGet, httpPost } from "../common/requestApi";
-import { RegisterUserModel } from "./accountService";
 
 const apiController = "account";
 
@@ -7,6 +6,7 @@ export enum ExternalAuthProviderType {
     Facebook = 1,
     Google = 2,
     Microsoft = 3,
+    Twitter = 4,
 }
 
 export interface TokenAuthenticationResult {
@@ -17,6 +17,13 @@ export interface TokenAuthenticationResult {
 export interface ExternalAuthenticationResult {
     token: string;
     type: ExternalAuthProviderType;
+}
+
+export interface RegisterUserModel {
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
 }
 
 export const login = async (username: string, password: string) => {
@@ -31,7 +38,7 @@ export const externalLogin = async (accessToken: string, type: ExternalAuthProvi
     });
 };
 
-export const register = async (body: RegisterUserModel) => {
+export const registerUser = async (body: RegisterUserModel) => {
     return httpPost<TokenAuthenticationResult>(`${apiController}/register`, {
         body: body
     });
@@ -39,4 +46,12 @@ export const register = async (body: RegisterUserModel) => {
 
 export const refreshToken = async () => {
     return httpGet<TokenAuthenticationResult>(`${apiController}/refresh-token`);
+};
+
+export const acquireTwitterRequestToken = () => {
+    return httpGet<string>(`${apiController}/twitter-request-token`);
+};
+
+export const logout = () => {
+    return httpGet<void>(`${apiController}/logout`);
 };

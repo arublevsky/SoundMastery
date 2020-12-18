@@ -8,6 +8,10 @@ namespace SoundMastery.Application.Authorization
     {
         Task<TokenAuthenticationResult?> Login(LoginUserModel model);
 
+        Task Logout(string username);
+
+        Task<string> GetTwitterRequestToken();
+
         Task<TokenAuthenticationResult?> ExternalLogin(ExternalLoginModel model);
 
         Task<TokenAuthenticationResult?> RefreshToken();

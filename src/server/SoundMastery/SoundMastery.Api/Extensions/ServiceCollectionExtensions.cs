@@ -11,6 +11,7 @@ using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Authorization.ExternalProviders.Facebook;
 using SoundMastery.Application.Authorization.ExternalProviders.Google;
 using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
+using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
@@ -19,6 +20,7 @@ using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Users;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
+using Tweetinvi.Auth;
 
 namespace SoundMastery.Api.Extensions
 {
@@ -40,6 +42,10 @@ namespace SoundMastery.Api.Extensions
             services.AddTransient<IFacebookService, FacebookService>();
             services.AddTransient<IGoogleService, GoogleService>();
             services.AddTransient<IMicrosoftService, MicrosoftService>();
+            services.AddTransient<ITwitterService, TwitterService>();
+
+            // Singletons
+            services.AddSingleton<IAuthenticationRequestStore, LocalAuthenticationRequestStore>();
         }
 
         public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)

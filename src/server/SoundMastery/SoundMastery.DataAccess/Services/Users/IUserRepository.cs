@@ -15,6 +15,6 @@ namespace SoundMastery.DataAccess.Services.Users
 
         Task AssignRefreshToken(string token, User user);
 
-        Task RemoveRefreshToken(string token, User user);
+        Task ClearRefreshToken(User user);
     }
 }

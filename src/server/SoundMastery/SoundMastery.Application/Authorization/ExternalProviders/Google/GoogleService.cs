@@ -14,9 +14,9 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Google
             _configurationService = configurationService;
         }
 
-        public async Task<User> GetUserData(string accessToken)
+        public async Task<User> GetUserData(string token)
         {
-            var payload = await GetSignaturePayload(accessToken);
+            var payload = await GetSignaturePayload(token);
             return new User
             {
                 UserName = payload.Email,
