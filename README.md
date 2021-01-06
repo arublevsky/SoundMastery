@@ -1,10 +1,10 @@
 # SoundMastery ![CI](https://github.com/arublevsky/soundmastery/workflows/CI/badge.svg)
 
-Portfolio project. 
+Administration portal for a music school. 
 
 * React SPA
 * ASP.NET 5.0 Web API
-* Multi database engine support: SQL Server and Postgress.
+* Multi database engine support: SQL Server and Postgres.
 * Dapper
 * ASP.NET Identity with JWT-based authentication
 * Docker
@@ -28,14 +28,14 @@ Portfolio project.
 ```
 3. Run `migrate-database.ps1 <command>` to prepare database
 
-For example
-`.\migrate-database.ps1 recreate` - to drop and recreate database with seeded users
-`.\migrate-database.ps1 update` - to run new migrations to the existing database
+    For example:
+    `.\migrate-database.ps1 recreate` - to drop and recreate database with seeded users
+    `.\migrate-database.ps1 update` - to run new migrations to the existing database
 
-3a. Run `run.ps1` to start webpack dev server with API host.
+    3a. Run `run.ps1` to start webpack dev server with API host.
 
-3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine).
-Note: docker deploy uses production webpack configuration, adjust server URL to point to the local server. See `webpack.prod.js`.
+    3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine).
+    Note: docker deploy uses production webpack configuration, adjust server URL to point to the local server. See `webpack.prod.js`.
 
 4. Setup SSL certificate
 
