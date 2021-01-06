@@ -16,6 +16,7 @@ Administration portal for a music school.
 1. .NET 5.0.100 SDK
 2. SQL Server 2017 or Postgres 13
 3. NodeJS 10+
+4. docker, docker-compose
 
 ## Development
 
