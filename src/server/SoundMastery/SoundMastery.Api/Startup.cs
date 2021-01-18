@@ -1,4 +1,5 @@
 ﻿using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SoundMastery.Api.Extensions;
+using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Validation;
 using SoundMastery.Domain.Identity;
 
@@ -19,17 +21,30 @@ namespace SoundMastery.Api
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureCors(Configuration);
             services.RegisterDependencies(Configuration);
             services.AddHttpContextAccessor();
-            services.AddIdentity<User, Role>().AddDefaultTokenProviders();
+            services.AddIdentity<User, Role>()
+                .AddDefaultTokenProviders()
+                .AddTokenProvider(TokenOptions.DefaultAuthenticatorProvider, typeof(TotpAuthenticatorTokenProvider))
+                .AddClaimsPrincipalFactory<AdditionalUserClaimsPrincipalFactory>();
             // ^services.AddIdentity sets default auth scheme to the cookies authentication,
             // so .AddAuthentication must go after this line to override the default to use JWT.
             services.ConfigureAuthentication(Configuration);
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("TwoFactorEnabled", x => x.RequireClaim("amr", "mfa"));
+                // options.AddPolicy("AdminAccess", policy => policy.RequireClaim("AdminAccess"));
+
+                options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+            });
 
             services.ConfigureIdentityOptions();
             services.AddSwaggerGen();

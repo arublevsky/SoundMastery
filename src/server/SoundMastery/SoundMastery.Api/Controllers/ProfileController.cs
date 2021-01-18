@@ -1,12 +1,11 @@
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SoundMastery.Api.Extensions;
 using SoundMastery.Application.Profile;
 
 namespace SoundMastery.Api.Controllers
 {
-    [Authorize]
+    // TODO check if default policy works
     [Route("api/[controller]")]
     [ApiController]
     public class ProfileController : ControllerBase

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Container,
@@ -8,6 +8,7 @@ import Page from './../../components/page';
 import Results from './results';
 import Toolbar from './toolbar';
 import data from './data';
+import { getUsers } from '../../modules/administration/adminApi';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -21,6 +22,11 @@ const useStyles = makeStyles((theme) => ({
 const CustomerListView = () => {
     const classes = useStyles();
     const [customers] = useState(data);
+
+    useEffect(() => {
+        const x = getUsers();
+        console.log(x);
+    }, []);
 
     return (
         <Page className={classes.root} title="Customers">

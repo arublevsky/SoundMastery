@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +10,12 @@ namespace SoundMastery.DataAccess.IdentityStores
     /// <summary>
     /// Proxy store to be used by ASP.NET Identity manager
     /// </summary>
-    public sealed class UserStore : IUserEmailStore<User>, IUserPasswordStore<User>
+    public sealed class UserStore :
+        IUserEmailStore<User>,
+        IUserPasswordStore<User>,
+        IUserAuthenticatorKeyStore<User>,
+        IUserTwoFactorStore<User>,
+        IUserTwoFactorRecoveryCodeStore<User>
     {
         private readonly IUserRepository _userRepository;
 
@@ -128,6 +134,41 @@ namespace SoundMastery.DataAccess.IdentityStores
 
         public void Dispose()
         {
+        }
+
+        public Task SetAuthenticatorKeyAsync(User user, string key, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<string> GetAuthenticatorKeyAsync(User user, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task SetTwoFactorEnabledAsync(User user, bool enabled, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<bool> GetTwoFactorEnabledAsync(User user, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task ReplaceCodesAsync(User user, IEnumerable<string> recoveryCodes, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<bool> RedeemCodeAsync(User user, string code, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public Task<int> CountCodesAsync(User user, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

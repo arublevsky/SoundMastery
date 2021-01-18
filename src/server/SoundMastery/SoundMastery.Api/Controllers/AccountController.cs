@@ -8,7 +8,6 @@ using SoundMastery.Application.Authorization.ExternalProviders;
 
 namespace SoundMastery.Api.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
