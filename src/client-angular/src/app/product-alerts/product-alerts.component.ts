@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
 import { Input, Output, EventEmitter } from '@angular/core';
-
-interface Product {
-    price: number;
-}
+import { Product } from '../products';
 
 @Component({
     selector: 'app-product-alerts',
