@@ -1,5 +1,5 @@
 using System;
-using DotNet.Testcontainers.Containers;
+using DotNet.Testcontainers.Containers.Modules.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using SoundMastery.DataAccess.Common;

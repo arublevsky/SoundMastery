@@ -1,7 +1,8 @@
 using System;
-using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Configurations;
-using DotNet.Testcontainers.Containers;
+using DotNet.Testcontainers.Containers.Builders;
+using DotNet.Testcontainers.Containers.Configurations.Databases;
+using DotNet.Testcontainers.Containers.Modules.Abstractions;
+using DotNet.Testcontainers.Containers.Modules.Databases;
 using SoundMastery.DataAccess.Common;
 
 namespace SoundMastery.Tests.DataAccess.Builders
