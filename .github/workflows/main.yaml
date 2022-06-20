@@ -54,5 +54,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - ​name​: ​Login to GHCR 
+  ​      ​uses​: ​docker/login-action@v1  
+  ​      ​with​: 
+  ​        ​registry​: ​ghcr.io 
+  ​        ​username​: ​${{ env.GITHUB_ACTOR }} 
+  ​        ​password​: ​${{ env.GITHUB_TOKEN }}
+
       - name: Publish Docker images
         run: ./build.sh --target PublishImages

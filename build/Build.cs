@@ -100,7 +100,7 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            Npm("i", workingDirectory: FrontendDirectory);
+            Npm("i --legacy-peer-deps", workingDirectory: FrontendDirectory);
             Npm("run build", workingDirectory: FrontendDirectory);
         });
 
@@ -127,15 +127,6 @@ class Build : NukeBuild
                 return;
             }
 
-            string? actor = Environment.GetEnvironmentVariable("GITHUB_ACTOR");
-            string? token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-
-            if (string.IsNullOrWhiteSpace(actor) || string.IsNullOrWhiteSpace(token))
-            {
-                throw new InvalidOperationException("Cannot publish docker images: missing github credentials");
-            }
-
-            Docker($"login ghcr.io -u {actor} -p {token}");
             DockerCompose($"-f {DockerComposePath} push");
         });
 

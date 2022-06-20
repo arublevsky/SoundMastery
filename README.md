@@ -3,7 +3,7 @@
 Administration portal for a music school. 
 
 * React SPA
-* ASP.NET 5.0 Web API
+* ASP.NET 6.0 Web API
 * Multi database engine support: SQL Server and Postgres.
 * Dapper
 * ASP.NET Identity with JWT-based authentication
@@ -13,7 +13,7 @@ Administration portal for a music school.
 
 ## Prerequsites
 
-1. .NET 5.0.100 SDK
+1. .NET 6.0.301 SDK
 2. SQL Server 2017 or Postgres 13
 3. NodeJS 10+
 4. docker, docker-compose
