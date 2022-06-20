@@ -39,7 +39,6 @@ namespace SoundMastery.Api
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining<UserProfileValidator>();
-                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 });
         }
 

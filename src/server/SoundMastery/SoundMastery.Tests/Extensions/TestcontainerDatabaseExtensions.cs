@@ -1,4 +1,4 @@
-using DotNet.Testcontainers.Containers.Modules.Abstractions;
+using DotNet.Testcontainers.Containers;
 
 namespace SoundMastery.Tests.Extensions
 {

@@ -24,7 +24,7 @@ namespace SoundMastery.Tests.DataAccess.DatabaseManagement
             Func<Task> action = () => sut.CheckConnection();
 
             // Assert
-            action.Should().NotThrow();
+            await action.Should().NotThrowAsync();
         }
 
         [Theory]
@@ -41,7 +41,7 @@ namespace SoundMastery.Tests.DataAccess.DatabaseManagement
             Func<Task> action = () => sut.CheckConnection();
 
             // Assert
-            action.Should().Throw<Exception>().WithMessage("*not*available*");
+            await action.Should().ThrowAsync<Exception>().WithMessage("*not*available*");
         }
 
         [Theory]
