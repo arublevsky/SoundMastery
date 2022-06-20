@@ -8,10 +8,10 @@ import {
     Grid,
     LinearProgress,
     Typography,
-    makeStyles,
     colors
-} from '@material-ui/core';
-import InsertChartIcon from '@material-ui/icons/InsertChartOutlined';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import InsertChartIcon from '@mui/icons-material/InsertChartOutlined';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -34,7 +34,7 @@ const TasksProgress = ({ className }: Props) => {
     return (
         <Card className={clsx(classes.root, className)}>
             <CardContent>
-                <Grid container justify="space-between" spacing={3}>
+                <Grid container spacing={3}>
                     <Grid item>
                         <Typography color="textSecondary" gutterBottom variant="h6">
                             TASKS PROGRESS

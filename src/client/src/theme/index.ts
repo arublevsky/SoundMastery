@@ -1,5 +1,5 @@
-import { createMuiTheme } from '@material-ui/core';
-import { indigo, common, blueGrey } from '@material-ui/core/colors';
+import { createMuiTheme } from '@mui/material';
+import { indigo, common, blueGrey } from '@mui/material/colors';
 import shadows from './shadows';
 import typography from './typography';
 

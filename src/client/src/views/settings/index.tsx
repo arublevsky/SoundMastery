@@ -1,9 +1,9 @@
 import React from 'react';
 import {
     Box,
-    Container,
-    makeStyles
-} from '@material-ui/core';
+    Container
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Page from '../../components/page';
 import Notifications from './notifications';
 import Password from './password';

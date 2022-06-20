@@ -15,10 +15,10 @@ import {
     TableHead,
     TableRow,
     TableSortLabel,
-    Tooltip,
-    makeStyles
-} from '@material-ui/core';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+    Tooltip
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { orders } from './data/orders';
 
 

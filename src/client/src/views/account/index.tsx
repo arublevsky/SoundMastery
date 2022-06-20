@@ -1,9 +1,9 @@
 import React from 'react';
 import {
     Container,
-    Grid,
-    makeStyles
-} from '@material-ui/core';
+    Grid
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Page from '../../components/page';
 import Profile from './profile';
 import ProfileDetails from './profileDetails';

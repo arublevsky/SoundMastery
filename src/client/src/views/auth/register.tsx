@@ -3,9 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Page from '../../components/page';
 import {
     Box,
-    Container,
-    makeStyles
-} from '@material-ui/core';
+    Container
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import RegisterForm, { RegisterFormData } from './registerForm';
 import { registerUser } from '../../modules/authorization/accountApi';
 import { useErrorHandling } from '../errors/useErrorHandling';

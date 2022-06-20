@@ -8,9 +8,9 @@ import {
     CardHeader,
     Divider,
     Typography,
-    makeStyles,
     useTheme
-} from '@material-ui/core';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { devices, getTrafficOptions, trafficData } from './data/traffic';
 
 const useStyles = makeStyles(() => ({ root: { height: '100%' } }));

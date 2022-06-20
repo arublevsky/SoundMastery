@@ -10,7 +10,7 @@ import {
     Link,
     TextField,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 export interface RegisterFormData {
     email: string;
@@ -53,110 +53,110 @@ const RegisterForm = ({ handleRegister }: Props) => (
             touched,
             values
         }) => (
-                <form onSubmit={handleSubmit}>
-                    <Box mb={3}>
-                        <Typography color="textPrimary" variant="h2">
-                            Create new account
-                        </Typography>
-                        <Typography color="textSecondary" gutterBottom variant="body2">
-                            Use your email to create new account
-                        </Typography>
-                    </Box>
-                    <TextField
-                        error={Boolean(touched.firstName && errors.firstName)}
-                        fullWidth
-                        helperText={touched.firstName && errors.firstName}
-                        label="First name"
-                        margin="normal"
-                        name="firstName"
-                        onBlur={handleBlur}
+            <form onSubmit={handleSubmit}>
+                <Box mb={3}>
+                    <Typography color="textPrimary" variant="h2">
+                        Create new account
+                    </Typography>
+                    <Typography color="textSecondary" gutterBottom variant="body2">
+                        Use your email to create new account
+                    </Typography>
+                </Box>
+                <TextField
+                    error={Boolean(touched.firstName && errors.firstName)}
+                    fullWidth
+                    helperText={touched.firstName && errors.firstName}
+                    label="First name"
+                    margin="normal"
+                    name="firstName"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.firstName}
+                    variant="outlined"
+                />
+                <TextField
+                    error={Boolean(touched.lastName && errors.lastName)}
+                    fullWidth
+                    helperText={touched.lastName && errors.lastName}
+                    label="Last name"
+                    margin="normal"
+                    name="lastName"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.lastName}
+                    variant="outlined"
+                />
+                <TextField
+                    error={Boolean(touched.email && errors.email)}
+                    fullWidth
+                    helperText={touched.email && errors.email}
+                    label="Email Address"
+                    margin="normal"
+                    name="email"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="email"
+                    value={values.email}
+                    variant="outlined"
+                />
+                <TextField
+                    error={Boolean(touched.password && errors.password)}
+                    fullWidth
+                    helperText={touched.password && errors.password}
+                    label="Password"
+                    margin="normal"
+                    name="password"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    type="password"
+                    value={values.password}
+                    variant="outlined"
+                />
+                <Box alignItems="center" display="flex" ml={-1}>
+                    <Checkbox
+                        checked={values.policy}
+                        name="policy"
                         onChange={handleChange}
-                        value={values.firstName}
-                        variant="outlined"
                     />
-                    <TextField
-                        error={Boolean(touched.lastName && errors.lastName)}
-                        fullWidth
-                        helperText={touched.lastName && errors.lastName}
-                        label="Last name"
-                        margin="normal"
-                        name="lastName"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.lastName}
-                        variant="outlined"
-                    />
-                    <TextField
-                        error={Boolean(touched.email && errors.email)}
-                        fullWidth
-                        helperText={touched.email && errors.email}
-                        label="Email Address"
-                        margin="normal"
-                        name="email"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="email"
-                        value={values.email}
-                        variant="outlined"
-                    />
-                    <TextField
-                        error={Boolean(touched.password && errors.password)}
-                        fullWidth
-                        helperText={touched.password && errors.password}
-                        label="Password"
-                        margin="normal"
-                        name="password"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        type="password"
-                        value={values.password}
-                        variant="outlined"
-                    />
-                    <Box alignItems="center" display="flex" ml={-1}>
-                        <Checkbox
-                            checked={values.policy}
-                            name="policy"
-                            onChange={handleChange}
-                        />
-                        <Typography color="textSecondary" variant="body1">
-                            I have read the
-                                            {' '}
-                            <Link
-                                color="primary"
-                                component={RouterLink}
-                                to="#"
-                                underline="always"
-                                variant="h6"
-                            >
-                                Terms and Conditions
-                            </Link>
-                        </Typography>
-                    </Box>
-                    {Boolean(touched.policy && errors.policy) && (
-                        <FormHelperText error>
-                            {errors.policy}
-                        </FormHelperText>
-                    )}
-                    <Box my={2}>
-                        <Button
-                            color="primary"
-                            disabled={isSubmitting}
-                            fullWidth
-                            size="large"
-                            type="submit"
-                            variant="contained"
-                        >
-                            Sign up now
-                        </Button>
-                    </Box>
                     <Typography color="textSecondary" variant="body1">
-                        Have an account?{' '}
-                        <Link component={RouterLink} to="/login" variant="h6">
-                            Sign in
+                        I have read the
+                        {' '}
+                        <Link
+                            color="primary"
+                            component={RouterLink}
+                            to="#"
+                            underline="always"
+                            variant="h6"
+                        >
+                            Terms and Conditions
                         </Link>
                     </Typography>
-                </form>
-            )}
+                </Box>
+                {Boolean(touched.policy && errors.policy) && (
+                    <FormHelperText error>
+                        {errors.policy}
+                    </FormHelperText>
+                )}
+                <Box my={2}>
+                    <Button
+                        color="primary"
+                        disabled={isSubmitting}
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        variant="contained"
+                    >
+                        Sign up now
+                    </Button>
+                </Box>
+                <Typography color="textSecondary" variant="body1">
+                    Have an account?{' '}
+                    <Link component={RouterLink} to="/login" variant="h6">
+                        Sign in
+                    </Link>
+                </Typography>
+            </form>
+        )}
     </Formik>);
 
 export default RegisterForm;

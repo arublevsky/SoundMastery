@@ -4,9 +4,9 @@ import clsx from 'clsx';
 import Logo from '../../components/logo';
 import {
     AppBar,
-    Toolbar,
-    makeStyles
-} from '@material-ui/core';
+    Toolbar
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles(({
     root: {},

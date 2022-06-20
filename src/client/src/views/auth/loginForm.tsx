@@ -9,7 +9,7 @@ import {
     Link,
     TextField,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import Facebook from '../../icons/facebook';
 import Google from '../../icons/google';
 import Microsoft from './../../icons/microsoft';
@@ -99,7 +99,7 @@ const LoginForm = ({
                             variant="contained"
                         >
                             Login with Microsoft
-                            </Button>
+                        </Button>
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <Button
@@ -116,7 +116,7 @@ const LoginForm = ({
                 <Box mt={3} mb={1}>
                     <Typography align="center" color="textSecondary" variant="body1">
                         or login with email address
-                        </Typography>
+                    </Typography>
                 </Box>
                 <TextField
                     error={Boolean(touched.email && errors.email)}
@@ -154,13 +154,13 @@ const LoginForm = ({
                         variant="contained"
                     >
                         Sign in now
-                        </Button>
+                    </Button>
                 </Box>
                 <Typography color="textSecondary" variant="body1">
                     Don&apos;t have an account?{' '}
                     <Link component={RouterLink} to="/register" variant="h6">
                         Sign up
-                        </Link>
+                    </Link>
                 </Typography>
             </form>
         )}

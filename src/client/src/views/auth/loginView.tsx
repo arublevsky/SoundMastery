@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Box, Container, makeStyles } from '@material-ui/core';
+import { Box, Container } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Page from '../../components/page';
 import LoginForm from './loginForm';
 import { ExternalAuthenticationResult, login } from '../../modules/authorization/accountApi';

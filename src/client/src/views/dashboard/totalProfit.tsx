@@ -6,10 +6,10 @@ import {
     CardContent,
     Grid,
     Typography,
-    makeStyles,
     colors
-} from '@material-ui/core';
-import AttachMoneyIcon from '@material-ui/icons/AttachMoney';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -32,7 +32,7 @@ const TotalProfit = ({ className }: Props) => {
     return (
         <Card className={clsx(classes.root, className)}>
             <CardContent>
-                <Grid container justify="space-between" spacing={3}>
+                <Grid container spacing={3}>
                     <Grid item>
                         <Typography color="textSecondary" gutterBottom variant="h6">
                             TOTAL PROFIT

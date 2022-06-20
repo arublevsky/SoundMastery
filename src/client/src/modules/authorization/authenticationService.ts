@@ -14,11 +14,11 @@ export class AuthenticationService {
 
     public set = (data: UserAuthorizationInfo) => {
         this.accessTokenInfo = data;
-    }
+    };
 
     public get = () => {
         return this.accessTokenInfo;
-    }
+    };
 
     public getAuthHeader = () => {
         if (this.accessTokenInfo && this.accessTokenInfo.token) {
@@ -26,11 +26,11 @@ export class AuthenticationService {
         }
 
         return null;
-    }
+    };
 
     public logout = () => {
         this.accessTokenInfo = null;
-    }
+    };
 
     public registerLogoutHandler = (handler: () => void) => {
         // SMELL: not protected from multiple registrations
@@ -39,7 +39,7 @@ export class AuthenticationService {
                 handler();
             }
         });
-    }
+    };
 }
 
 export const authenticationService = new AuthenticationService();
