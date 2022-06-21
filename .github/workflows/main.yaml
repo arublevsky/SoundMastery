@@ -42,7 +42,8 @@ jobs:
           show_class_names: true
           only_changed_files: true
 
-  login_to_gh_registry:
+  push_images:
+    name: Publish Docker images
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -53,15 +54,12 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-  push_images:
-    needs: login_to_gh_registry
-    name: Publish Docker images
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+          
+      -
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Publish Docker images
+      -
+        name: Publish Docker images
         run: ./build.sh --target PublishImages
