@@ -1,10 +1,10 @@
 # SoundMastery ![CI](https://github.com/arublevsky/soundmastery/workflows/CI/badge.svg)
 
-Portfolio project. 
+Administration portal for a music school. 
 
 * React SPA
-* ASP.NET 5.0 Web API
-* Multi database engine support: SQL Server and Postgress.
+* ASP.NET 6.0 Web API
+* Multi database engine support: SQL Server and Postgres.
 * Dapper
 * ASP.NET Identity with JWT-based authentication
 * Docker
@@ -13,9 +13,10 @@ Portfolio project.
 
 ## Prerequsites
 
-1. .NET 5.0.100 SDK
+1. .NET 6.0.301 SDK
 2. SQL Server 2017 or Postgres 13
 3. NodeJS 10+
+4. docker, docker-compose
 
 ## Development
 
@@ -28,14 +29,14 @@ Portfolio project.
 ```
 3. Run `migrate-database.ps1 <command>` to prepare database
 
-For example
-`.\migrate-database.ps1 recreate` - to drop and recreate database with seeded users
-`.\migrate-database.ps1 update` - to run new migrations to the existing database
+    For example:
+    `.\migrate-database.ps1 recreate` - to drop and recreate database with seeded users
+    `.\migrate-database.ps1 update` - to run new migrations to the existing database
 
-3a. Run `run.ps1` to start webpack dev server with API host.
+    3a. Run `run.ps1` to start webpack dev server with API host.
 
-3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine).
-Note: docker deploy uses production webpack configuration, adjust server URL to point to the local server. See `webpack.prod.js`.
+    3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine).
+    Note: docker deploy uses production webpack configuration, adjust server URL to point to the local server. See `webpack.prod.js`.
 
 4. Setup SSL certificate
 
@@ -45,9 +46,17 @@ In Powershell, execute the following command:
 
 To generate a new certificate use [this](https://gist.github.com/pgilad/63ddb94e0691eebd502deee207ff62bd) guide.
 
-# Cloud Deployments
+## Cloud Deployments
 
-## Azure
+### Azure
+
+Two pre-configured app services:
 
 Client: https://soundmastery-client.azurewebsites.net/
 API: https://soundmastery.azurewebsites.net/
+
+Pull-request deployments:
+
+1. Create a pull request and wait for the required checks to complete (so the app is built and images are published)
+2. Add `azure-deploy-pull-request` label to run deploy action.
+3. When the `AzureDeploy / Deploy PR package (pull_request)` completes, navigate to https://soundmastery-client.azurewebsites.net/ 

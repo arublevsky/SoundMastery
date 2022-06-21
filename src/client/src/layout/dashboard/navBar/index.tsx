@@ -8,10 +8,9 @@ import {
     Drawer,
     Hidden,
     List,
-    Typography,
-    makeStyles
-} from '@material-ui/core';
-
+    Typography
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import NavItem from './navItem';
 import navItems from './navItems';
 import { useAuthContext } from '../../../modules/authorization/context';

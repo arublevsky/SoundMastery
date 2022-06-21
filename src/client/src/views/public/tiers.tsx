@@ -1,13 +1,13 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import CardHeader from '@material-ui/core/CardHeader';
-import Grid from '@material-ui/core/Grid';
-import StarIcon from '@material-ui/icons/StarBorder';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
+import Button from '@mui/material/Button';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardHeader from '@mui/material/CardHeader';
+import Grid from '@mui/material/Grid';
+import StarIcon from '@mui/icons-material/StarBorder';
+import Typography from '@mui/material/Typography';
+import { makeStyles } from '@mui/styles';
 import { Tier } from './content';
 
 interface Props {
@@ -17,7 +17,7 @@ interface Props {
 const useStyles = makeStyles((theme) => ({
     cardHeader: {
         backgroundColor:
-            theme.palette.type === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
+            theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[700],
     },
     cardPricing: {
         display: 'flex',

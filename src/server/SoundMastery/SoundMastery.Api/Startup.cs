@@ -32,13 +32,13 @@ namespace SoundMastery.Api
             services.ConfigureAuthentication(Configuration);
 
             services.ConfigureIdentityOptions();
+            services.AddSwaggerGen();
 
             services.AddMvc()
                 .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining<UserProfileValidator>();
-                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                 });
         }
 
@@ -47,7 +47,11 @@ namespace SoundMastery.Api
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                });
             }
             else
             {

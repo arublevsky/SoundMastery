@@ -1,16 +1,23 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using SoundMastery.Application.Authorization.ExternalProviders;
 
 namespace SoundMastery.Application.Authorization
 {
     public interface IUserAuthorizationService
     {
-        Task<TokenAuthorizationResult?> Login(LoginUserModel model);
+        Task<TokenAuthenticationResult?> Login(LoginUserModel model);
 
-        Task<TokenAuthorizationResult?> RefreshToken();
+        Task Logout(string username);
+
+        Task<string> GetTwitterRequestToken();
+
+        Task<TokenAuthenticationResult?> ExternalLogin(ExternalLoginModel model);
+
+        Task<TokenAuthenticationResult?> RefreshToken();
 
         Task<IdentityResult> Register(RegisterUserModel model);
 
-        TokenAuthorizationResult GetAccessToken(string username);
+        TokenAuthenticationResult GetAccessToken(string username);
     }
 }

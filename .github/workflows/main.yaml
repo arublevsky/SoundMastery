@@ -4,16 +4,12 @@ on:
   pull_request:
     branches: [ develop, master ]
 
-  release:
-    types:
-      - created
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +24,7 @@ jobs:
       - name: RunBuild 
         run: ./build.sh
 
-      - name: 'Upload artifacts'
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: test-coverage
@@ -47,36 +43,23 @@ jobs:
           only_changed_files: true
 
   push_images:
-    needs: build
     name: Publish Docker images
     runs-on: ubuntu-latest
-    env:
-      DB_COMMAND: update
-      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
-      SSL_PASSWORD: ${{ secrets.SSL_PASSWORD }}      
-      GITHUB_ACTOR: ${{ github.actor }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    needs: build
     steps:
-      - uses: actions/checkout@v2
+      -
+        name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.CR_PAT }}
+          
+      -
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Publish Docker images
-        run: ./build.sh --target PublishImages
-
-  push_images_release:
-    name: Publish Docker images (release)
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'release' }}
-    env:
-      DB_COMMAND: update
-      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
-      GITHUB_ACTOR: ${{ github.actor }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Publish Docker images  (release)
+      -
+        name: Publish Docker images
         run: ./build.sh --target PublishImages

@@ -2,10 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using SoundMastery.Api.Extensions;
 using SoundMastery.Application.Authorization;
+using SoundMastery.Application.Authorization.ExternalProviders;
 
 namespace SoundMastery.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AccountController : ControllerBase
@@ -22,19 +25,26 @@ namespace SoundMastery.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] LoginUserModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            TokenAuthenticationResult? result = await _authorizationService.Login(model);
+            return result != null ? Ok(result) : (IActionResult) BadRequest();
+        }
 
-            TokenAuthorizationResult? result = await _authorizationService.Login(model);
+        [AllowAnonymous]
+        [Route("external-login")]
+        [HttpPost]
+        public async Task<IActionResult> ExternalLogin([FromBody] ExternalLoginModel model)
+        {
+            TokenAuthenticationResult? result = await _authorizationService.ExternalLogin(model);
+            return result != null ? Ok(result) : (IActionResult) BadRequest();
+        }
 
-            if (result == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(result);
+        [AllowAnonymous]
+        [Route("twitter-request-token")]
+        [HttpGet]
+        public async Task<IActionResult> GetTwitterRequestToken()
+        {
+            var token =  await _authorizationService.GetTwitterRequestToken();
+            return token != null ? Ok(token) : (IActionResult) BadRequest();
         }
 
         [AllowAnonymous]
@@ -49,12 +59,9 @@ namespace SoundMastery.Api.Controllers
 
             IdentityResult result = await _authorizationService.Register(model);
 
-            if (result.Succeeded)
-            {
-                return Ok(_authorizationService.GetAccessToken(model.Email!));
-            }
-
-            return BadRequest(result.Errors);
+            return result.Succeeded
+                ? Ok(_authorizationService.GetAccessToken(model.Email!))
+                : (IActionResult) BadRequest(result.Errors);
         }
 
         [AllowAnonymous]
@@ -62,14 +69,16 @@ namespace SoundMastery.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> RefreshToken()
         {
-            TokenAuthorizationResult? result = await _authorizationService.RefreshToken();
+            TokenAuthenticationResult? result = await _authorizationService.RefreshToken();
+            return result != null ? Ok(result) : (IActionResult) Unauthorized();
+        }
 
-            if (result == null)
-            {
-                return Unauthorized();
-            }
-
-            return Ok(result);
+        [Route("logout")]
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            await _authorizationService.Logout(User.GetEmail());
+            return Ok();
         }
     }
 }

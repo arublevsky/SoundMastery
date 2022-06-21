@@ -1,7 +1,7 @@
-import { colors, Theme } from '@material-ui/core';
-import LaptopMacIcon from '@material-ui/icons/LaptopMac';
-import PhoneIcon from '@material-ui/icons/Phone';
-import TabletIcon from '@material-ui/icons/Tablet';
+import { colors, Theme } from '@mui/material';
+import LaptopMacIcon from '@mui/icons-material/LaptopMac';
+import PhoneIcon from '@mui/icons-material/Phone';
+import TabletIcon from '@mui/icons-material/Tablet';
 
 export const trafficData = {
     datasets: [
@@ -21,7 +21,6 @@ export const trafficData = {
 };
 
 export const getTrafficOptions = (theme: Theme) => ({
-    animation: false,
     cutoutPercentage: 80,
     layout: { padding: 0 },
     legend: {

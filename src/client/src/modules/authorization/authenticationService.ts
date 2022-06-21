@@ -1,24 +1,24 @@
-import { TokenAuthorizationResult } from "./authorizationApi";
+import { TokenAuthenticationResult } from "./accountApi";
 
 export interface RefreshTokenData {
     refreshToken: string;
     username: string;
 }
 
-export interface UserAuthorizationInfo extends TokenAuthorizationResult {
+export interface UserAuthorizationInfo extends TokenAuthenticationResult {
     loggedInAt: number;
 }
 
-export class AuthorizationService {
+export class AuthenticationService {
     private accessTokenInfo?: UserAuthorizationInfo = null;
 
     public set = (data: UserAuthorizationInfo) => {
         this.accessTokenInfo = data;
-    }
+    };
 
     public get = () => {
         return this.accessTokenInfo;
-    }
+    };
 
     public getAuthHeader = () => {
         if (this.accessTokenInfo && this.accessTokenInfo.token) {
@@ -26,11 +26,11 @@ export class AuthorizationService {
         }
 
         return null;
-    }
+    };
 
     public logout = () => {
         this.accessTokenInfo = null;
-    }
+    };
 
     public registerLogoutHandler = (handler: () => void) => {
         // SMELL: not protected from multiple registrations
@@ -39,7 +39,7 @@ export class AuthorizationService {
                 handler();
             }
         });
-    }
+    };
 }
 
-export const authorizationService = new AuthorizationService();
+export const authenticationService = new AuthenticationService();

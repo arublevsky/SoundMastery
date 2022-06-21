@@ -1,4 +1,4 @@
-import { authorizationService } from "../authorization/authorizationService";
+import { authenticationService } from "../authorization/authenticationService";
 import { ApiError } from "./apiErrors";
 
 declare const __API_BASE_URL__: string;
@@ -14,15 +14,15 @@ export interface RequestOptions extends Options {
     params?: unknown;
 }
 
-export const httpGet = async <T extends unknown>(url: string, options?: RequestOptions) => {
+export const httpGet = async <T>(url: string, options?: RequestOptions) => {
     return await request<T>(url, "GET", options);
 };
 
-export const httpPost = async <T extends unknown>(url: string, options?: RequestOptions) => {
+export const httpPost = async <T>(url: string, options?: RequestOptions) => {
     return await request<T>(url, "POST", options);
 };
 
-export const httpPut = async <T extends unknown>(url: string, options?: RequestOptions) => {
+export const httpPut = async <T>(url: string, options?: RequestOptions) => {
     return await request<T>(url, "PUT", options);
 };
 
@@ -30,7 +30,7 @@ export const httpDelete = async (url: string, options?: RequestOptions) => {
     await request(url, "DELETE", options);
 };
 
-const request = async <T extends unknown>(
+const request = async <T>(
     url: string,
     method: "GET" | "POST" | "DELETE" | "PUT",
     options?: RequestOptions,
@@ -44,7 +44,7 @@ const request = async <T extends unknown>(
             headers: {
                 Accept: "application/json",
                 ...getContentTypeHeader(options),
-                "Authorization": authorizationService.getAuthHeader(),
+                "Authorization": authenticationService.getAuthHeader(),
             },
             method,
         });

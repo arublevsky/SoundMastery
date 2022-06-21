@@ -8,11 +8,11 @@ import {
     CardContent,
     CardHeader,
     Divider,
-    useTheme,
-    makeStyles
-} from '@material-ui/core';
-import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+    useTheme
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { getSalesOptions, salesData } from './data/sales';
 
 const useStyles = makeStyles(() => ({ root: {} }));

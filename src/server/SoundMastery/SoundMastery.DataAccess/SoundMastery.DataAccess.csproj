@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.0.78" />
-      <PackageReference Include="Npgsql" Version="5.0.0" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-      <PackageReference Include="FluentMigrator" Version="3.2.9" />
-      <PackageReference Include="FluentMigrator.Runner" Version="3.2.9" />
-      <PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.2.9" />
-      <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="3.2.9" />
+      <PackageReference Include="Dapper" Version="2.0.123" />
+      <PackageReference Include="Npgsql" Version="6.0.5" />
+      <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+      <PackageReference Include="FluentMigrator" Version="3.3.2" />
+      <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
+      <PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.3.2" />
+      <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="3.3.2" />
     </ItemGroup>
     <ItemGroup>
       <None Remove="Identity\Sql\CreateUser.sql" />
@@ -19,7 +19,7 @@
       <EmbeddedResource Include="Sql\Generic\Users\FindUserByEmail.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\FindUserByName.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\InsertRefreshToken.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\RemoveRefreshToken.sql" />
+      <EmbeddedResource Include="Sql\Generic\Users\ClearRefreshToken.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\UpdateUser.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\UserCollections.sql" />
       <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CheckDatabaseExists.sql" />

@@ -100,19 +100,14 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            Npm("i", workingDirectory: FrontendDirectory);
+            Npm("i --legacy-peer-deps", workingDirectory: FrontendDirectory);
             Npm("run build", workingDirectory: FrontendDirectory);
         });
 
     Target BuildDockerImages => _ => _
         .Executes(() =>
         {
-            if (!IsLocalBuild)
-            {
-                SetAppVersionEnvVariable();
-                PrepareDotEnv();
-            }
-
+            SetAppVersionInternal();
             DockerCompose($"-f {DockerComposePath} --env-file {DotEnvPath} build");
         });
 
@@ -132,17 +127,10 @@ class Build : NukeBuild
                 return;
             }
 
-            string? actor = Environment.GetEnvironmentVariable("GITHUB_ACTOR");
-            string? token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
-
-            if (string.IsNullOrWhiteSpace(actor) || string.IsNullOrWhiteSpace(token))
-            {
-                throw new InvalidOperationException("Cannot  publish docker images: missing github credentials");
-            }
-
-            Docker($"login docker.pkg.github.com -u {actor} -p {token}");
             DockerCompose($"-f {DockerComposePath} push");
         });
+
+    Target SetAppVersion => _ => _.Executes(SetAppVersionInternal);
 
     static string Env => IsLocalBuild ? "dev" : "ci";
 
@@ -150,20 +138,46 @@ class Build : NukeBuild
 
     static string DockerComposePath => Path.Combine(DockerDirectory, $"docker-compose.{Env}.yml");
 
-    void SetAppVersionEnvVariable()
+    void SetAppVersionInternal()
     {
-        DotNet("tool restore", workingDirectory: RootDirectory);
-        var version = DotNet("minver").First(x => x.Type != OutputType.Err).Text;
-
-        // TODO exclude sha if commit is tagged
-        var sha = Git("rev-parse HEAD").Single().Text;
-        Environment.SetEnvironmentVariable("APP_VERSION", $"{version}-{sha.Substring(0, 5)}");
+        var version = GetVersionInternal();
+        Environment.SetEnvironmentVariable("APP_VERSION", version);
+        File.AppendAllLines(DotEnvPath, new[] { Environment.NewLine, $"APP_VERSION={version}" });
     }
 
-    static void PrepareDotEnv()
+    string GetVersionInternal()
     {
-        var requiredVariables = new[] { "SA_PASSWORD", "DB_COMMAND", "APP_VERSION" };
-        var lines = requiredVariables.Select(key => $"{key}={Environment.GetEnvironmentVariable(key)}");
-        File.AppendAllLines(DotEnvPath, lines);
+        DotNet("tool restore", workingDirectory: RootDirectory);
+
+        var version = DotNet("minver", logOutput: false, logInvocation: false)
+            .First(x => x.Type != OutputType.Err)
+            .Text;
+
+        return IsTaggedCommit() ? version : $"{version}-{GetCommitSha().Substring(0, 5)}";
+    }
+
+    bool IsTaggedCommit()
+    {
+        var isTagged = false;
+        try
+        {
+            var sha = GetCommitSha();
+            var tag = Git($"describe --exact-match {sha}", logOutput: false, logInvocation: false).Single().Text;
+            isTagged = !string.IsNullOrEmpty(tag);
+        }
+        catch
+        {
+            // no tag, ignore
+        }
+
+        return isTagged;
+    }
+
+    string GetCommitSha()
+    {
+        // github does merge into target branch during checkout
+        // so to have a deterministic version for the pull request, the 2nd parent of merge commit is taken
+        var commitPath = IsLocalBuild ? "HEAD" : "HEAD^2";
+        return Git($"rev-parse {commitPath}").Single().Text;
     }
 }

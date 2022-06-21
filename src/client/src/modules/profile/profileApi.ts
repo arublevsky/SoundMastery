@@ -14,5 +14,5 @@ export const getProfile = async () => {
 };
 
 export const saveProfile = async (body: UserProfile) => {
-    return httpPost(`${apiController}/save-profile`, { body: body });
+    return httpPost<void>(`${apiController}/save-profile`, { body: body });
 };

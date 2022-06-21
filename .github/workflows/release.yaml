@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  release:
+    types:
+      - created
+jobs:
+  push_images_release:
+    name: Publish Release Docker images
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'release' }}
+    env:
+      GITHUB_ACTOR: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.CR_PAT }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Publish
+        run: ./build.sh --target PublishImages

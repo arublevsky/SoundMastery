@@ -13,9 +13,9 @@ import {
     TableHead,
     TablePagination,
     TableRow,
-    Typography,
-    makeStyles
-} from '@material-ui/core';
+    Typography
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 const getInitials = (name = '') => name
     .replace(/\s+/, ' ')
@@ -163,10 +163,9 @@ const Results = ({ className, customers }: Props) => {
                 </Box>
             </PerfectScrollbar>
             <TablePagination
-                component="div"
                 count={customers.length}
-                onChangePage={handlePageChange}
-                onChangeRowsPerPage={handleLimitChange}
+                onPageChange={handlePageChange}
+                onRowsPerPageChange={handleLimitChange}
                 page={page}
                 rowsPerPage={limit}
                 rowsPerPageOptions={[5, 10, 25]}

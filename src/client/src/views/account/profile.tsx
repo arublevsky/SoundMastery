@@ -10,9 +10,9 @@ import {
     CardActions,
     CardContent,
     Divider,
-    Typography,
-    makeStyles
-} from '@material-ui/core';
+    Typography
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 const user = {
     avatar: '/static/images/avatars/avatar_6.png',

@@ -27,7 +27,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
 
             // Act
             const string username = "admin@gmail.com";
-            var user = new UserBuilder().WithUserName(username).Build();
+            var user = new UserBuilder().WithUsername(username).Build();
             await sut.CreateAsync(user);
 
             // Assert
@@ -52,7 +52,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
             runner.MigrateUp();
 
             const string username = "admin@gmail.com";
-            var user = new UserBuilder().WithUserName(username).Build();
+            var user = new UserBuilder().WithUsername(username).Build();
             await sut.CreateAsync(user);
 
             // Act
@@ -93,7 +93,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
             runner.MigrateUp();
 
             const string username = "admin@gmail.com";
-            var user = new UserBuilder().WithUserName(username).Build();
+            var user = new UserBuilder().WithUsername(username).Build();
             await sut.CreateAsync(user);
 
             // Act
@@ -122,14 +122,14 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
             runner.MigrateUp();
 
             const string username = "admin@gmail.com";
-            var user = new UserBuilder().WithUserName(username).Build();
+            var user = new UserBuilder().WithUsername(username).Build();
             await sut.CreateAsync(user);
 
             user = await sut.FindByNameAsync(username);
             await sut.AssignRefreshToken("some_token", user!);
 
             // Act
-            await sut.RemoveRefreshToken("some_token", user!);
+            await sut.ClearRefreshToken(user!);
 
             // Assert
             var result = await sut.FindByNameAsync(username);

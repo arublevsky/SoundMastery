@@ -1,10 +1,10 @@
 import { createContext, useContext } from "react";
 import { UserProfile } from "../profile/profileApi";
-import { TokenAuthorizationResult } from "./authorizationApi";
+import { ExternalAuthenticationResult, TokenAuthenticationResult } from "./accountApi";
 
 export interface AuthorizationContext {
-    onLoggedIn: (data: TokenAuthorizationResult) => Promise<void>;
-    onLoggedOut: () => void;
+    onLoggedIn: (data: TokenAuthenticationResult | ExternalAuthenticationResult) => Promise<void>;
+    onLoggedOut: () => Promise<void>;
     isAuthenticated: boolean;
     isLoading: boolean;
     userProfile: UserProfile;
@@ -15,7 +15,7 @@ export const initialState: AuthorizationContext = {
     isLoading: true,
     userProfile: null,
     onLoggedIn: () => Promise.reject("Authorization context state is not initialized yet"),
-    onLoggedOut: () => { /* not initialized */ },
+    onLoggedOut: () => Promise.reject("Authorization context state is not initialized yet"),
 };
 
 export const AuthorizationContext = createContext<AuthorizationContext>(initialState);

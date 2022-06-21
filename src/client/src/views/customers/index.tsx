@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
     Box,
-    Container,
-    makeStyles
-} from '@material-ui/core';
+    Container
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Page from './../../components/page';
 import Results from './results';
 import Toolbar from './toolbar';

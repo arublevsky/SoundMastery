@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +11,8 @@ using SoundMastery.Domain.Services;
 using Microsoft.AspNetCore.Http;
 using SoundMastery.Application.Profile;
 using Microsoft.AspNetCore.Identity;
+using SoundMastery.Application.Authorization.ExternalProviders;
+using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -25,22 +28,28 @@ namespace SoundMastery.Application.Authorization
         private readonly IIdentityManager _identityManager;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IExternalAuthProviderResolver _authProviderResolver;
+        private readonly ITwitterService _twitterService;
 
         public UserAuthorizationService(
             ISystemConfigurationService configurationService,
             IHttpContextAccessor httpContextAccessor,
             IUserService userService,
             IIdentityManager identityManager,
-            IDateTimeProvider dateTimeProvider)
+            IDateTimeProvider dateTimeProvider,
+            IExternalAuthProviderResolver authProviderResolver,
+            ITwitterService twitterService)
         {
             _configurationService = configurationService;
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _identityManager = identityManager;
             _dateTimeProvider = dateTimeProvider;
+            _authProviderResolver = authProviderResolver;
+            _twitterService = twitterService;
         }
 
-        public async Task<TokenAuthorizationResult?> Login(LoginUserModel model)
+        public async Task<TokenAuthenticationResult?> Login(LoginUserModel model)
         {
             SignInResult result =
                 await _identityManager.PasswordSignInAsync(model.Username, model.Password);
@@ -55,7 +64,39 @@ namespace SoundMastery.Application.Authorization
             return GetAccessToken(user!.UserName);
         }
 
-        public async Task<TokenAuthorizationResult?> RefreshToken()
+        public Task<string> GetTwitterRequestToken()
+        {
+            return _twitterService.AcquireRequestToken();
+        }
+
+        public async Task<TokenAuthenticationResult?> ExternalLogin(ExternalLoginModel model)
+        {
+            IExternalAuthProviderService service = _authProviderResolver.Resolve(model.Type!.Value);
+
+            User userData = await service.GetUserData(model.AccessToken);
+
+            User user = await _userService.FindByNameAsync(userData.Email)
+                // SMELL: user needs to specify its own password later on to use form login
+                ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
+
+            await SetRefreshTokenCookie(user);
+            return GetAccessToken(user.UserName);
+        }
+
+        private async Task<User> CreateNewUser(User user, string password)
+        {
+            var result = await _identityManager.CreateAsync(user, password);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(x => $"{x.Code}{x.Description}"));
+                throw new InvalidOperationException($"Could not create a new user from external system. Details: {errors}");
+            }
+
+            return (await _userService.FindByNameAsync(user.Email))!;
+        }
+
+        public async Task<TokenAuthenticationResult?> RefreshToken()
         {
             var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
             if (cookies == null || !cookies.TryGetValue(RefreshTokenCookieKey, out var value) || string.IsNullOrEmpty(value))
@@ -75,7 +116,7 @@ namespace SoundMastery.Application.Authorization
                 return null;
             }
 
-            await _userService.RemoveRefreshToken(user, model.RefreshToken);
+            await _userService.ClearRefreshToken(user);
             user = (await _userService.FindByNameAsync(model.Username))!;
             await SetRefreshTokenCookie(user);
 
@@ -96,7 +137,7 @@ namespace SoundMastery.Application.Authorization
             return _identityManager.CreateAsync(user, model.Password);
         }
 
-        public TokenAuthorizationResult GetAccessToken(string username)
+        public TokenAuthenticationResult GetAccessToken(string username)
         {
             var expiresIn = _configurationService.GetSetting<int>("Jwt:AccessTokenExpirationInMinutes");
             var jwtKey = _configurationService.GetSetting<string>("Jwt:Key");
@@ -120,7 +161,7 @@ namespace SoundMastery.Application.Authorization
                 signingCredentials: credentials);
 
             var result = new JwtSecurityTokenHandler().WriteToken(token);
-            return new TokenAuthorizationResult(result, expiresIn);
+            return new TokenAuthenticationResult(result, expiresIn);
         }
 
         private async Task SetRefreshTokenCookie(User user)
@@ -141,6 +182,18 @@ namespace SoundMastery.Application.Authorization
                     SameSite = SameSiteMode.None,
                     Expires = _dateTimeProvider.GetUtcNow() + TimeSpan.FromMinutes(expires)
                 });
+        }
+
+        public async Task Logout(string username)
+        {
+            User? user = await _userService.FindByNameAsync(username);
+            if (user == null)
+            {
+                return;
+            }
+
+            await _userService.ClearRefreshToken(user);
+            _httpContextAccessor.HttpContext?.Response.Cookies.Delete(RefreshTokenCookieKey);
         }
     }
 }

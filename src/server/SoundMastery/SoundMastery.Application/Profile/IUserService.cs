@@ -15,6 +15,6 @@ namespace SoundMastery.Application.Profile
 
         bool IsValidRefreshToken(User user, string token);
 
-        Task RemoveRefreshToken(User user, string refreshToken);
+        Task ClearRefreshToken(User user);
     }
 }

@@ -3,22 +3,27 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ApiError } from "../common/apiErrors";
 import { getProfile, UserProfile } from "../profile/profileApi";
-import { refreshToken, TokenAuthorizationResult } from "./authorizationApi";
-import { authorizationService, UserAuthorizationInfo } from "./authorizationService";
+import { ExternalAuthenticationResult, externalLogin, logout, refreshToken, TokenAuthenticationResult } from "./accountApi";
+import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
 import { AuthorizationContext, initialState } from "./context";
+import { isTwitterRedirectUrl, logoutExternal } from "./externalAuthentication";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
 }
 
-const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
+const isExternalAuth = (
+    object: TokenAuthenticationResult | ExternalAuthenticationResult
+): object is ExternalAuthenticationResult => 'type' in object;
+
+const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(initialState.isLoading);
     const [profile, setProfile] = useState<UserProfile>(initialState.userProfile);
-    const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo>(authorizationService.get());
+    const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo>(authenticationService.get());
 
     useEffect(() => {
-        authorizationService.registerLogoutHandler(() => navigate("/login"));
+        authenticationService.registerLogoutHandler(() => navigate("/login"));
 
         async function initialize() {
             const isAuthenticated = getIsAuthenticated();
@@ -32,20 +37,26 @@ const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
         initialize();
     }, []);
 
-    const onLoggedIn = async (data: TokenAuthorizationResult) => {
+    const onLoggedIn = async (data: TokenAuthenticationResult | ExternalAuthenticationResult) => {
+        if (isExternalAuth(data)) {
+            data = await externalLogin(data.token, data.type);
+        }
+
         const info = {
             ...data,
             loggedInAt: new Date().getTime(),
         };
 
-        authorizationService.set(info);
+        authenticationService.set(info);
         setAuthorizationInfo(info);
         await loadProfile();
     };
 
-    const onLoggedOut = () => {
+    const onLoggedOut = async () => {
         setAuthorizationInfo(null);
+        logoutExternal();
         window.localStorage.setItem('logout', Date.now().toString());
+        await logout();
     };
 
     async function tryRefreshToken() {
@@ -76,7 +87,7 @@ const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
             setIsLoading(true);
             await action();
         } catch (e) {
-            if (e instanceof ApiError && e.isUnauthenticated()) {
+            if (e instanceof ApiError && e.isUnauthenticated() && !isTwitterRedirectUrl()) {
                 navigate("/login");
             }
             throw e;
@@ -99,4 +110,4 @@ const AuthorizationProvider = ({ children }: AuthorizationProviderProps) => {
     );
 };
 
-export default AuthorizationProvider;
+export default AuthenticationProvider;

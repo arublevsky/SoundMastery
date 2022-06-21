@@ -52,13 +52,9 @@ namespace SoundMastery.DataAccess.Services.Users
             });
         }
 
-        public Task RemoveRefreshToken(string token, User user)
+        public Task ClearRefreshToken(User user)
         {
-            return ExecuteUserQuery("RemoveRefreshToken.sql", new
-            {
-                UserId = user.Id,
-                Token = token,
-            });
+            return ExecuteUserQuery("ClearRefreshToken.sql", new { UserId = user.Id });
         }
 
         private async Task ExecuteUserQuery(string sqlName, object user)

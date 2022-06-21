@@ -3,11 +3,11 @@ version: "3.8"
 
 services:
   api:
-    image: docker.pkg.github.com/arublevsky/soundmastery/sound-mastery-api:${APP_VERSION:?err}
+    image: ghcr.io/arublevsky/sound-mastery-api:${APP_VERSION:?err}
     build:
       context: ./../../src/server  
   client:
-    image: docker.pkg.github.com/arublevsky/soundmastery/sound-mastery-client:${APP_VERSION:?err}
+    image: ghcr.io/arublevsky/sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
       dockerfile: Dockerfile-ci

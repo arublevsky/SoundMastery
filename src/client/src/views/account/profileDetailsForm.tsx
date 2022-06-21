@@ -11,7 +11,7 @@ import {
     Divider,
     Grid,
     TextField,
-} from '@material-ui/core';
+} from '@mui/material';
 
 export interface ProfileDetailsFormData {
     firstName: string;
@@ -51,79 +51,79 @@ export const ProfileDetailsForm = ({ handleProfileSave, userProfile }: Props) =>
             touched,
             values
         }) => (
-                <form onSubmit={handleSubmit}>
-                    <Card>
-                        <CardHeader subheader="The information can be edited" title="Profile" />
-                        <Divider />
-                        <CardContent>
-                            <Grid container spacing={3}>
-                                <Grid item md={6} xs={12}>
-                                    <TextField
-                                        error={Boolean(touched.firstName && errors.firstName)}
-                                        fullWidth
-                                        helperText={touched.firstName && errors.firstName}
-                                        label="First name"
-                                        name="firstName"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        required
-                                        value={values.firstName}
-                                        variant="outlined"
-                                    />
-                                </Grid>
-                                <Grid item md={6} xs={12}>
-                                    <TextField
-                                        error={Boolean(touched.firstName && errors.firstName)}
-                                        fullWidth
-                                        helperText={touched.firstName && errors.firstName}
-                                        label="Last name"
-                                        name="lastName"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        required
-                                        value={values.lastName}
-                                        variant="outlined"
-                                    />
-                                </Grid>
-                                <Grid item md={6} xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Email Address"
-                                        name="email"
-                                        required
-                                        value={userProfile.email}
-                                        onBlur={handleBlur}
-                                        variant="outlined"
-                                        disabled={true}
-                                    />
-                                </Grid>
-                                <Grid item md={6} xs={12}>
-                                    <TextField
-                                        fullWidth
-                                        label="Phone Number"
-                                        name="phoneNumber"
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        value={values.phoneNumber}
-                                        variant="outlined"
-                                    />
-                                </Grid>
+            <form onSubmit={handleSubmit}>
+                <Card>
+                    <CardHeader subheader="The information can be edited" title="Profile" />
+                    <Divider />
+                    <CardContent>
+                        <Grid container spacing={3}>
+                            <Grid item md={6} xs={12}>
+                                <TextField
+                                    error={Boolean(touched.firstName && errors.firstName)}
+                                    fullWidth
+                                    helperText={touched.firstName && errors.firstName}
+                                    label="First name"
+                                    name="firstName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    required
+                                    value={values.firstName}
+                                    variant="outlined"
+                                />
                             </Grid>
-                        </CardContent>
-                        <Divider />
-                        <Box display="flex" justifyContent="flex-end" p={2}>
-                            <Button
-                                color="primary"
-                                disabled={isSubmitting}
-                                fullWidth
-                                size="large"
-                                type="submit"
-                                variant="contained"
-                            >
-                                Save details
-                            </Button>
-                        </Box>
-                    </Card>
-                </form>
-            )}
+                            <Grid item md={6} xs={12}>
+                                <TextField
+                                    error={Boolean(touched.firstName && errors.firstName)}
+                                    fullWidth
+                                    helperText={touched.firstName && errors.firstName}
+                                    label="Last name"
+                                    name="lastName"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    required
+                                    value={values.lastName}
+                                    variant="outlined"
+                                />
+                            </Grid>
+                            <Grid item md={6} xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Email Address"
+                                    name="email"
+                                    required
+                                    value={userProfile.email}
+                                    onBlur={handleBlur}
+                                    variant="outlined"
+                                    disabled={true}
+                                />
+                            </Grid>
+                            <Grid item md={6} xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Phone Number"
+                                    name="phoneNumber"
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    value={values.phoneNumber}
+                                    variant="outlined"
+                                />
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                    <Divider />
+                    <Box display="flex" justifyContent="flex-end" p={2}>
+                        <Button
+                            color="primary"
+                            disabled={isSubmitting}
+                            fullWidth
+                            size="large"
+                            type="submit"
+                            variant="contained"
+                        >
+                            Save details
+                        </Button>
+                    </Box>
+                </Card>
+            </form>
+        )}
     </Formik>);

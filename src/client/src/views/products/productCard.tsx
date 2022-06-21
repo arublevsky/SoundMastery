@@ -7,11 +7,11 @@ import {
     CardContent,
     Divider,
     Grid,
-    Typography,
-    makeStyles
-} from '@material-ui/core';
-import AccessTimeIcon from '@material-ui/icons/AccessTime';
-import GetAppIcon from '@material-ui/icons/GetApp';
+    Typography
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import GetAppIcon from '@mui/icons-material/GetApp';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -58,7 +58,7 @@ const ProductCard = ({ className, product }: Props) => {
             <Box flexGrow={1} />
             <Divider />
             <Box p={2}>
-                <Grid container justify="space-between" spacing={2}>
+                <Grid container spacing={2}>
                     <Grid className={classes.statsItem} item>
                         <AccessTimeIcon className={classes.statsIcon} color="action" />
                         <Typography color="textSecondary" display="inline" variant="body2">
