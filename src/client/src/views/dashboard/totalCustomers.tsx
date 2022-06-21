@@ -7,11 +7,11 @@ import {
     CardContent,
     Grid,
     Typography,
-    colors,
-    makeStyles
-} from '@material-ui/core';
-import ArrowUpwardIcon from '@material-ui/icons/ArrowUpward';
-import PeopleIcon from '@material-ui/icons/PeopleOutlined';
+    colors
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import PeopleIcon from '@mui/icons-material/PeopleOutlined';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -41,7 +41,7 @@ const TotalCustomers = ({ className }: Props) => {
     return (
         <Card className={clsx(classes.root, className)}>
             <CardContent>
-                <Grid container justify="space-between" spacing={3}>
+                <Grid container spacing={3}>
                     <Grid item>
                         <Typography color="textSecondary" gutterBottom variant="h6">
                             TOTAL CUSTOMERS

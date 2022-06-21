@@ -1,15 +1,15 @@
 import React from 'react';
-import AppBar from '@material-ui/core/AppBar';
-import Button from '@material-ui/core/Button';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Grid from '@material-ui/core/Grid';
-import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
+import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import CssBaseline from '@mui/material/CssBaseline';
+import Grid from '@mui/material/Grid';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 import { Link as RouterLink } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import Box from '@material-ui/core/Box';
+import { makeStyles } from '@mui/styles';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import { useNavigate } from 'react-router-dom';
 import { footers, tiers } from './content';
 import Tiers from './tiers';
@@ -111,7 +111,7 @@ const Public = () => {
                 </Grid>
             </Container>
             <Container maxWidth="md" component="footer" className={classes.footer}>
-                <Grid container spacing={4} justify="space-evenly">
+                <Grid container spacing={4}>
                     <Footer footers={footers} />
                 </Grid>
                 <Box mt={5}>

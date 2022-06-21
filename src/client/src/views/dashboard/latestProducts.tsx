@@ -10,11 +10,11 @@ import {
     List,
     ListItem,
     ListItemAvatar,
-    ListItemText,
-    makeStyles
-} from '@material-ui/core';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+    ListItemText
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { products } from './data/products';
 
 

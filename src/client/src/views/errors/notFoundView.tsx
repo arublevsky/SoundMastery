@@ -2,9 +2,9 @@ import React from 'react';
 import {
     Box,
     Container,
-    Typography,
-    makeStyles
-} from '@material-ui/core';
+    Typography
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Page from '../../components/page';
 
 const useStyles = makeStyles((theme) => ({

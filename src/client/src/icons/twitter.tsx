@@ -1,10 +1,9 @@
 import React from 'react';
-import { SvgIcon } from '@material-ui/core';
+import { SvgIcon } from '@mui/material';
 
-const Twitter = (props: unknown) => {
+const Twitter = () => {
     return (
         <SvgIcon
-            {...props}
             enableBackground="new 0 0 455.731 455.731"
             version="1.1"
             x="0"

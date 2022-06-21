@@ -3,9 +3,9 @@ import { NavLink as RouterLink } from 'react-router-dom';
 import clsx from 'clsx';
 import {
     Button,
-    ListItem,
-    makeStyles
-} from '@material-ui/core';
+    ListItem
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Activity } from 'react-feather';
 
 const useStyles = makeStyles((theme) => ({
@@ -53,7 +53,6 @@ const NavItem = ({ className, href, icon: Icon, title }: Props) => {
     return (
         <ListItem className={clsx(classes.item, className)} disableGutters>
             <Button
-                activeClassName={classes.active}
                 className={classes.button}
                 component={RouterLink}
                 to={href}

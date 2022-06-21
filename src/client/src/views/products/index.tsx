@@ -3,9 +3,9 @@ import {
     Box,
     Container,
     Grid,
-    makeStyles
-} from '@material-ui/core';
-import { Pagination } from '@material-ui/lab';
+    Pagination
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Page from '../../components/page';
 import Toolbar from './toolbar';
 import ProductCard from './productCard';

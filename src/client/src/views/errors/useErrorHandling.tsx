@@ -6,8 +6,8 @@ type ReturnType = [
     boolean,
     boolean,
     ApplicationError[],
-    <T extends unknown>(action: () => Promise<T>) => Promise<T>,
-    <T extends unknown>(action: () => T) => void,
+    <T extends void>(action: () => Promise<T>) => Promise<T>,
+    <T extends void>(action: () => T) => void,
 ];
 
 export const useErrorHandling = (showFallback = true): ReturnType => {
@@ -21,7 +21,7 @@ export const useErrorHandling = (showFallback = true): ReturnType => {
         setShowError(true);
     };
 
-    const handler = <T extends unknown>(action: () => T) => {
+    const handler = <T extends void>(action: () => T) => {
         try {
             const result = action();
             setShowSuccess(true);
@@ -31,7 +31,7 @@ export const useErrorHandling = (showFallback = true): ReturnType => {
         }
     };
 
-    const asyncHandler = async <T extends unknown>(action: () => Promise<T>) => {
+    const asyncHandler = async <T extends void>(action: () => Promise<T>) => {
         try {
             const result = await action();
             setShowSuccess(true);

@@ -1,4 +1,4 @@
-import { Alert, AlertTitle } from '@material-ui/lab';
+import { Alert, AlertTitle } from '@mui/material';
 import React from 'react';
 import { ApplicationError } from './../../modules/common/errorHandling';
 

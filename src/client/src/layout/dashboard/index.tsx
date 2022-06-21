@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@mui/styles';
 import NavBar from './navBar';
 import TopBar from './topBar';
 

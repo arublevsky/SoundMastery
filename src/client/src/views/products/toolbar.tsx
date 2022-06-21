@@ -7,9 +7,9 @@ import {
     CardContent,
     TextField,
     InputAdornment,
-    SvgIcon,
-    makeStyles
-} from '@material-ui/core';
+    SvgIcon
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Search as SearchIcon } from 'react-feather';
 
 const useStyles = makeStyles((theme) => ({
