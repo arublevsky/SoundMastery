@@ -24,7 +24,7 @@ jobs:
       - name: RunBuild 
         run: ./build.sh
 
-      - name: 'Upload artifacts'
+      - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: test-coverage
@@ -46,20 +46,17 @@ jobs:
     needs: build
     name: Publish Docker images
     runs-on: ubuntu-latest
-    env:
-      GITHUB_ACTOR: ${{ github.actor }}
-      GITHUB_TOKEN: ${{ secrets.CR_PAT }}
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - ​name​: ​Login to GHCR 
-  ​      ​uses​: ​docker/login-action@v1  
+      - ​name​: ​Login to GHCR
+  ​      ​uses​: ​docker/login-action@v2
   ​      ​with​: 
-  ​        ​registry​: ​ghcr.io 
-  ​        ​username​: ​${{ env.GITHUB_ACTOR }} 
-  ​        ​password​: ​${{ env.GITHUB_TOKEN }}
+  ​        ​registry​: ​ghcr.io
+  ​        ​username​: ${{ github.actor }}
+  ​        ​password​: ${{ secrets.CR_PAT }}
 
       - name: Publish Docker images
         run: ./build.sh --target PublishImages
