@@ -29,15 +29,24 @@ namespace SoundMastery.DataAccess.Services.Postgres
         {
             try
             {
+                Console.WriteLine($"CheckConnection : {_connectionString}");
+
                 await using var conn = new NpgsqlConnection(_connectionString);
                 await using var command = new NpgsqlCommand("SELECT 1", conn);
                 await conn.OpenAsync();
+                Console.WriteLine($"CheckConnection : Opened");
+
                 await command.ExecuteScalarAsync();
+
+                Console.WriteLine($"CheckConnection : Executed");
+
                 await conn.CloseAsync();
+
+                Console.WriteLine($"CheckConnection : Closed");
             }
-            catch
+            catch (Exception ex)
             {
-                throw new Exception("Database is not available...");
+                throw new Exception("Database is not available...", ex);
             }
         }
 
@@ -50,13 +59,13 @@ namespace SoundMastery.DataAccess.Services.Postgres
         public async Task<bool> DatabaseExists()
         {
             await using var conn = new NpgsqlConnection(_connectionString);
-            string sql = EmbeddedResource.GetAsString("CheckDatabaseExists.sql", SqlPath);
+            var sql = EmbeddedResource.GetAsString("CheckDatabaseExists.sql", SqlPath);
 
             await using var command = new NpgsqlCommand(sql, conn);
             try
             {
                 await conn.OpenAsync();
-                object? result = await command.ExecuteScalarAsync();
+                var result = await command.ExecuteScalarAsync();
                 await conn.CloseAsync();
                 return result != null && result.Equals("soundmastery");
             }
@@ -71,7 +80,7 @@ namespace SoundMastery.DataAccess.Services.Postgres
         private async Task CreateDatabase()
         {
             await using var conn = new NpgsqlConnection(_connectionString);
-            string sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
+            var sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
 
             await using var command = new NpgsqlCommand(sql, conn);
             try

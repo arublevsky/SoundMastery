@@ -15,12 +15,12 @@ namespace SoundMastery.Application.Identity
             _userManager = userManager;
         }
 
-        public Task<SignInResult> PasswordSignInAsync(string? username, string? password)
+        public Task<SignInResult> PasswordSignInAsync(string username, string password)
         {
             return _signInManager.PasswordSignInAsync(username, password, false, false);
         }
 
-        public Task<IdentityResult> CreateAsync(User user, string? password)
+        public Task<IdentityResult> CreateAsync(User user, string password)
         {
             return _userManager.CreateAsync(user, password);
         }

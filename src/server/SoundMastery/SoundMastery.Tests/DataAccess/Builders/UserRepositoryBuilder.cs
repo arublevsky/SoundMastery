@@ -9,7 +9,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class UserRepositoryBuilder
     {
-        private IConfiguration? _configuration;
+        private IConfiguration _configuration;
 
         public UserRepositoryBuilder With(IConfiguration configuration)
         {

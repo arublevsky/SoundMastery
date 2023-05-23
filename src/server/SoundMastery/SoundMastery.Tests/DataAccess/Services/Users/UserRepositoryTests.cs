@@ -58,7 +58,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
             // Act
             var persistedUser = await sut.FindByNameAsync(username);
 
-            persistedUser!.FirstName = "NewFirstName";
+            persistedUser.FirstName = "NewFirstName";
             persistedUser.LastName = "NewLastName";
             persistedUser.PhoneNumber = "NewPhoneNumber";
             persistedUser.SecurityStamp = Guid.NewGuid().ToString();
@@ -102,7 +102,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
 
             // Assert
             var result = await sut.FindByNameAsync(username);
-            result!.RefreshTokens.Should().ContainSingle("some_token");
+            result.RefreshTokens.Should().ContainSingle("some_token");
         }
 
         [Theory]
@@ -133,7 +133,7 @@ namespace SoundMastery.Tests.DataAccess.Services.Users
 
             // Assert
             var result = await sut.FindByNameAsync(username);
-            result!.RefreshTokens.Should().BeEmpty();
+            result.RefreshTokens.Should().BeEmpty();
         }
     }
 }

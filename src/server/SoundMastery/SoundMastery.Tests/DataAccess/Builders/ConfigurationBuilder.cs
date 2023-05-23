@@ -9,7 +9,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class ConfigurationBuilder
     {
-        private TestcontainerDatabase? _container;
+        private TestcontainerDatabase _container;
 
         public ConfigurationBuilder For(TestcontainerDatabase container)
         {
@@ -42,13 +42,13 @@ namespace SoundMastery.Tests.DataAccess.Builders
 
             if (engine == DatabaseEngine.Postgres)
             {
-                csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container!.ConnectionString);
+                csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
                 csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
             }
 
             if (engine == DatabaseEngine.SqlServer)
             {
-                csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container!.ConnectionString);
+                csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
                 csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
             }
 

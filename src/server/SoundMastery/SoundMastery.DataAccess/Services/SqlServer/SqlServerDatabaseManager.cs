@@ -28,13 +28,13 @@ namespace SoundMastery.DataAccess.Services.SqlServer
         public async Task<bool> DatabaseExists()
         {
             await using var conn = new SqlConnection(_connectionString);
-            string sql = EmbeddedResource.GetAsString("CheckDatabaseExists.sql", SqlPath);
+            var sql = EmbeddedResource.GetAsString("CheckDatabaseExists.sql", SqlPath);
 
             await using var command = new SqlCommand(sql, conn);
             try
             {
                 await conn.OpenAsync();
-                object? result = await command.ExecuteScalarAsync();
+                var result = await command.ExecuteScalarAsync();
                 await conn.CloseAsync();
                 return result != null && result.Equals("soundmastery");
             }
@@ -51,7 +51,7 @@ namespace SoundMastery.DataAccess.Services.SqlServer
             try
             {
                 await using var conn = new SqlConnection(_connectionString);
-                await using SqlCommand command = new SqlCommand("SELECT 1", conn);
+                await using var command = new SqlCommand("SELECT 1", conn);
                 await conn.OpenAsync();
                 await command.ExecuteScalarAsync();
                 await conn.CloseAsync();
@@ -67,7 +67,7 @@ namespace SoundMastery.DataAccess.Services.SqlServer
             var sql = EmbeddedResource.GetAsString("DropDatabase.sql", SqlPath);
 
             await using var conn = new SqlConnection(_connectionString);
-            await using SqlCommand command = new SqlCommand(sql, conn);
+            await using var command = new SqlCommand(sql, conn);
             await conn.OpenAsync();
             await command.ExecuteScalarAsync();
             await conn.CloseAsync();
@@ -76,9 +76,9 @@ namespace SoundMastery.DataAccess.Services.SqlServer
         private async Task CreateDatabase()
         {
             await using var conn = new SqlConnection(_connectionString);
-            string sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
+            var sql = EmbeddedResource.GetAsString("CreateDatabase.sql", SqlPath);
 
-            await using SqlCommand command = new SqlCommand(sql, conn);
+            await using var command = new SqlCommand(sql, conn);
             try
             {
                 await conn.OpenAsync();

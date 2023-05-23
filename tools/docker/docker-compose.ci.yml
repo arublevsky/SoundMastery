@@ -10,4 +10,3 @@ services:
     image: ghcr.io/arublevsky/sound-mastery-client:${APP_VERSION:?err}
     build:
       context: ./../../src/client
-      dockerfile: Dockerfile-ci

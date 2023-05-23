@@ -21,11 +21,11 @@ namespace SoundMastery.Migration
 {
     public class Program
     {
-        private static IConfiguration? Configuration { get; set; }
+        private static IConfiguration Configuration { get; set; }
 
         public static async Task Main(string[] args)
         {
-            using IServiceScope scope = CreateServices(args).CreateScope();
+            using var scope = CreateServices(args).CreateScope();
             await HandleCommand(args.First(), scope);
         }
 
@@ -33,7 +33,7 @@ namespace SoundMastery.Migration
         {
             Configuration = ConfigurationFactory.Create(args);
 
-            DatabaseEngine engine = GetDatabaseEngine();
+            var engine = GetDatabaseEngine();
 
             var services = new ServiceCollection()
                 .AddFluentMigratorCore()
@@ -90,8 +90,11 @@ namespace SoundMastery.Migration
 
         private static async Task HandleCommand(string command, IServiceScope scope)
         {
+            Console.WriteLine($"Start handling command: {command}");
             var manager = scope.ServiceProvider.GetService<IDatabaseManager>()!;
             var migrationService = scope.ServiceProvider.GetService<IMigrationService>()!;
+
+            Console.WriteLine($"Resolved manager: {manager.GetType()}");
 
             switch (command)
             {

@@ -18,7 +18,7 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
 
         public async Task<User> GetUserData(string token)
         {
-            FacebookClient client = CreateFacebookClient(token);
+            var client = CreateFacebookClient(token);
 
             await ValidateAccessToken(client);
 

@@ -38,13 +38,12 @@ Administration portal for a music school.
     3b. Run `build.ps1 -target DeployDocker` to run the whole application in docker (atm postgress is used as a database engine).
     Note: docker deploy uses production webpack configuration, adjust server URL to point to the local server. See `webpack.prod.js`.
 
-4. Setup SSL certificate
-
-In Powershell, execute the following command:
-
-`Import-Certificate -FilePath "C:/<path-to-project>SoundMastery/tools/ssl/private.crt" -CertStoreLocation Cert:\LocalMachine\Root`
-
-To generate a new certificate use [this](https://gist.github.com/pgilad/63ddb94e0691eebd502deee207ff62bd) guide.
+## K8s deployment
+Repository contains helm templates to run application in local kubernetes cluster, for exapmple minikube.
+To run application in minikube:
+1. Intall and configure minikube cluster ([details](https://stackoverflow.com/questions/58561682/minikube-with-ingress-example-not-working/73735009#73735009))
+2. Install helm and deploy charts for postgress, client and backend
+3. Naviage to http://soundmastery-client.local
 
 ## Cloud Deployments
 

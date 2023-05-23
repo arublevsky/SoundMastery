@@ -1,10 +1,5 @@
 import { TokenAuthenticationResult } from "./accountApi";
 
-export interface RefreshTokenData {
-    refreshToken: string;
-    username: string;
-}
-
 export interface UserAuthorizationInfo extends TokenAuthenticationResult {
     loggedInAt: number;
 }

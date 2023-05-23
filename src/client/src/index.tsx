@@ -1,13 +1,15 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import 'chart.js/auto';
 import { BrowserRouter } from 'react-router-dom';
 import AuthenticationProvider from "./modules/authorization/authenticationProvider";
 import { App } from "./app";
+import { createRoot } from 'react-dom/client';
 
-ReactDOM.render(
+const container = document.getElementById("app");
+const root = createRoot(container);
+root.render(
     <BrowserRouter>
         <AuthenticationProvider>
             <App />
         </AuthenticationProvider>
-    </BrowserRouter>,
-    document.getElementById("app"));
+    </BrowserRouter>);

@@ -21,8 +21,4 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
-
-    <PropertyGroup>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
 </Project>

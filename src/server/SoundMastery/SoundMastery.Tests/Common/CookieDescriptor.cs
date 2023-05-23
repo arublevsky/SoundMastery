@@ -4,7 +4,7 @@ namespace SoundMastery.Tests.Common
 {
     public class CookieDescriptor
     {
-        public CookieDescriptor(string key, string value, CookieOptions? options)
+        public CookieDescriptor(string key, string value, CookieOptions options)
         {
             Key = key;
             Value = value;
@@ -15,6 +15,6 @@ namespace SoundMastery.Tests.Common
 
         public string Value { get; set; }
 
-        public CookieOptions? Options { get; set; }
+        public CookieOptions Options { get; set; }
     }
 }

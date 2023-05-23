@@ -5,7 +5,7 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
     public class InspectTokenResponse
     {
         [JsonPropertyName("data")]
-        public InspectTokenData? Data { get; set; }
+        public InspectTokenData Data { get; set; }
     }
 
     public class InspectTokenData

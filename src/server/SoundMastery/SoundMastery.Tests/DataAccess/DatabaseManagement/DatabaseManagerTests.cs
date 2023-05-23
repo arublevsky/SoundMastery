@@ -21,7 +21,7 @@ namespace SoundMastery.Tests.DataAccess.DatabaseManagement
             await container.StartAsync();
 
             // Act
-            Func<Task> action = () => sut.CheckConnection();
+            var action = () => sut.CheckConnection();
 
             // Assert
             await action.Should().NotThrowAsync();
@@ -38,7 +38,7 @@ namespace SoundMastery.Tests.DataAccess.DatabaseManagement
             var sut = new DatabaseManagerBuilder().With(configuration).Build(engine);
 
             // Act: container not started
-            Func<Task> action = () => sut.CheckConnection();
+            var action = () => sut.CheckConnection();
 
             // Assert
             await action.Should().ThrowAsync<Exception>().WithMessage("*not*available*");

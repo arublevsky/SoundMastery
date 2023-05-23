@@ -15,7 +15,6 @@ using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
-using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace SoundMastery.Application.Authorization
 {
@@ -49,19 +48,17 @@ namespace SoundMastery.Application.Authorization
             _twitterService = twitterService;
         }
 
-        public async Task<TokenAuthenticationResult?> Login(LoginUserModel model)
+        public async Task<TokenAuthenticationResult> Login(LoginUserModel model)
         {
-            SignInResult result =
-                await _identityManager.PasswordSignInAsync(model.Username, model.Password);
-
+            var result = await _identityManager.PasswordSignInAsync(model.Username, model.Password);
             if (!result.Succeeded)
             {
                 return null;
             }
 
-            User? user = await _userService.FindByNameAsync(model.Username!);
-            await SetRefreshTokenCookie(user!);
-            return GetAccessToken(user!.UserName);
+            var user = await _userService.FindByNameAsync(model.Username!);
+            await SetRefreshTokenCookie(user);
+            return GetAccessToken(user.UserName);
         }
 
         public Task<string> GetTwitterRequestToken()
@@ -69,15 +66,19 @@ namespace SoundMastery.Application.Authorization
             return _twitterService.AcquireRequestToken();
         }
 
-        public async Task<TokenAuthenticationResult?> ExternalLogin(ExternalLoginModel model)
+        public async Task<TokenAuthenticationResult> ExternalLogin(ExternalLoginModel model)
         {
-            IExternalAuthProviderService service = _authProviderResolver.Resolve(model.Type!.Value);
+            if (!model.Type.HasValue)
+            {
+                return null;
+            }
 
-            User userData = await service.GetUserData(model.AccessToken);
+            var service = _authProviderResolver.Resolve(model.Type.Value);
+            var userData = await service.GetUserData(model.AccessToken);
 
-            User user = await _userService.FindByNameAsync(userData.Email)
-                // SMELL: user needs to specify its own password later on to use form login
-                ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
+            var user = await _userService.FindByNameAsync(userData.Email)
+                       // SMELL: user needs to specify its own password later on to use form login
+                       ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
 
             await SetRefreshTokenCookie(user);
             return GetAccessToken(user.UserName);
@@ -86,17 +87,16 @@ namespace SoundMastery.Application.Authorization
         private async Task<User> CreateNewUser(User user, string password)
         {
             var result = await _identityManager.CreateAsync(user, password);
-
             if (!result.Succeeded)
             {
                 var errors = string.Join(", ", result.Errors.Select(x => $"{x.Code}{x.Description}"));
                 throw new InvalidOperationException($"Could not create a new user from external system. Details: {errors}");
             }
 
-            return (await _userService.FindByNameAsync(user.Email))!;
+            return await _userService.FindByNameAsync(user.Email);
         }
 
-        public async Task<TokenAuthenticationResult?> RefreshToken()
+        public async Task<TokenAuthenticationResult> RefreshToken()
         {
             var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
             if (cookies == null || !cookies.TryGetValue(RefreshTokenCookieKey, out var value) || string.IsNullOrEmpty(value))
@@ -110,7 +110,7 @@ namespace SoundMastery.Application.Authorization
                 return null;
             }
 
-            User? user = await _userService.FindByNameAsync(model.Username);
+            var user = await _userService.FindByNameAsync(model.Username);
             if (user == null || !_userService.IsValidRefreshToken(user, model.RefreshToken))
             {
                 return null;
@@ -186,7 +186,7 @@ namespace SoundMastery.Application.Authorization
 
         public async Task Logout(string username)
         {
-            User? user = await _userService.FindByNameAsync(username);
+            var user = await _userService.FindByNameAsync(username);
             if (user == null)
             {
                 return;

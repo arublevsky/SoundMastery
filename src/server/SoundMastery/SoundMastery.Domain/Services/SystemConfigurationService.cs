@@ -14,14 +14,14 @@ namespace SoundMastery.Domain.Services
 
         public T GetSetting<T>(string key)
         {
-            string? value = _configuration[key];
+            var value = _configuration[key];
             AssertSettingExists(key, value);
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
         public string GetConnectionString(string name)
         {
-            string? value = _configuration.GetConnectionString(name);
+            var value = _configuration.GetConnectionString(name);
             AssertSettingExists(name, value);
             return value;
         }

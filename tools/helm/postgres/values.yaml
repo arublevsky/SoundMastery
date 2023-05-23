@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "15.3"
+
+imagePullSecrets: []
+nameOverride: "postgres-db"
+fullnameOverride: "postgres-db"
+
+serviceAccount:
+  create: true
+  name: "postgres-db"
+
+service:
+  type: ClusterIP
+  port: 5432
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: false
