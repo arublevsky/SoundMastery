@@ -6,7 +6,8 @@ import {
     ShoppingBag as ShoppingBagIcon,
     User as UserIcon,
     UserPlus as UserPlusIcon,
-    Users as UsersIcon
+    Users as UsersIcon,
+    Camera as CameraIcon
 } from 'react-feather';
 
 const navItems = [
@@ -14,6 +15,11 @@ const navItems = [
         href: '/admin/dashboard',
         icon: BarChartIcon,
         title: 'Dashboard'
+    },
+    {
+        href: '/admin/videos',
+        icon: CameraIcon,
+        title: 'Videos'
     },
     {
         href: '/admin/customers',

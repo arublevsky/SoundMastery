@@ -35,7 +35,7 @@ namespace SoundMastery.Api
                 .ConfigureLogging(logging => logging.AddSerilog())
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddCustomConfiguration(hostingContext.HostingEnvironment, args);
+                    config.AddCustomConfiguration(hostingContext.HostingEnvironment);
                 })
                 .UseStartup<Startup>()
                 .UseSerilog();

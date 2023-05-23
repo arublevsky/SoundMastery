@@ -76,7 +76,7 @@ namespace SoundMastery.Tests.Application.Authorization
                 .Returns(() => Task.FromResult(SignInResult.Success));
 
             // user repository
-            User user = new UserBuilder().Build();
+            var user = new UserBuilder().Build();
             userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == "test@username"))).ReturnsAsync(user);
             userService.Setup(x => x.GetOrAddRefreshToken(It.Is<User>(u => u == user))).ReturnsAsync("refresh_token");
 
@@ -115,7 +115,7 @@ namespace SoundMastery.Tests.Application.Authorization
 
             // Assert
             result.Should().NotBeNull();
-            result!.Token.Should().NotBeNullOrWhiteSpace();
+            result.Token.Should().NotBeNullOrWhiteSpace();
             result.ExpiresInMilliseconds.Should().Be(TimeSpan.FromMinutes(10).TotalMilliseconds);
 
             cookies.GetCookie("RefreshTokenCookieKey").Should().BeEquivalentTo(new
@@ -150,7 +150,7 @@ namespace SoundMastery.Tests.Application.Authorization
             var twitterService = new Mock<ITwitterService>();
 
             var accessToken = "access_token";
-            User user = new UserBuilder().WithUsername($"TheNewUser@email.com").Build();
+            var user = new UserBuilder().WithUsername($"TheNewUser@email.com").Build();
 
             identityManager.Setup(x => x.CreateAsync(It.Is<User>(u => u == user), It.IsAny<string>()))
                 .ReturnsAsync(IdentityResult.Success);
@@ -161,10 +161,10 @@ namespace SoundMastery.Tests.Application.Authorization
             twitterService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
 
             userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
-                .ReturnsAsync((User?) null);
+                .ReturnsAsync((User) null);
 
             userService.SetupSequence(m => m.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
-                .ReturnsAsync((User?) null) // user is not created yet
+                .ReturnsAsync((User) null) // user is not created yet
                 .ReturnsAsync(user); // user has been created
 
             var sut = new UserAuthorizationServiceBuilder()
@@ -184,7 +184,7 @@ namespace SoundMastery.Tests.Application.Authorization
             identityManager.Verify(x => x.CreateAsync(It.Is<User>(u => u == user), It.IsAny<string>()), Times.Once);
 
             result.Should().NotBeNull();
-            result!.Token.Should().NotBeNullOrWhiteSpace();
+            result.Token.Should().NotBeNullOrWhiteSpace();
             result.ExpiresInMilliseconds.Should().Be(TimeSpan.FromMinutes(10).TotalMilliseconds);
         }
     }

@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -24,7 +23,7 @@ namespace SoundMastery.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.ConfigureCors(Configuration);
-            services.RegisterDependencies(Configuration);
+            services.RegisterDependencies();
             services.AddHttpContextAccessor();
             services.AddIdentity<User, Role>().AddDefaultTokenProviders();
             // ^services.AddIdentity sets default auth scheme to the cookies authentication,
@@ -35,7 +34,6 @@ namespace SoundMastery.Api
             services.AddSwaggerGen();
 
             services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddFluentValidation(fv =>
                 {
                     fv.RegisterValidatorsFromAssemblyContaining<UserProfileValidator>();

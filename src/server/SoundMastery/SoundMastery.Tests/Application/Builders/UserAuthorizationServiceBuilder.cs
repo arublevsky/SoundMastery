@@ -15,15 +15,15 @@ namespace SoundMastery.Tests.Application.Builders
 {
     public class UserAuthorizationServiceBuilder
     {
-        private ISystemConfigurationService? _configurationService;
-        private IUserService? _userService;
-        private IIdentityManager? _identityManager;
-        private IHttpContextAccessor? _httpContextAccessor;
-        private IDateTimeProvider? _dateTimeProvider;
-        private IFacebookService? _facebookService;
-        private IGoogleService? _googleService;
-        private IMicrosoftService? _microsoftService;
-        private ITwitterService? _twitterService;
+        private ISystemConfigurationService _configurationService;
+        private IUserService _userService;
+        private IIdentityManager _identityManager;
+        private IHttpContextAccessor _httpContextAccessor;
+        private IDateTimeProvider _dateTimeProvider;
+        private IFacebookService _facebookService;
+        private IGoogleService _googleService;
+        private IMicrosoftService _microsoftService;
+        private ITwitterService _twitterService;
 
         public UserAuthorizationServiceBuilder With(ISystemConfigurationService configuration)
         {
@@ -73,7 +73,7 @@ namespace SoundMastery.Tests.Application.Builders
             return this;
         }
 
-        public UserAuthorizationServiceBuilder With(ITwitterService? twitterService)
+        public UserAuthorizationServiceBuilder With(ITwitterService twitterService)
         {
             _twitterService = twitterService;
             return this;

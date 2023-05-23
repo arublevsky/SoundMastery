@@ -7,9 +7,9 @@ namespace SoundMastery.DataAccess.Services.Users
     {
         Task CreateAsync(User user);
 
-        Task<User?> FindByNameAsync(string userName);
+        Task<User> FindByNameAsync(string userName);
 
-        Task<User?> FindByEmailAsync(string email);
+        Task<User> FindByEmailAsync(string email);
 
         Task UpdateAsync(User user);
 

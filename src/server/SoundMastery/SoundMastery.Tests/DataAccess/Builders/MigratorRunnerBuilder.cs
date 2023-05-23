@@ -12,7 +12,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class MigratorRunnerBuilder
     {
-        private IConfiguration? _configuration;
+        private IConfiguration _configuration;
 
         public MigratorRunnerBuilder With(IConfiguration configuration)
         {
@@ -27,7 +27,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
                 throw new InvalidOperationException("Configuration is not specified");
             }
 
-            IServiceScope scope = CreateServiceProvider(_configuration, engine).CreateScope();
+            var scope = CreateServiceProvider(_configuration, engine).CreateScope();
             return scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
         }
 

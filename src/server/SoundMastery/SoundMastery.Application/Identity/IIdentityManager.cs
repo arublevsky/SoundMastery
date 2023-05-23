@@ -9,8 +9,8 @@ namespace SoundMastery.Application.Identity
     /// </summary>
     public interface IIdentityManager
     {
-        Task<SignInResult> PasswordSignInAsync(string? username, string? password);
+        Task<SignInResult> PasswordSignInAsync(string username, string password);
 
-        Task<IdentityResult> CreateAsync(User user, string? password);
+        Task<IdentityResult> CreateAsync(User user, string password);
     }
 }

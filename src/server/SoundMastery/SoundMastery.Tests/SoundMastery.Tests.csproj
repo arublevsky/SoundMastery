@@ -33,8 +33,4 @@
       <ProjectReference Include="..\SoundMastery.Application\SoundMastery.Application.csproj" />
       <ProjectReference Include="..\SoundMastery.DataAccess\SoundMastery.DataAccess.csproj" />
     </ItemGroup>
-    
-    <PropertyGroup>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
 </Project>

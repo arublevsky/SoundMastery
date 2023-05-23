@@ -9,7 +9,7 @@ namespace SoundMastery.Tests.DataAccess.Builders
 {
     public class DatabaseManagerBuilder
     {
-        private IConfiguration? _configuration;
+        private IConfiguration _configuration;
 
         public DatabaseManagerBuilder With(IConfiguration configuration)
         {

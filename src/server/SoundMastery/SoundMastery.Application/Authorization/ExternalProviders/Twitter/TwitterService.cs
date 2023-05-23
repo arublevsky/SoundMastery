@@ -4,7 +4,6 @@ using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 using Tweetinvi;
 using Tweetinvi.Auth;
-using Tweetinvi.Models;
 using Tweetinvi.Parameters;
 
 namespace SoundMastery.Application.Authorization.ExternalProviders.Twitter
@@ -53,7 +52,7 @@ namespace SoundMastery.Application.Authorization.ExternalProviders.Twitter
                 $"{clientUrl}/twitter-sign-in-success",
                 authRequestId);
 
-            IAuthenticationRequest result = await client.Auth.RequestAuthenticationUrlAsync(callbackUrl);
+            var result = await client.Auth.RequestAuthenticationUrlAsync(callbackUrl);
 
             await _authRequestStore.AddAuthenticationTokenAsync(authRequestId, result);
 

@@ -21,7 +21,7 @@ namespace SoundMastery.DataAccess.Services.Users
             return ExecuteUserQuery("CreateUser.sql", user);
         }
 
-        public Task<User?> FindByNameAsync(string userName)
+        public Task<User> FindByNameAsync(string userName)
         {
             return FindUserQuery("FindUserByName.sql", new
             {
@@ -29,7 +29,7 @@ namespace SoundMastery.DataAccess.Services.Users
             });
         }
 
-        public Task<User?> FindByEmailAsync(string email)
+        public Task<User> FindByEmailAsync(string email)
         {
             return FindUserQuery("FindUserByEmail.sql", new
             {
@@ -64,7 +64,7 @@ namespace SoundMastery.DataAccess.Services.Users
             await connection.QueryAsync(GetSql(sqlName), user);
         }
 
-        private async Task<User?> FindUserQuery(string sqlName, object options)
+        private async Task<User> FindUserQuery(string sqlName, object options)
         {
             await using var connection = _connectionService.CreateConnection();
             await connection.OpenAsync();

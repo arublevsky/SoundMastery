@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+data:
+  nginx.conf: |
+    log_format postdata escape=json $request_body;
+
+    upstream Backend {
+        server soundmastery-backend;
+    }
+
+    server { 
+        listen 80;
+        server_name client;
+        
+        location / {
+            root /usr/share/nginx/html;
+            try_files $uri /index.html;
+        }
+
+        location /api/ {
+            proxy_redirect off;
+            proxy_set_header host $host;
+            proxy_set_header Cookie $http_cookie;
+            proxy_set_header X-real-ip $remote_addr;
+            proxy_set_header X-forward-for $proxy_add_x_forwarded_for;
+            proxy_pass http://backend;
+        }
+
+        error_log /var/log/nginx/project_error.log;
+        access_log /var/log/nginx/project_access.log;   
+    }

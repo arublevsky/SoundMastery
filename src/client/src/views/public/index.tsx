@@ -82,7 +82,7 @@ const Public = () => {
                             Enterprise
                         </Link>
                         {isAuthenticated &&
-                            <Link component={RouterLink} to="/admin" variant="button" color="textPrimary" className={classes.link}>
+                            <Link component={RouterLink} to="/admin/dashboard" variant="button" color="textPrimary" className={classes.link}>
                                 Administration
                             </Link>}
                     </nav>

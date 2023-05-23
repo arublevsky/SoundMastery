@@ -1,0 +1,41 @@
+replicaCount: 1
+
+image:
+  repository: soundmastery-backend-v5
+  pullPolicy: Never
+  tag: latest
+
+runtimeOptions:
+  dbCommand: recreate
+  dbEngine: postgres
+  postgresServerConnection: Host=postgres-db;Port=5432;Username=postgres;Password=Secret-23-password@
+  postgresDatabaseConnection: Host=postgres-db;Port=5432;Username=postgres;Password=Secret-23-password@;Database=soundmastery
+  aspnetEnv: Development
+  aspnetUrls: http://+:80
+  clientUrl: http://soundmastery-client.local
+
+imagePullSecrets: []
+nameOverride: "soundmastery-backend"
+fullnameOverride: "soundmastery-backend"
+
+serviceAccount:
+  create: true
+  name: "soundmastery-backend"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false

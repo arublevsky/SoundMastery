@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +25,7 @@ namespace SoundMastery.Api.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void RegisterDependencies(this IServiceCollection services, IConfiguration configuration)
+        public static void RegisterDependencies(this IServiceCollection services)
         {
             services.AddTransient<IUserStore<User>, UserStore>();
             services.AddTransient<IUserEmailStore<User>, UserStore>();
@@ -106,8 +105,10 @@ namespace SoundMastery.Api.Extensions
                     options.AddPolicy(CorsPolicyName.FrontendApp,
                         builder =>
                         {
+                            // while running inside k8s the API is not exposed to outer world
+                            // client requests are coming from cluster's localhost
                             builder
-                                .WithOrigins(configuration.GetValue<string>("ClientUrl"))
+                                .WithOrigins(configuration.GetValue<string>("CLIENT_URL"))
                                 .AllowAnyMethod()
                                 .AllowAnyHeader()
                                 .AllowCredentials();

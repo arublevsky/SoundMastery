@@ -6,8 +6,9 @@ module.exports = merge(common, {
     mode: 'production',
     plugins: [
         new webpack.DefinePlugin({
-            // when running in docker locally, replace with dev URL
-            // SMELL: to improve try use dockerfile ARG API_URL="http://something.com" ?
+            // when running in k8s locally, replace both URLs with http://soundmastery-client.local 
+            // TODO: to improve try use dockerfile ARG API_URL="http://something.com" 
+            // https://github.com/arublevsky/SoundMastery/issues/86
             __API_BASE_URL__: JSON.stringify("https://soundmastery.azurewebsites.net"),
             __CLIENT_APP_BASE_URL__: JSON.stringify("https://soundmastery-client.azurewebsites.net"),
             __FACEBOOK_APP_ID__: JSON.stringify("186246619844260"),

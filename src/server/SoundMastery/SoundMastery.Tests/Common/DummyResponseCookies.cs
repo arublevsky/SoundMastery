@@ -28,7 +28,7 @@ namespace SoundMastery.Tests.Common
             _cookies.RemoveAll(x => x.Key == key);
         }
 
-        public CookieDescriptor? GetCookie(string key)
+        public CookieDescriptor GetCookie(string key)
         {
             return _cookies.SingleOrDefault(x => x.Key == key);
         }

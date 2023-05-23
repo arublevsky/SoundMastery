@@ -36,7 +36,4 @@
     <ItemGroup>
       <Folder Include="Sql\Generic" />
     </ItemGroup>
-    <PropertyGroup>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
 </Project>

@@ -18,7 +18,7 @@ namespace SoundMastery.DataAccess.Services.Common
 
         public string GetSqlPath(string name, string nestedPath, bool useEngineSpecificPath = false)
         {
-            string path = useEngineSpecificPath ? GetDatabaseEngine().ToString() : "Generic";
+            var path = useEngineSpecificPath ? GetDatabaseEngine().ToString() : "Generic";
             return EmbeddedResource.GetAsString(name, $"Sql.{path}.{nestedPath}");
         }
 
@@ -30,13 +30,13 @@ namespace SoundMastery.DataAccess.Services.Common
                 : _configurationService.GetConnectionString("PostgresDatabaseConnection");
 
             return engine == DatabaseEngine.SqlServer
-                ? new SqlConnection(connectionString) as DbConnection
+                ? new SqlConnection(connectionString)
                 : new NpgsqlConnection(connectionString);
         }
 
         public DatabaseEngine GetDatabaseEngine()
         {
-            string engineConfig = _configurationService.GetSetting<string>("DatabaseSettings:Engine");
+            var engineConfig = _configurationService.GetSetting<string>("DatabaseSettings:Engine");
             return Enum.TryParse<DatabaseEngine>(engineConfig, ignoreCase: true, out var result)
                 ? result
                 : DatabaseEngine.Postgres;

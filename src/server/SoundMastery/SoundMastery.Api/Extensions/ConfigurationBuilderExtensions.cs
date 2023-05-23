@@ -7,8 +7,7 @@ namespace SoundMastery.Api.Extensions
     {
         public static IConfigurationBuilder AddCustomConfiguration(
             this IConfigurationBuilder configurationBuilder,
-            IWebHostEnvironment hostingEnvironment,
-            string[] args)
+            IWebHostEnvironment hostingEnvironment)
         {
             return configurationBuilder
                 .AddJsonFile("appsettings.json", false, true)

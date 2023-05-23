@@ -12,6 +12,7 @@ import PublicView from './views/public/index';
 import SettingsView from './views/settings';
 import { Navigate } from "react-router-dom";
 import TwitterAuthenticationView from "./views/auth/twitterAuthenticationView";
+import VideoPage from "./views/video";
 
 export const publicRoutes = [
     {
@@ -34,11 +35,11 @@ export const protectedRoutes = [
         path: 'admin',
         element: <DashboardLayout />,
         children: [
-            { path: '/', element: <Navigate to="/admin/dashboard" /> },
             { path: 'account', element: <AccountView /> },
             { path: 'customers', element: <CustomerListView /> },
             { path: 'dashboard', element: <DashboardView /> },
             { path: 'products', element: <ProductListView /> },
+            { path: 'videos', element: <VideoPage /> },
             { path: 'settings', element: <SettingsView /> },
             { path: '*', element: <Navigate to="/404" /> }
         ]

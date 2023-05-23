@@ -19,14 +19,14 @@ namespace SoundMastery.Application.Profile
             _configurationService = configurationService;
         }
 
-        public Task<User?> FindByNameAsync(string username)
+        public Task<User> FindByNameAsync(string username)
         {
             return _userRepository.FindByNameAsync(username);
         }
 
         public async Task<UserProfile> GetUserProfile(string email)
         {
-            User user = await GetUser(email);
+            var user = await GetUser(email);
             return new UserProfile
             {
                 Email = email,
@@ -38,7 +38,7 @@ namespace SoundMastery.Application.Profile
 
         public async Task SaveUserProfile(UserProfile profile)
         {
-            User user = await GetUser(profile.Email);
+            var user = await GetUser(profile.Email);
 
             user.FirstName = profile.FirstName;
             user.LastName = profile.LastName;
@@ -49,7 +49,7 @@ namespace SoundMastery.Application.Profile
 
         public Task<string> GetOrAddRefreshToken(User user)
         {
-            string? existing = FindActiveRefreshToken(user);
+            var existing = FindActiveRefreshToken(user);
             return string.IsNullOrEmpty(existing)
                 ? CreateRefreshToken(user)
                 : Task.FromResult(existing);
@@ -57,19 +57,19 @@ namespace SoundMastery.Application.Profile
 
         private async Task<string> CreateRefreshToken(User user)
         {
-            string token = RefreshTokenFactory.GenerateToken();
+            var token = RefreshTokenFactory.GenerateToken();
             await _userRepository.AssignRefreshToken(token, user);
             return token;
         }
 
-        private string? FindActiveRefreshToken(User user)
+        private string FindActiveRefreshToken(User user)
         {
             return user.RefreshTokens.SingleOrDefault(IsValidToken)?.Token;
         }
 
         public bool IsValidRefreshToken(User user, string token)
         {
-            RefreshToken? existing = user.RefreshTokens.SingleOrDefault(t => t.Token.Equals(token));
+            var existing = user.RefreshTokens.SingleOrDefault(t => t.Token.Equals(token));
             return existing != null && IsValidToken(existing);
         }
 
@@ -86,7 +86,7 @@ namespace SoundMastery.Application.Profile
 
         private async Task<User> GetUser(string email)
         {
-            User? user = await _userRepository.FindByEmailAsync(email);
+            var user = await _userRepository.FindByEmailAsync(email);
             if (user == null)
             {
                 throw new InvalidOperationException($"Cannot find a user {email}");

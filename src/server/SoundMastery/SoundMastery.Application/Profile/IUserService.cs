@@ -5,7 +5,7 @@ namespace SoundMastery.Application.Profile
 {
     public interface IUserService
     {
-        Task<User?> FindByNameAsync(string username);
+        Task<User> FindByNameAsync(string username);
 
         Task<UserProfile> GetUserProfile(string email);
 

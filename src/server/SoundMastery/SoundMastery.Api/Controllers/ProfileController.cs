@@ -22,8 +22,8 @@ namespace SoundMastery.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<UserProfile>> GetUserProfile()
         {
-            string email = User.GetEmail();
-            UserProfile profile = await _service.GetUserProfile(email);
+            var email = User.GetEmail();
+            var profile = await _service.GetUserProfile(email);
             return Ok(profile);
         }
 

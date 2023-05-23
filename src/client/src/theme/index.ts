@@ -1,9 +1,9 @@
-import { createMuiTheme } from '@mui/material';
+import { createTheme } from '@mui/material/styles';
 import { indigo, common, blueGrey } from '@mui/material/colors';
 import shadows from './shadows';
 import typography from './typography';
 
-const theme = createMuiTheme({
+const theme = createTheme({
     palette: {
         background: {
             default: common.white,
