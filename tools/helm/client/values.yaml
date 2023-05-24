@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: soundmastery-client-ingres
+  repository: soundmastery-client-local # use minikibe image load to copy images from local docker
   pullPolicy: Never
   tag: "latest"
 
