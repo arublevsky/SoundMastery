@@ -27,16 +27,71 @@ jobs:
           ./build.sh --target SetAppVersion
           echo "::set-output name=app-version::$(grep APP_VERSION ./.config/ci.env | cut -d '=' -f 2)"
 
-      - name: Deploy API
-        uses: azure/webapps-deploy@v2
+      - uses: Azure/aks-set-context@v1
         with:
-          app-name: 'soundmastery'
-          publish-profile: ${{ secrets.API_PUBLISH_PROFILE }}
-          images: 'ghcr.io/arublevsky/sound-mastery-api:${{ steps.get_version.outputs.app-version }}'
+          creds: '${{ secrets.AZURE_AUTH }}'
+          cluster-name: SoundMasteryCluster
+          resource-group: SoundMasteryCluster_group
 
-      - name: Deploy Client
-        uses: azure/webapps-deploy@v2
+      - uses: Azure/k8s-create-secret@v1.1
         with:
-          app-name: 'soundmastery-client'
-          publish-profile: ${{ secrets.CLIENT_PUBLISH_PROFILE }}
-          images: 'ghcr.io/arublevsky/sound-mastery-client:${{ steps.get_version.outputs.app-version }}'
+          namespace: ${{ env.NAMESPACE  }}
+          container-registry-url: ghcr.io
+          container-registry-username: ${{ github.actor }}
+          container-registry-password: ${{ secrets.CR_PAT }}
+          secret-name: demo-k8s-secret
+
+      - uses: azure/k8s-bake@v2
+        with:
+          renderEngine: 'helm'
+          helmChart: './tools/helm/postgres'
+          helm-version: 'latest'
+        id: bake-postgres
+
+      - uses: azure/k8s-bake@v2
+        with:
+          renderEngine: 'helm'
+          helmChart: './tools/helm/backend'
+          overrideFiles: './tools/helm/backend/values.yaml'
+          overrides: |
+            replicas:2
+            image.repository:ghcr.io/arublevsky/sound-mastery-api
+            image.pullPolicy:Always
+            image.tag:${{ steps.get_version.outputs.app-version }}
+          helm-version: 'latest'
+        id: bake-backend
+
+      - uses: azure/k8s-bake@v2
+        with:
+          renderEngine: 'helm'
+          helmChart: './tools/helm/client'
+          overrideFiles: './tools/helm/client/values.yaml'
+          overrides: |
+            image.repository:ghcr.io/arublevsky/sound-mastery-client
+            image.pullPolicy:Always
+            image.tag:${{ steps.get_version.outputs.app-version }}
+            ingress.annotations.kubernetes\.io/ingress\.class: azure/application-gateway
+            ingres.hosts[0].host:soundmasterycluster-dns-h0lwk2ab.hcp.westus.azmk8s.io
+          helm-version: 'latest'
+        id: bake-client
+
+      - uses: Azure/k8s-deploy@v1.2
+        with:
+          action: deploy
+          manifests: ${{ steps.bake-postgres.outputs.manifestsBundle }}
+          imagepullsecrets: |
+              demo-k8s-secret
+
+      - uses: Azure/k8s-deploy@v1.2
+        with:
+          action: deploy
+          manifests: ${{ steps.bake-backend.outputs.manifestsBundle }}
+          imagepullsecrets: |
+              demo-k8s-secret
+
+      - uses: Azure/k8s-deploy@v1.2
+        with:
+          action: deploy
+          manifests: ${{ steps.bake-client.outputs.manifestsBundle }}
+          imagepullsecrets: |
+              demo-k8s-secret
