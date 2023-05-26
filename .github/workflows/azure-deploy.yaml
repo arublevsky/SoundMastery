@@ -70,7 +70,7 @@ jobs:
             image.repository:ghcr.io/arublevsky/sound-mastery-client
             image.pullPolicy:Always
             image.tag:${{ steps.get_version.outputs.app-version }}
-            ingress.annotations.kubernetes\.io/ingress\.class: azure/application-gateway
+            ingress.annotations.kubernetes\.io/ingress\.class:azure/application-gateway
             ingres.hosts[0].host:soundmasterycluster-dns-h0lwk2ab.hcp.westus.azmk8s.io
           helm-version: 'latest'
         id: bake-client
