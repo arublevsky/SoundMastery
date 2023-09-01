@@ -1,23 +1,22 @@
 using System;
-using DotNet.Testcontainers.Containers.Modules.Abstractions;
+using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using SoundMastery.DataAccess.Common;
-using SoundMastery.Tests.Extensions;
+using Testcontainers.MsSql;
 
 namespace SoundMastery.Tests.DataAccess.Builders;
 
 public class ConfigurationBuilder
 {
-    private TestcontainerDatabase _container;
+    private DockerContainer _container;
 
-    public ConfigurationBuilder For(TestcontainerDatabase container)
+    public ConfigurationBuilder For(DockerContainer container)
     {
         _container = container;
         return this;
     }
 
-    public IConfiguration Build(DatabaseEngine engine)
+    public IConfiguration Build()
     {
         if (_container == null)
         {
@@ -28,29 +27,17 @@ public class ConfigurationBuilder
 
         // configure ConnectionStrings settings
         configuration.Setup(config => config.GetSection("ConnectionStrings"))
-            .Returns(ConfigureConnectionStringSection(engine).Object);
-
-        // other settings
-        configuration.SetupGet(p => p["DatabaseSettings:Engine"]).Returns(engine.ToString);
+            .Returns(ConfigureConnectionStringSection().Object);
 
         return configuration.Object;
     }
 
-    private Mock<IConfigurationSection> ConfigureConnectionStringSection(DatabaseEngine engine)
+    private Mock<IConfigurationSection> ConfigureConnectionStringSection()
     {
         var csSection = new Mock<IConfigurationSection>();
 
-        if (engine == DatabaseEngine.Postgres)
-        {
-            csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
-            csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
-        }
-
-        if (engine == DatabaseEngine.SqlServer)
-        {
-            csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
-            csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
-        }
+        csSection.SetupGet(p => p["SqlServerDatabaseConnection"])
+            .Returns((_container as MsSqlContainer)!.GetConnectionString().Replace("master", "soundmastery"));
 
         return csSection;
     }

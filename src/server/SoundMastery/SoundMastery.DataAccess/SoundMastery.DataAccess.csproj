@@ -3,28 +3,9 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.0.151" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
-      <PackageReference Include="Npgsql" Version="7.0.4" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
-      <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-    </ItemGroup>
-    <ItemGroup>
-      <None Remove="Identity\Sql\CreateUser.sql" />
-    </ItemGroup>
-    <ItemGroup>
-      <EmbeddedResource Include="Sql\Generic\Users\CreateUser.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\FindUserByEmail.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\FindUserByName.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\InsertRefreshToken.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\ClearRefreshToken.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\UpdateUser.sql" />
-      <EmbeddedResource Include="Sql\Generic\Users\UserCollections.sql" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Sql\Generic" />
     </ItemGroup>
 </Project>

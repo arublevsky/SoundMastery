@@ -1,26 +1,28 @@
 using System;
 using System.Threading.Tasks;
+using DotNet.Testcontainers.Containers;
 using FluentAssertions;
-using SoundMastery.DataAccess.Common;
 using SoundMastery.Tests.DataAccess.Builders;
 using Xunit;
 
 namespace SoundMastery.Tests.DataAccess.Services.Users;
 
-public class UserRepositoryTests
+public class UserRepositoryTests : IAsyncLifetime
 {
-    [Theory]
-    [InlineData(DatabaseEngine.Postgres)]
-    [InlineData(DatabaseEngine.SqlServer)]
-    public async Task it_should_create_a_user(DatabaseEngine engine)
+    private readonly DockerContainer _container = DatabaseTestContainerBuilder.Build();
+
+    public Task InitializeAsync() => _container.StartAsync();
+
+    public Task DisposeAsync() => _container.DisposeAsync().AsTask();
+
+    [Fact]
+    public async Task it_should_create_a_user()
     {
         // Arrange
-        await using var container = new DatabaseTestContainerBuilder().Build(engine);
-        var configuration = new ConfigurationBuilder().For(container).Build(engine);
+        var configuration = new ConfigurationBuilder().For(_container).Build();
         var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
 
-        await container.StartAsync();
         await manager.MigrateUp();
 
         // Act
@@ -33,18 +35,14 @@ public class UserRepositoryTests
         result.Should().BeEquivalentTo(user, opt => opt.Excluding(x => x.Id));
     }
 
-    [Theory]
-    [InlineData(DatabaseEngine.Postgres)]
-    [InlineData(DatabaseEngine.SqlServer)]
-    public async Task it_should_update_a_user(DatabaseEngine engine)
+    [Fact]
+    public async Task it_should_update_a_user()
     {
         // Arrange
-        await using var container = new DatabaseTestContainerBuilder().Build(engine);
-        var configuration = new ConfigurationBuilder().For(container).Build(engine);
+        var configuration = new ConfigurationBuilder().For(_container).Build();
         var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
 
-        await container.StartAsync();
         await manager.MigrateUp();
 
         const string username = "admin@gmail.com";
@@ -72,18 +70,14 @@ public class UserRepositoryTests
         result.Should().BeEquivalentTo(persistedUser, opt => opt.Excluding(x => x.Id));
     }
 
-    [Theory]
-    [InlineData(DatabaseEngine.Postgres)]
-    [InlineData(DatabaseEngine.SqlServer)]
-    public async Task it_should_add_a_refresh_token(DatabaseEngine engine)
+    [Fact]
+    public async Task it_should_add_a_refresh_token()
     {
         // Arrange
-        await using var container = new DatabaseTestContainerBuilder().Build(engine);
-        var configuration = new ConfigurationBuilder().For(container).Build(engine);
+        var configuration = new ConfigurationBuilder().For(_container).Build();
         var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
 
-        await container.StartAsync();
         await manager.MigrateUp();
 
         const string username = "admin@gmail.com";
@@ -99,18 +93,14 @@ public class UserRepositoryTests
         result.RefreshTokens.Should().ContainSingle("some_token");
     }
 
-    [Theory]
-    [InlineData(DatabaseEngine.Postgres)]
-    [InlineData(DatabaseEngine.SqlServer)]
-    public async Task it_should_delete_a_refresh_token(DatabaseEngine engine)
+    [Fact]
+    public async Task it_should_delete_a_refresh_token()
     {
         // Arrange
-        await using var container = new DatabaseTestContainerBuilder().Build(engine);
-        var configuration = new ConfigurationBuilder().For(container).Build(engine);
+        var configuration = new ConfigurationBuilder().For(_container).Build();
         var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
 
-        await container.StartAsync();
         await manager.MigrateUp();
 
         const string username = "admin@gmail.com";

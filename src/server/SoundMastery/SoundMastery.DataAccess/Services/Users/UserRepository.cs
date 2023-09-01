@@ -1,88 +1,80 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Dapper;
+using Microsoft.EntityFrameworkCore;
+using SoundMastery.DataAccess.Contexts;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.DataAccess.Services.Users;
 
 public class UserRepository : IUserRepository
 {
-    private readonly IDatabaseConnectionService _connectionService;
+    private readonly SoundMasteryContext _context;
 
-    public UserRepository(IDatabaseConnectionService connectionService)
+    public UserRepository(SoundMasteryContext context)
     {
-        _connectionService = connectionService;
+        _context = context;
     }
 
-    public Task CreateAsync(User user)
+    public async Task CreateAsync(User user)
     {
-        return ExecuteUserQuery("CreateUser.sql", user);
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
     }
 
     public Task<User> FindByNameAsync(string userName)
     {
-        return FindUserQuery("FindUserByName.sql", new
-        {
-            NormalizedUserName = userName.ToUpperInvariant()
-        });
+        var name = userName.ToUpperInvariant();
+        return _context.Users.SingleOrDefaultAsync(x => x.NormalizedUserName == name);
     }
 
     public Task<User> FindByEmailAsync(string email)
     {
-        return FindUserQuery("FindUserByEmail.sql", new
-        {
-            NormalizedEmail = email.ToUpperInvariant()
-        });
+        var normalizedEmail = email.ToUpperInvariant();
+        return _context.Users.SingleOrDefaultAsync(x => x.NormalizedEmail == normalizedEmail);
     }
 
-    public Task UpdateAsync(User user)
+    public async Task UpdateAsync(User user)
     {
-        return ExecuteUserQuery("UpdateUser.sql", user);
+        var existingUser = await GetUser(user.Id);
+        existingUser.FirstName = user.FirstName;
+        existingUser.LastName = user.LastName;
+
+        _context.Users.Update(existingUser);
+        await _context.SaveChangesAsync();
     }
 
-    public Task AssignRefreshToken(string token, User user)
+    public async Task AssignRefreshToken(string token, User user)
     {
-        return ExecuteUserQuery("InsertRefreshToken.sql", new
+        var existingUser = await GetUser(user.Id);
+        var now = DateTime.UtcNow;
+
+        existingUser.RefreshTokens.Add(new RefreshToken
         {
             UserId = user.Id,
-            CreatedAtUtc = DateTime.UtcNow,
             Token = token,
+            CreatedAtUtc = now
         });
+
+        _context.Users.Update(existingUser);
+        await _context.SaveChangesAsync();
     }
 
-    public Task ClearRefreshToken(User user)
+    public async Task ClearRefreshToken(User user)
     {
-        return ExecuteUserQuery("ClearRefreshToken.sql", new { UserId = user.Id });
+        var existingUser = await GetUser(user.Id);
+        existingUser.RefreshTokens.Clear();
+        _context.Users.Update(existingUser);
+        await _context.SaveChangesAsync();
     }
 
-    private async Task ExecuteUserQuery(string sqlName, object user)
+    private async Task<User> GetUser(int userId)
     {
-        await using var connection = _connectionService.CreateConnection();
-        await connection.OpenAsync();
-        await connection.QueryAsync(GetSql(sqlName), user);
-    }
-
-    private async Task<User> FindUserQuery(string sqlName, object options)
-    {
-        await using var connection = _connectionService.CreateConnection();
-        await connection.OpenAsync();
-
-        var user = await connection.QuerySingleOrDefaultAsync<User>(GetSql(sqlName), options);
-        if (user == null)
+        var existingUser = await _context.Users.SingleOrDefaultAsync(x => x.Id == userId);
+        if (existingUser == null)
         {
-            return null;
+            throw new InvalidOperationException($"Cannot find user to update: {userId}");
         }
 
-        await using var multi = await connection.QueryMultipleAsync(
-            GetSql("UserCollections.sql"),
-            new { user.Id });
-
-        user.Roles = multi.Read<Role>().ToList();
-        user.RefreshTokens = multi.Read<RefreshToken>().ToList();
-
-        return user;
+        return existingUser;
     }
-
-    private string GetSql(string name) => _connectionService.GetSqlPath(name, "Users");
 }

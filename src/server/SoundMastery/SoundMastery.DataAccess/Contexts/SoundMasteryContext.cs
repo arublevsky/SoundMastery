@@ -1,6 +1,4 @@
-using System;
 using Microsoft.EntityFrameworkCore;
-using SoundMastery.DataAccess.Common;
 using SoundMastery.DataAccess.Services;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
@@ -32,20 +30,7 @@ public class SoundMasteryContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var (engine, connectionString) = _service.GetConnectionParameters();
-
-        switch (engine)
-        {
-            case DatabaseEngine.Postgres:
-                optionsBuilder.UseNpgsql(connectionString,
-                    b => b.MigrationsAssembly("SoundMastery.Migration"));
-                break;
-            case DatabaseEngine.SqlServer:
-                optionsBuilder.UseSqlServer(connectionString,
-                    b => b.MigrationsAssembly("SoundMastery.Migration"));
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(engine), engine.ToString());
-        }
+        var connectionString = _service.GetConnectionString();
+        optionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("SoundMastery.Migration"));
     }
 }
