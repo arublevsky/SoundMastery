@@ -1,9 +1,8 @@
 using System;
 
-namespace SoundMastery.Application.Common
+namespace SoundMastery.Application.Common;
+
+public interface IDateTimeProvider
 {
-    public interface IDateTimeProvider
-    {
-        DateTimeOffset GetUtcNow();
-    }
+    DateTimeOffset GetUtcNow();
 }

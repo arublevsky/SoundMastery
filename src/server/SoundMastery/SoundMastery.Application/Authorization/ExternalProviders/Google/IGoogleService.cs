@@ -1,6 +1,5 @@
-namespace SoundMastery.Application.Authorization.ExternalProviders.Google
+namespace SoundMastery.Application.Authorization.ExternalProviders.Google;
+
+public interface IGoogleService : IExternalAuthProviderService
 {
-    public interface IGoogleService : IExternalAuthProviderService
-    {
-    }
 }

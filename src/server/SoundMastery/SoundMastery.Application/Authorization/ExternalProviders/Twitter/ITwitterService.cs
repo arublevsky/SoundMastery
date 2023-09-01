@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
 
-namespace SoundMastery.Application.Authorization.ExternalProviders.Twitter
+namespace SoundMastery.Application.Authorization.ExternalProviders.Twitter;
+
+public interface ITwitterService : IExternalAuthProviderService
 {
-    public interface ITwitterService : IExternalAuthProviderService
-    {
-        Task<string> AcquireRequestToken();
-    }
+    Task<string> AcquireRequestToken();
 }

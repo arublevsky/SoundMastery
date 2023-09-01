@@ -1,32 +1,30 @@
 using System;
 using Microsoft.Extensions.Configuration;
-using SoundMastery.DataAccess.Common;
-using SoundMastery.DataAccess.Services.Common;
+using SoundMastery.DataAccess.Services;
 using SoundMastery.DataAccess.Services.Users;
 using SoundMastery.Domain.Services;
 
-namespace SoundMastery.Tests.DataAccess.Builders
+namespace SoundMastery.Tests.DataAccess.Builders;
+
+public class UserRepositoryBuilder
 {
-    public class UserRepositoryBuilder
+    private IConfiguration _configuration;
+
+    public UserRepositoryBuilder With(IConfiguration configuration)
     {
-        private IConfiguration _configuration;
+        _configuration = configuration;
+        return this;
+    }
 
-        public UserRepositoryBuilder With(IConfiguration configuration)
+    public IUserRepository Build()
+    {
+        if (_configuration == null)
         {
-            _configuration = configuration;
-            return this;
+            throw new InvalidOperationException("Configuration is not specified");
         }
 
-        public IUserRepository Build(DatabaseEngine engine)
-        {
-            if (_configuration == null)
-            {
-                throw new InvalidOperationException("Configuration is not specified");
-            }
-
-            var configurationService = new SystemConfigurationService(_configuration);
-            var connectionService = new DatabaseConnectionService(configurationService);
-            return new UserRepository(connectionService);
-        }
+        var configurationService = new SystemConfigurationService(_configuration);
+        var connectionService = new DatabaseConnectionService(configurationService);
+        return new UserRepository(connectionService);
     }
 }

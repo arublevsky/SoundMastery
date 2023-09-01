@@ -1,20 +1,19 @@
 using System.Threading.Tasks;
 using SoundMastery.Domain.Identity;
 
-namespace SoundMastery.Application.Profile
+namespace SoundMastery.Application.Profile;
+
+public interface IUserService
 {
-    public interface IUserService
-    {
-        Task<User> FindByNameAsync(string username);
+    Task<User> FindByNameAsync(string username);
 
-        Task<UserProfile> GetUserProfile(string email);
+    Task<UserProfile> GetUserProfile(string email);
 
-        Task SaveUserProfile(UserProfile profile);
+    Task SaveUserProfile(UserProfile profile);
 
-        Task<string> GetOrAddRefreshToken(User user);
+    Task<string> GetOrAddRefreshToken(User user);
 
-        bool IsValidRefreshToken(User user, string token);
+    bool IsValidRefreshToken(User user, string token);
 
-        Task ClearRefreshToken(User user);
-    }
+    Task ClearRefreshToken(User user);
 }

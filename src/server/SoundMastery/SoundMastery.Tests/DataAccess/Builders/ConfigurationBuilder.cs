@@ -5,54 +5,53 @@ using Moq;
 using SoundMastery.DataAccess.Common;
 using SoundMastery.Tests.Extensions;
 
-namespace SoundMastery.Tests.DataAccess.Builders
+namespace SoundMastery.Tests.DataAccess.Builders;
+
+public class ConfigurationBuilder
 {
-    public class ConfigurationBuilder
+    private TestcontainerDatabase _container;
+
+    public ConfigurationBuilder For(TestcontainerDatabase container)
     {
-        private TestcontainerDatabase _container;
+        _container = container;
+        return this;
+    }
 
-        public ConfigurationBuilder For(TestcontainerDatabase container)
+    public IConfiguration Build(DatabaseEngine engine)
+    {
+        if (_container == null)
         {
-            _container = container;
-            return this;
+            throw new InvalidOperationException("Test container is not specified");
         }
 
-        public IConfiguration Build(DatabaseEngine engine)
+        var configuration = new Mock<IConfiguration>();
+
+        // configure ConnectionStrings settings
+        configuration.Setup(config => config.GetSection("ConnectionStrings"))
+            .Returns(ConfigureConnectionStringSection(engine).Object);
+
+        // other settings
+        configuration.SetupGet(p => p["DatabaseSettings:Engine"]).Returns(engine.ToString);
+
+        return configuration.Object;
+    }
+
+    private Mock<IConfigurationSection> ConfigureConnectionStringSection(DatabaseEngine engine)
+    {
+        var csSection = new Mock<IConfigurationSection>();
+
+        if (engine == DatabaseEngine.Postgres)
         {
-            if (_container == null)
-            {
-                throw new InvalidOperationException("Test container is not specified");
-            }
-
-            var configuration = new Mock<IConfiguration>();
-
-            // configure ConnectionStrings settings
-            configuration.Setup(config => config.GetSection("ConnectionStrings"))
-                .Returns(ConfigureConnectionStringSection(engine).Object);
-
-            // other settings
-            configuration.SetupGet(p => p["DatabaseSettings:Engine"]).Returns(engine.ToString);
-
-            return configuration.Object;
+            csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
+            csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
         }
 
-        private Mock<IConfigurationSection> ConfigureConnectionStringSection(DatabaseEngine engine)
+        if (engine == DatabaseEngine.SqlServer)
         {
-            var csSection = new Mock<IConfigurationSection>();
-
-            if (engine == DatabaseEngine.Postgres)
-            {
-                csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
-                csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
-            }
-
-            if (engine == DatabaseEngine.SqlServer)
-            {
-                csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
-                csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
-            }
-
-            return csSection;
+            csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
+            csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
         }
+
+        return csSection;
     }
 }

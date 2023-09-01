@@ -1,7 +1,6 @@
-namespace SoundMastery.Application.Authorization.ExternalProviders
+namespace SoundMastery.Application.Authorization.ExternalProviders;
+
+public interface IExternalAuthProviderResolver
 {
-    public interface IExternalAuthProviderResolver
-    {
-        IExternalAuthProviderService Resolve(ExternalAuthProviderType type);
-    }
+    IExternalAuthProviderService Resolve(ExternalAuthProviderType type);
 }

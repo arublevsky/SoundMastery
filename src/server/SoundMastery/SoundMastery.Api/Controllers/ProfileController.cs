@@ -4,40 +4,39 @@ using Microsoft.AspNetCore.Mvc;
 using SoundMastery.Api.Extensions;
 using SoundMastery.Application.Profile;
 
-namespace SoundMastery.Api.Controllers
+namespace SoundMastery.Api.Controllers;
+
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class ProfileController : ControllerBase
 {
-    [Authorize]
-    [Route("api/[controller]")]
-    [ApiController]
-    public class ProfileController : ControllerBase
+    private readonly IUserService _service;
+
+    public ProfileController(IUserService service)
     {
-        private readonly IUserService _service;
+        _service = service;
+    }
 
-        public ProfileController(IUserService service)
+    [Route("get-profile")]
+    [HttpGet]
+    public async Task<ActionResult<UserProfile>> GetUserProfile()
+    {
+        var email = User.GetEmail();
+        var profile = await _service.GetUserProfile(email);
+        return Ok(profile);
+    }
+
+    [Route("save-profile")]
+    [HttpPost]
+    public async Task<ActionResult<UserProfile>> SaveUserProfile([FromBody] UserProfile profile)
+    {
+        if (!ModelState.IsValid)
         {
-            _service = service;
+            return BadRequest();
         }
 
-        [Route("get-profile")]
-        [HttpGet]
-        public async Task<ActionResult<UserProfile>> GetUserProfile()
-        {
-            var email = User.GetEmail();
-            var profile = await _service.GetUserProfile(email);
-            return Ok(profile);
-        }
-
-        [Route("save-profile")]
-        [HttpPost]
-        public async Task<ActionResult<UserProfile>> SaveUserProfile([FromBody] UserProfile profile)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            await _service.SaveUserProfile(profile);
-            return Ok();
-        }
+        await _service.SaveUserProfile(profile);
+        return Ok();
     }
 }

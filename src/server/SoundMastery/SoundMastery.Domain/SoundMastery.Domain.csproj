@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="microsoft.extensions.identity.stores" Version="6.0.6" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="6.0.0" />
+      <PackageReference Include="microsoft.extensions.identity.stores" Version="7.0.10" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
     </ItemGroup>
 </Project>

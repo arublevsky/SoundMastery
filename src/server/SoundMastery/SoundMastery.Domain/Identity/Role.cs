@@ -1,9 +1,7 @@
-using System;
 using Microsoft.AspNetCore.Identity;
 
-namespace SoundMastery.Domain.Identity
+namespace SoundMastery.Domain.Identity;
+
+public class Role : IdentityRole<int>
 {
-    public class Role : IdentityRole<Guid>
-    {
-    }
 }

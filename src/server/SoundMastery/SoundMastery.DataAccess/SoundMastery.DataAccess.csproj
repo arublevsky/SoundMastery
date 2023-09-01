@@ -3,13 +3,11 @@
         <TargetFramework>net7.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="Dapper" Version="2.0.123" />
-      <PackageReference Include="Npgsql" Version="6.0.5" />
+      <PackageReference Include="Dapper" Version="2.0.151" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />
+      <PackageReference Include="Npgsql" Version="7.0.4" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.4" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-      <PackageReference Include="FluentMigrator" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.3.2" />
-      <PackageReference Include="FluentMigrator.Runner.SqlServer" Version="3.3.2" />
     </ItemGroup>
     <ItemGroup>
       <None Remove="Identity\Sql\CreateUser.sql" />
@@ -22,13 +20,6 @@
       <EmbeddedResource Include="Sql\Generic\Users\ClearRefreshToken.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\UpdateUser.sql" />
       <EmbeddedResource Include="Sql\Generic\Users\UserCollections.sql" />
-      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CheckDatabaseExists.sql" />
-      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\CreateDatabase.sql" />
-      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropConnections.sql" />
-      <EmbeddedResource Include="Sql\Postgres\DatabaseManagement\DropDatabase.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CheckDatabaseExists.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\CreateDatabase.sql" />
-      <EmbeddedResource Include="Sql\SqlServer\DatabaseManagement\DropDatabase.sql" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />

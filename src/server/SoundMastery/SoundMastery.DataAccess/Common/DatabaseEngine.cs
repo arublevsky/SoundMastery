@@ -1,8 +1,7 @@
-namespace SoundMastery.DataAccess.Common
+namespace SoundMastery.DataAccess.Common;
+
+public enum DatabaseEngine
 {
-    public enum DatabaseEngine
-    {
-        Postgres,
-        SqlServer
-    }
+    Postgres,
+    SqlServer
 }
