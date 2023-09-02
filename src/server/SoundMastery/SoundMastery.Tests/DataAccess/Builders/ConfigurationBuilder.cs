@@ -34,11 +34,10 @@ public class ConfigurationBuilder
 
     private Mock<IConfigurationSection> ConfigureConnectionStringSection()
     {
+        var cs = ((MsSqlContainer)_container).GetConnectionString().Replace("master", "soundmastery");
+
         var csSection = new Mock<IConfigurationSection>();
-
-        csSection.SetupGet(p => p["SqlServerDatabaseConnection"])
-            .Returns((_container as MsSqlContainer)!.GetConnectionString().Replace("master", "soundmastery"));
-
+        csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(cs);
         return csSection;
     }
 }

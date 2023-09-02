@@ -46,13 +46,12 @@ public class UserRepository : IUserRepository
     public async Task AssignRefreshToken(string token, User user)
     {
         var existingUser = await GetUser(user.Id);
-        var now = DateTime.UtcNow;
 
         existingUser.RefreshTokens.Add(new RefreshToken
         {
             UserId = user.Id,
             Token = token,
-            CreatedAtUtc = now
+            CreatedAtUtc = DateTime.UtcNow
         });
 
         _context.Users.Update(existingUser);

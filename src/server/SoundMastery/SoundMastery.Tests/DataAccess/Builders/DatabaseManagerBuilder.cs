@@ -23,7 +23,7 @@ public class DatabaseManagerBuilder
             throw new InvalidOperationException("Configuration is not specified");
         }
 
-        var ctx = new SoundMasteryContext(new DatabaseConnectionService(new SystemConfigurationService(_configuration)));
+        var ctx = new SoundMasteryContext(new SystemConfigurationService(_configuration));
         return new DatabaseManager(ctx);
     }
 }

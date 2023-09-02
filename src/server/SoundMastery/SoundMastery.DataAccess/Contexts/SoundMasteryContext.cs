@@ -2,14 +2,15 @@ using Microsoft.EntityFrameworkCore;
 using SoundMastery.DataAccess.Services;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
+using SoundMastery.Domain.Services;
 
 namespace SoundMastery.DataAccess.Contexts;
 
 public class SoundMasteryContext : DbContext
 {
-    private readonly IDatabaseConnectionService _service;
+    private readonly ISystemConfigurationService _service;
 
-    public SoundMasteryContext(IDatabaseConnectionService service)
+    public SoundMasteryContext(ISystemConfigurationService service)
     {
         _service = service;
     }
@@ -30,7 +31,7 @@ public class SoundMasteryContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connectionString = _service.GetConnectionString();
+        var connectionString = _service.GetConnectionString("SqlServerDatabaseConnection");
         optionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("SoundMastery.Migration"));
     }
 }

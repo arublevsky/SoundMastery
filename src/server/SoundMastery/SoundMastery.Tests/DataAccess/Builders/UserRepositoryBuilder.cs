@@ -1,7 +1,6 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using SoundMastery.DataAccess.Contexts;
-using SoundMastery.DataAccess.Services;
 using SoundMastery.DataAccess.Services.Users;
 using SoundMastery.Domain.Services;
 
@@ -25,7 +24,6 @@ public class UserRepositoryBuilder
         }
 
         var configurationService = new SystemConfigurationService(_configuration);
-        var connectionService = new DatabaseConnectionService(configurationService);
-        return new UserRepository(new SoundMasteryContext(connectionService));
+        return new UserRepository(new SoundMasteryContext(configurationService));
     }
 }
