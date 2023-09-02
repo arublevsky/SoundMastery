@@ -10,6 +10,6 @@ public class SoundMasteryContextFactory : IDesignTimeDbContextFactory<SoundMaste
     public SoundMasteryContext CreateDbContext(string[] args)
     {
         var config = ConfigurationFactory.Create(args);
-        return new SoundMasteryContext(new DatabaseConnectionService(new SystemConfigurationService(config)));
+        return new SoundMasteryContext(new SystemConfigurationService(config));
     }
 }

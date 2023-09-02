@@ -32,7 +32,6 @@ public static class Program
             .AddSingleton(Configuration)
             .AddDbContext<SoundMasteryContext>()
             .AddTransient<IUserStore<User>, UserStore>()
-            .AddTransient<IDatabaseConnectionService, DatabaseConnectionService>()
             .AddTransient<ISeedDataService, SeedDataService>()
             .AddTransient<ISystemConfigurationService, SystemConfigurationService>()
             .AddTransient<IDatabaseManager, DatabaseManager>()

@@ -32,7 +32,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRoleStore<Role>, RoleStore>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
-        services.AddTransient<IDatabaseConnectionService, DatabaseConnectionService>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
         services.AddTransient<IIdentityManager, IdentityManager>();
