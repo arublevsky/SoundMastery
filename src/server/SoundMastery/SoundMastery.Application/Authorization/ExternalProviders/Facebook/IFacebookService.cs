@@ -1,6 +1,5 @@
-namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
+namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook;
+
+public interface IFacebookService : IExternalAuthProviderService
 {
-    public interface IFacebookService : IExternalAuthProviderService
-    {
-    }
 }

@@ -1,86 +1,62 @@
 using System;
 using System.Threading.Tasks;
+using DotNet.Testcontainers.Containers;
 using FluentAssertions;
-using SoundMastery.DataAccess.Common;
 using SoundMastery.Tests.DataAccess.Builders;
 using Xunit;
 
-namespace SoundMastery.Tests.DataAccess.DatabaseManagement
+namespace SoundMastery.Tests.DataAccess.DatabaseManagement;
+
+public class DatabaseManagerTests : IAsyncLifetime
 {
-    public class DatabaseManagerTests
+    private readonly DockerContainer _container = DatabaseTestContainerBuilder.Build();
+
+    public Task InitializeAsync() => _container.StartAsync();
+
+    public Task DisposeAsync() => _container.DisposeAsync().AsTask();
+
+    [Fact]
+    public async Task it_should_check_connectivity_when_database_is_available()
     {
-        [Theory]
-        [InlineData(DatabaseEngine.Postgres)]
-        [InlineData(DatabaseEngine.SqlServer)]
-        public async Task it_should_check_connectivity_when_database_is_available(DatabaseEngine engine)
-        {
-            // Arrange
-            await using var container = new DatabaseTestContainerBuilder().Build(engine);
-            var configuration = new ConfigurationBuilder().For(container).Build(engine);
-            var sut = new DatabaseManagerBuilder().With(configuration).Build(engine);
-            await container.StartAsync();
+        // Arrange
+        var configuration = new ConfigurationBuilder().For(_container).Build();
+        var sut = new DatabaseManagerBuilder().With(configuration).Build();
 
-            // Act
-            var action = () => sut.CheckConnection();
+        // Act
+        await sut.MigrateUp();
+        var action = () => sut.CheckConnection();
 
-            // Assert
-            await action.Should().NotThrowAsync();
-        }
+        // Assert
+        await action.Should().NotThrowAsync();
+    }
 
-        [Theory]
-        [InlineData(DatabaseEngine.Postgres)]
-        [InlineData(DatabaseEngine.SqlServer)]
-        public async Task it_should_check_connectivity_when_database_is_not_available(DatabaseEngine engine)
-        {
-            // Arrange
-            await using var container = new DatabaseTestContainerBuilder().Build(engine);
-            var configuration = new ConfigurationBuilder().For(container).Build(engine);
-            var sut = new DatabaseManagerBuilder().With(configuration).Build(engine);
+    [Fact]
+    public async Task it_should_check_connectivity_when_database_is_not_available()
+    {
+        // Arrange
+        var configuration = new ConfigurationBuilder().For(_container).Build();
+        var sut = new DatabaseManagerBuilder().With(configuration).Build();
 
-            // Act: container not started
-            var action = () => sut.CheckConnection();
+        // Act: DB not exists
+        var action = () => sut.CheckConnection();
 
-            // Assert
-            await action.Should().ThrowAsync<Exception>().WithMessage("*not*available*");
-        }
+        // Assert
+        await action.Should().ThrowAsync<Exception>().WithMessage("*not*available*");
+    }
 
-        [Theory]
-        [InlineData(DatabaseEngine.Postgres)]
-        [InlineData(DatabaseEngine.SqlServer)]
-        public async Task it_should_drop_database(DatabaseEngine engine)
-        {
-            // Arrange
-            await using var container = new DatabaseTestContainerBuilder().Build(engine);
-            var configuration = new ConfigurationBuilder().For(container).Build(engine);
-            var sut = new DatabaseManagerBuilder().With(configuration).Build(engine);
-            await container.StartAsync();
+    [Fact]
+    public async Task it_should_drop_database()
+    {
+        // Arrange
+        var configuration = new ConfigurationBuilder().For(_container).Build();
+        var sut = new DatabaseManagerBuilder().With(configuration).Build();
 
-            // Act
-            await sut.EnsureDatabaseCreated();
-            await sut.Drop();
+        // Act
+        await sut.MigrateUp();
+        await sut.Drop();
 
-            // Assert
-            (await sut.DatabaseExists()).Should().BeFalse();
-        }
-
-        [Theory]
-        [InlineData(DatabaseEngine.Postgres)]
-        [InlineData(DatabaseEngine.SqlServer)]
-        public async Task it_ensures_that_database_is_created(DatabaseEngine engine)
-        {
-            // Arrange
-            await using var container = new DatabaseTestContainerBuilder().Build(engine);
-            var configuration = new ConfigurationBuilder().For(container).Build(engine);
-            var sut = new DatabaseManagerBuilder().With(configuration).Build(engine);
-            await container.StartAsync();
-
-            // Act
-            await sut.EnsureDatabaseCreated();
-            await sut.Drop();
-            await sut.EnsureDatabaseCreated();
-
-            // Assert
-            (await sut.DatabaseExists()).Should().BeTrue();
-        }
+        // Assert
+        var func = () => sut.CheckConnection();
+        await func.Should().ThrowAsync<InvalidOperationException>();
     }
 }

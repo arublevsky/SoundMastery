@@ -1,6 +1,5 @@
-namespace SoundMastery.Application.Authorization.ExternalProviders.Microsoft
+namespace SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
+
+public interface IMicrosoftService : IExternalAuthProviderService
 {
-    public interface IMicrosoftService : IExternalAuthProviderService
-    {
-    }
 }

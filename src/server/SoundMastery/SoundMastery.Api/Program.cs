@@ -7,44 +7,43 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using SoundMastery.Api.Extensions;
 
-namespace SoundMastery.Api
+namespace SoundMastery.Api;
+
+public class Program
 {
-    public class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
+        try
         {
-            try
-            {
-                var webHost = CreateWebHostBuilder(args).Build();
-                ConfigureLogger(webHost);
-                webHost.Run();
-            }
-            catch (Exception ex)
-            {
-                Log.Fatal(ex, "Host terminated unexpectedly");
-            }
-            finally
-            {
-                Log.CloseAndFlush();
-            }
+            var webHost = CreateWebHostBuilder(args).Build();
+            ConfigureLogger(webHost);
+            webHost.Run();
         }
-
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .ConfigureLogging(logging => logging.AddSerilog())
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.AddCustomConfiguration(hostingContext.HostingEnvironment);
-                })
-                .UseStartup<Startup>()
-                .UseSerilog();
-
-        private static void ConfigureLogger(IWebHost webHost)
+        catch (Exception ex)
         {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(webHost.Services.GetRequiredService<IConfiguration>())
-                .CreateLogger();
+            Log.Fatal(ex, "Host terminated unexpectedly");
         }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
+    }
+
+    public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        WebHost.CreateDefaultBuilder(args)
+            .UseContentRoot(Directory.GetCurrentDirectory())
+            .ConfigureLogging(logging => logging.AddSerilog())
+            .ConfigureAppConfiguration((hostingContext, config) =>
+            {
+                config.AddCustomConfiguration(hostingContext.HostingEnvironment);
+            })
+            .UseStartup<Startup>()
+            .UseSerilog();
+
+    private static void ConfigureLogger(IWebHost webHost)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(webHost.Services.GetRequiredService<IConfiguration>())
+            .CreateLogger();
     }
 }

@@ -6,66 +6,65 @@ using Tweetinvi;
 using Tweetinvi.Auth;
 using Tweetinvi.Parameters;
 
-namespace SoundMastery.Application.Authorization.ExternalProviders.Twitter
+namespace SoundMastery.Application.Authorization.ExternalProviders.Twitter;
+
+public class TwitterService : ITwitterService
 {
-    public class TwitterService : ITwitterService
+    private readonly ISystemConfigurationService _configurationService;
+    private readonly IAuthenticationRequestStore _authRequestStore;
+
+    public TwitterService(
+        ISystemConfigurationService configurationService,
+        IAuthenticationRequestStore authRequestStore)
     {
-        private readonly ISystemConfigurationService _configurationService;
-        private readonly IAuthenticationRequestStore _authRequestStore;
+        _configurationService = configurationService;
+        _authRequestStore = authRequestStore;
+    }
 
-        public TwitterService(
-            ISystemConfigurationService configurationService,
-            IAuthenticationRequestStore authRequestStore)
+    public async Task<User> GetUserData(string token)
+    {
+        var (key, secret, _) = GetConfigurationParameters();
+        var client = new TwitterClient(key, secret);
+
+        var parameters = await RequestCredentialsParameters.FromCallbackUrlAsync(token, _authRequestStore);
+        var userCredentials = await client.Auth.RequestCredentialsAsync(parameters);
+        var userClient = new TwitterClient(userCredentials);
+        var user = await userClient.Users.GetAuthenticatedUserAsync();
+
+        return new User
         {
-            _configurationService = configurationService;
-            _authRequestStore = authRequestStore;
-        }
+            UserName = user.Email,
+            Email = user.Email,
+            FirstName = user.Name,
+            LastName = user.ScreenName,
+            EmailConfirmed = true
+        };
+    }
 
-        public async Task<User> GetUserData(string token)
-        {
-            var (key, secret, _) = GetConfigurationParameters();
-            var client = new TwitterClient(key, secret);
+    public async Task<string> AcquireRequestToken()
+    {
+        var (key, secret, clientUrl) = GetConfigurationParameters();
+        var client = new TwitterClient(key, secret);
 
-            var parameters = await RequestCredentialsParameters.FromCallbackUrlAsync(token, _authRequestStore);
-            var userCredentials = await client.Auth.RequestCredentialsAsync(parameters);
-            var userClient = new TwitterClient(userCredentials);
-            var user = await userClient.Users.GetAuthenticatedUserAsync();
+        var authRequestId = Guid.NewGuid().ToString();
 
-            return new User
-            {
-                UserName = user.Email,
-                Email = user.Email,
-                FirstName = user.Name,
-                LastName = user.ScreenName,
-                EmailConfirmed = true
-            };
-        }
+        var callbackUrl = _authRequestStore.AppendAuthenticationRequestIdToCallbackUrl(
+            $"{clientUrl}/twitter-sign-in-success",
+            authRequestId);
 
-        public async Task<string> AcquireRequestToken()
-        {
-            var (key, secret, clientUrl) = GetConfigurationParameters();
-            var client = new TwitterClient(key, secret);
+        var result = await client.Auth.RequestAuthenticationUrlAsync(callbackUrl);
 
-            var authRequestId = Guid.NewGuid().ToString();
+        await _authRequestStore.AddAuthenticationTokenAsync(authRequestId, result);
 
-            var callbackUrl = _authRequestStore.AppendAuthenticationRequestIdToCallbackUrl(
-                $"{clientUrl}/twitter-sign-in-success",
-                authRequestId);
+        return result.AuthorizationKey;
+    }
 
-            var result = await client.Auth.RequestAuthenticationUrlAsync(callbackUrl);
+    private (string key, string secret, string clientUrl) GetConfigurationParameters()
+    {
+        var key = _configurationService.GetSetting<string>("Authentication:Twitter:ConsumerKey");
+        var secret = _configurationService.GetSetting<string>("Authentication:Twitter:ConsumerSecret");
+        var clientUrl = _configurationService.GetSetting<string>("ClientUrl");
 
-            await _authRequestStore.AddAuthenticationTokenAsync(authRequestId, result);
-
-            return result.AuthorizationKey;
-        }
-
-        private (string key, string secret, string clientUrl) GetConfigurationParameters()
-        {
-            var key = _configurationService.GetSetting<string>("Authentication:Twitter:ConsumerKey");
-            var secret = _configurationService.GetSetting<string>("Authentication:Twitter:ConsumerSecret");
-            var clientUrl = _configurationService.GetSetting<string>("ClientUrl");
-
-            return (key, secret, clientUrl);
-        }
+        return (key, secret, clientUrl);
     }
 }

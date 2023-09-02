@@ -1,35 +1,29 @@
 using System;
 using Microsoft.Extensions.Configuration;
-using SoundMastery.DataAccess.Common;
-using SoundMastery.DataAccess.Services.Common;
-using SoundMastery.DataAccess.Services.Postgres;
-using SoundMastery.DataAccess.Services.SqlServer;
+using SoundMastery.DataAccess.Contexts;
+using SoundMastery.DataAccess.Services;
+using SoundMastery.Domain.Services;
 
-namespace SoundMastery.Tests.DataAccess.Builders
+namespace SoundMastery.Tests.DataAccess.Builders;
+
+public class DatabaseManagerBuilder
 {
-    public class DatabaseManagerBuilder
+    private IConfiguration _configuration;
+
+    public DatabaseManagerBuilder With(IConfiguration configuration)
     {
-        private IConfiguration _configuration;
+        _configuration = configuration;
+        return this;
+    }
 
-        public DatabaseManagerBuilder With(IConfiguration configuration)
+    public IDatabaseManager Build()
+    {
+        if (_configuration == null)
         {
-            _configuration = configuration;
-            return this;
+            throw new InvalidOperationException("Configuration is not specified");
         }
 
-        public IDatabaseManager Build(DatabaseEngine engine)
-        {
-            if (_configuration == null)
-            {
-                throw new InvalidOperationException("Configuration is not specified");
-            }
-
-            return engine switch
-            {
-                DatabaseEngine.Postgres => new PgsqlDatabaseManager(_configuration),
-                DatabaseEngine.SqlServer => new SqlServerDatabaseManager(_configuration),
-                _ => throw new ArgumentOutOfRangeException(nameof(engine), engine, $"Unknown engine {engine}")
-            };
-        }
+        var ctx = new SoundMasteryContext(new SystemConfigurationService(_configuration));
+        return new DatabaseManager(ctx);
     }
 }

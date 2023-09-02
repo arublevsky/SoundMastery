@@ -1,20 +1,19 @@
 using System.Threading.Tasks;
 using SoundMastery.Domain.Identity;
 
-namespace SoundMastery.DataAccess.Services.Users
+namespace SoundMastery.DataAccess.Services.Users;
+
+public interface IUserRepository
 {
-    public interface IUserRepository
-    {
-        Task CreateAsync(User user);
+    Task CreateAsync(User user);
 
-        Task<User> FindByNameAsync(string userName);
+    Task<User> FindByNameAsync(string userName);
 
-        Task<User> FindByEmailAsync(string email);
+    Task<User> FindByEmailAsync(string email);
 
-        Task UpdateAsync(User user);
+    Task UpdateAsync(User user);
 
-        Task AssignRefreshToken(string token, User user);
+    Task AssignRefreshToken(string token, User user);
 
-        Task ClearRefreshToken(User user);
-    }
+    Task ClearRefreshToken(User user);
 }

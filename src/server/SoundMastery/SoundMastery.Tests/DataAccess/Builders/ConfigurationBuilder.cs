@@ -1,58 +1,43 @@
 using System;
-using DotNet.Testcontainers.Containers.Modules.Abstractions;
+using DotNet.Testcontainers.Containers;
 using Microsoft.Extensions.Configuration;
 using Moq;
-using SoundMastery.DataAccess.Common;
-using SoundMastery.Tests.Extensions;
+using Testcontainers.MsSql;
 
-namespace SoundMastery.Tests.DataAccess.Builders
+namespace SoundMastery.Tests.DataAccess.Builders;
+
+public class ConfigurationBuilder
 {
-    public class ConfigurationBuilder
+    private DockerContainer _container;
+
+    public ConfigurationBuilder For(DockerContainer container)
     {
-        private TestcontainerDatabase _container;
+        _container = container;
+        return this;
+    }
 
-        public ConfigurationBuilder For(TestcontainerDatabase container)
+    public IConfiguration Build()
+    {
+        if (_container == null)
         {
-            _container = container;
-            return this;
+            throw new InvalidOperationException("Test container is not specified");
         }
 
-        public IConfiguration Build(DatabaseEngine engine)
-        {
-            if (_container == null)
-            {
-                throw new InvalidOperationException("Test container is not specified");
-            }
+        var configuration = new Mock<IConfiguration>();
 
-            var configuration = new Mock<IConfiguration>();
+        // configure ConnectionStrings settings
+        configuration.Setup(config => config.GetSection("ConnectionStrings"))
+            .Returns(ConfigureConnectionStringSection().Object);
 
-            // configure ConnectionStrings settings
-            configuration.Setup(config => config.GetSection("ConnectionStrings"))
-                .Returns(ConfigureConnectionStringSection(engine).Object);
+        return configuration.Object;
+    }
 
-            // other settings
-            configuration.SetupGet(p => p["DatabaseSettings:Engine"]).Returns(engine.ToString);
+    private Mock<IConfigurationSection> ConfigureConnectionStringSection()
+    {
+        var cs = ((MsSqlContainer)_container).GetConnectionString().Replace("master", "soundmastery");
 
-            return configuration.Object;
-        }
-
-        private Mock<IConfigurationSection> ConfigureConnectionStringSection(DatabaseEngine engine)
-        {
-            var csSection = new Mock<IConfigurationSection>();
-
-            if (engine == DatabaseEngine.Postgres)
-            {
-                csSection.SetupGet(p => p["PostgresDatabaseConnection"]).Returns(_container.ConnectionString);
-                csSection.SetupGet(p => p["PostgresServerConnection"]).Returns(_container.GetServerConnectionString());
-            }
-
-            if (engine == DatabaseEngine.SqlServer)
-            {
-                csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(_container.ConnectionString);
-                csSection.SetupGet(p => p["SqlServerServerConnection"]).Returns(_container.GetServerConnectionString());
-            }
-
-            return csSection;
-        }
+        var csSection = new Mock<IConfigurationSection>();
+        csSection.SetupGet(p => p["SqlServerDatabaseConnection"]).Returns(cs);
+        return csSection;
     }
 }

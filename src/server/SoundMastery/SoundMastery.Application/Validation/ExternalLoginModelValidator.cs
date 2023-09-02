@@ -1,14 +1,13 @@
 using FluentValidation;
 using SoundMastery.Application.Authorization.ExternalProviders;
 
-namespace SoundMastery.Application.Validation
+namespace SoundMastery.Application.Validation;
+
+public class ExternalLoginModelValidator : AbstractValidator<ExternalLoginModel>
 {
-    public class ExternalLoginModelValidator : AbstractValidator<ExternalLoginModel>
+    public ExternalLoginModelValidator()
     {
-        public ExternalLoginModelValidator()
-        {
-            RuleFor(x => x.Type).NotNull();
-            RuleFor(x => x.AccessToken).NotEmpty();
-        }
+        RuleFor(x => x.Type).NotNull();
+        RuleFor(x => x.AccessToken).NotEmpty();
     }
 }

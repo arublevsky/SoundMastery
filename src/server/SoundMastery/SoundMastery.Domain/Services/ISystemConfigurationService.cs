@@ -1,9 +1,8 @@
-namespace SoundMastery.Domain.Services
-{
-    public interface ISystemConfigurationService
-    {
-        T GetSetting<T>(string key);
+namespace SoundMastery.Domain.Services;
 
-        string GetConnectionString(string name);
-    }
+public interface ISystemConfigurationService
+{
+    T GetSetting<T>(string key);
+
+    string GetConnectionString(string name);
 }

@@ -16,184 +16,187 @@ using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 
-namespace SoundMastery.Application.Authorization
+namespace SoundMastery.Application.Authorization;
+
+public class UserAuthorizationService : IUserAuthorizationService
 {
-    public class UserAuthorizationService : IUserAuthorizationService
+    private const string RefreshTokenCookieKey = "RefreshTokenCookieKey";
+
+    private readonly ISystemConfigurationService _configurationService;
+    private readonly IUserService _userService;
+    private readonly IIdentityManager _identityManager;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IExternalAuthProviderResolver _authProviderResolver;
+    private readonly ITwitterService _twitterService;
+
+    public UserAuthorizationService(
+        ISystemConfigurationService configurationService,
+        IHttpContextAccessor httpContextAccessor,
+        IUserService userService,
+        IIdentityManager identityManager,
+        IDateTimeProvider dateTimeProvider,
+        IExternalAuthProviderResolver authProviderResolver,
+        ITwitterService twitterService)
     {
-        private const string RefreshTokenCookieKey = "RefreshTokenCookieKey";
+        _configurationService = configurationService;
+        _httpContextAccessor = httpContextAccessor;
+        _userService = userService;
+        _identityManager = identityManager;
+        _dateTimeProvider = dateTimeProvider;
+        _authProviderResolver = authProviderResolver;
+        _twitterService = twitterService;
+    }
 
-        private readonly ISystemConfigurationService _configurationService;
-        private readonly IUserService _userService;
-        private readonly IIdentityManager _identityManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly IExternalAuthProviderResolver _authProviderResolver;
-        private readonly ITwitterService _twitterService;
-
-        public UserAuthorizationService(
-            ISystemConfigurationService configurationService,
-            IHttpContextAccessor httpContextAccessor,
-            IUserService userService,
-            IIdentityManager identityManager,
-            IDateTimeProvider dateTimeProvider,
-            IExternalAuthProviderResolver authProviderResolver,
-            ITwitterService twitterService)
+    public async Task<TokenAuthenticationResult> Login(LoginUserModel model)
+    {
+        var result = await _identityManager.PasswordSignInAsync(model.Username, model.Password);
+        if (!result.Succeeded)
         {
-            _configurationService = configurationService;
-            _httpContextAccessor = httpContextAccessor;
-            _userService = userService;
-            _identityManager = identityManager;
-            _dateTimeProvider = dateTimeProvider;
-            _authProviderResolver = authProviderResolver;
-            _twitterService = twitterService;
+            return null;
         }
 
-        public async Task<TokenAuthenticationResult> Login(LoginUserModel model)
-        {
-            var result = await _identityManager.PasswordSignInAsync(model.Username, model.Password);
-            if (!result.Succeeded)
-            {
-                return null;
-            }
+        var user = await _userService.FindByNameAsync(model.Username!);
+        await SetRefreshTokenCookie(user);
+        return GetAccessToken(user.UserName);
+    }
 
-            var user = await _userService.FindByNameAsync(model.Username!);
-            await SetRefreshTokenCookie(user);
-            return GetAccessToken(user.UserName);
+    public Task<string> GetTwitterRequestToken()
+    {
+        return _twitterService.AcquireRequestToken();
+    }
+
+    public async Task<TokenAuthenticationResult> ExternalLogin(ExternalLoginModel model)
+    {
+        if (!model.Type.HasValue)
+        {
+            return null;
         }
 
-        public Task<string> GetTwitterRequestToken()
+        var service = _authProviderResolver.Resolve(model.Type.Value);
+        var userData = await service.GetUserData(model.AccessToken);
+        if (userData == null)
         {
-            return _twitterService.AcquireRequestToken();
+            return null;
         }
 
-        public async Task<TokenAuthenticationResult> ExternalLogin(ExternalLoginModel model)
+        var user = await _userService.FindByNameAsync(userData.Email)
+                   // SMELL: user needs to specify its own password later on to use form login
+                   ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
+
+        await SetRefreshTokenCookie(user);
+        return GetAccessToken(user.UserName);
+    }
+
+    private async Task<User> CreateNewUser(User user, string password)
+    {
+        var result = await _identityManager.CreateAsync(user, password);
+        if (!result.Succeeded)
         {
-            if (!model.Type.HasValue)
-            {
-                return null;
-            }
-
-            var service = _authProviderResolver.Resolve(model.Type.Value);
-            var userData = await service.GetUserData(model.AccessToken);
-
-            var user = await _userService.FindByNameAsync(userData.Email)
-                       // SMELL: user needs to specify its own password later on to use form login
-                       ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
-
-            await SetRefreshTokenCookie(user);
-            return GetAccessToken(user.UserName);
+            var errors = string.Join(", ", result.Errors.Select(x => $"{x.Code}{x.Description}"));
+            throw new InvalidOperationException($"Could not create a new user from external system. Details: {errors}");
         }
 
-        private async Task<User> CreateNewUser(User user, string password)
-        {
-            var result = await _identityManager.CreateAsync(user, password);
-            if (!result.Succeeded)
-            {
-                var errors = string.Join(", ", result.Errors.Select(x => $"{x.Code}{x.Description}"));
-                throw new InvalidOperationException($"Could not create a new user from external system. Details: {errors}");
-            }
+        return await _userService.FindByNameAsync(user.Email);
+    }
 
-            return await _userService.FindByNameAsync(user.Email);
+    public async Task<TokenAuthenticationResult> RefreshToken()
+    {
+        var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
+        if (cookies == null || !cookies.TryGetValue(RefreshTokenCookieKey, out var value) || string.IsNullOrEmpty(value))
+        {
+            return null;
         }
 
-        public async Task<TokenAuthenticationResult> RefreshToken()
+        var model = JsonSerializer.Deserialize<RefreshTokenModel>(value);
+        if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.RefreshToken))
         {
-            var cookies = _httpContextAccessor.HttpContext?.Request.Cookies;
-            if (cookies == null || !cookies.TryGetValue(RefreshTokenCookieKey, out var value) || string.IsNullOrEmpty(value))
-            {
-                return null;
-            }
-
-            var model = JsonSerializer.Deserialize<RefreshTokenModel>(value);
-            if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.RefreshToken))
-            {
-                return null;
-            }
-
-            var user = await _userService.FindByNameAsync(model.Username);
-            if (user == null || !_userService.IsValidRefreshToken(user, model.RefreshToken))
-            {
-                return null;
-            }
-
-            await _userService.ClearRefreshToken(user);
-            user = (await _userService.FindByNameAsync(model.Username))!;
-            await SetRefreshTokenCookie(user);
-
-            return GetAccessToken(user.UserName);
+            return null;
         }
 
-        public Task<IdentityResult> Register(RegisterUserModel model)
+        var user = await _userService.FindByNameAsync(model.Username);
+        if (user == null || !_userService.IsValidRefreshToken(user, model.RefreshToken))
         {
-            var user = new User
-            {
-                UserName = model.Email,
-                FirstName = model.FirstName!,
-                LastName = model.LastName!,
-                Email = model.Email,
-                EmailConfirmed = true
-            };
-
-            return _identityManager.CreateAsync(user, model.Password);
+            return null;
         }
 
-        public TokenAuthenticationResult GetAccessToken(string username)
+        await _userService.ClearRefreshToken(user);
+        user = (await _userService.FindByNameAsync(model.Username))!;
+        await SetRefreshTokenCookie(user);
+
+        return GetAccessToken(user.UserName);
+    }
+
+    public Task<IdentityResult> Register(RegisterUserModel model)
+    {
+        var user = new User
         {
-            var expiresIn = _configurationService.GetSetting<int>("Jwt:AccessTokenExpirationInMinutes");
-            var jwtKey = _configurationService.GetSetting<string>("Jwt:Key");
-            var issuer = _configurationService.GetSetting<string>("Jwt:Issuer");
+            UserName = model.Email,
+            FirstName = model.FirstName!,
+            LastName = model.LastName!,
+            Email = model.Email,
+            EmailConfirmed = true
+        };
 
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+        return _identityManager.CreateAsync(user, model.Password);
+    }
 
-            var claims = new[]
-            {
-                new Claim(ClaimsIdentity.DefaultNameClaimType, username),
-                new Claim(JwtRegisteredClaimNames.Email, username),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+    public TokenAuthenticationResult GetAccessToken(string username)
+    {
+        var expiresIn = _configurationService.GetSetting<int>("Jwt:AccessTokenExpirationInMinutes");
+        var jwtKey = _configurationService.GetSetting<string>("Jwt:Key");
+        var issuer = _configurationService.GetSetting<string>("Jwt:Issuer");
 
-            var token = new JwtSecurityToken(
-                issuer,
-                issuer,
-                claims,
-                expires: DateTime.Now.AddMinutes(expiresIn),
-                signingCredentials: credentials);
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            var result = new JwtSecurityTokenHandler().WriteToken(token);
-            return new TokenAuthenticationResult(result, expiresIn);
-        }
-
-        private async Task SetRefreshTokenCookie(User user)
+        var claims = new[]
         {
-            var refreshToken = await _userService.GetOrAddRefreshToken(user);
-            var expires = _configurationService.GetSetting<int>("Jwt:RefreshTokenExpirationInMinutes");
-            var cookieValue = JsonSerializer.Serialize(new RefreshTokenModel
+            new Claim(ClaimsIdentity.DefaultNameClaimType, username),
+            new Claim(JwtRegisteredClaimNames.Email, username),
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        };
+
+        var token = new JwtSecurityToken(
+            issuer,
+            issuer,
+            claims,
+            expires: DateTime.Now.AddMinutes(expiresIn),
+            signingCredentials: credentials);
+
+        var result = new JwtSecurityTokenHandler().WriteToken(token);
+        return new TokenAuthenticationResult(result, expiresIn);
+    }
+
+    private async Task SetRefreshTokenCookie(User user)
+    {
+        var refreshToken = await _userService.GetOrAddRefreshToken(user);
+        var expires = _configurationService.GetSetting<int>("Jwt:RefreshTokenExpirationInMinutes");
+        var cookieValue = JsonSerializer.Serialize(new RefreshTokenModel
+        {
+            Username = user.UserName,
+            RefreshToken = refreshToken
+        });
+
+        _httpContextAccessor.HttpContext?.Response.Cookies.Append(RefreshTokenCookieKey, cookieValue,
+            new CookieOptions
             {
-                Username = user.UserName,
-                RefreshToken = refreshToken
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = _dateTimeProvider.GetUtcNow() + TimeSpan.FromMinutes(expires)
             });
+    }
 
-            _httpContextAccessor.HttpContext?.Response.Cookies.Append(RefreshTokenCookieKey, cookieValue,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.None,
-                    Expires = _dateTimeProvider.GetUtcNow() + TimeSpan.FromMinutes(expires)
-                });
-        }
-
-        public async Task Logout(string username)
+    public async Task Logout(string username)
+    {
+        var user = await _userService.FindByNameAsync(username);
+        if (user == null)
         {
-            var user = await _userService.FindByNameAsync(username);
-            if (user == null)
-            {
-                return;
-            }
-
-            await _userService.ClearRefreshToken(user);
-            _httpContextAccessor.HttpContext?.Response.Cookies.Delete(RefreshTokenCookieKey);
+            return;
         }
+
+        await _userService.ClearRefreshToken(user);
+        _httpContextAccessor.HttpContext?.Response.Cookies.Delete(RefreshTokenCookieKey);
     }
 }

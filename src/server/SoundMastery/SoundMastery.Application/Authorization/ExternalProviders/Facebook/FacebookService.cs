@@ -5,62 +5,61 @@ using Facebook;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
-namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook
+namespace SoundMastery.Application.Authorization.ExternalProviders.Facebook;
+
+public class FacebookService : IFacebookService
 {
-    public class FacebookService : IFacebookService
+    private readonly ISystemConfigurationService _configurationService;
+
+    public FacebookService(ISystemConfigurationService configurationService)
     {
-        private readonly ISystemConfigurationService _configurationService;
+        _configurationService = configurationService;
+    }
 
-        public FacebookService(ISystemConfigurationService configurationService)
+    public async Task<User> GetUserData(string token)
+    {
+        var client = CreateFacebookClient(token);
+
+        await ValidateAccessToken(client);
+
+        var model = await client.GetTaskAsync<MeFacebookModel>($"me?fields=first_name,last_name,email");
+
+        if (model == null || !model.IsValid())
         {
-            _configurationService = configurationService;
+            throw new InvalidOperationException("Cannot find a Facebook user by provided access token.");
         }
 
-        public async Task<User> GetUserData(string token)
+        return new User
         {
-            var client = CreateFacebookClient(token);
+            Email = model.Email,
+            FirstName = model.FirstName,
+            LastName = model.LastName,
+            UserName = model.Email,
+        };
+    }
 
-            await ValidateAccessToken(client);
+    private static FacebookClient CreateFacebookClient(string accessToken)
+    {
+        var client = new FacebookClient(accessToken);
 
-            var model = await client.GetTaskAsync<MeFacebookModel>($"me?fields=first_name,last_name,email");
+        client.SetJsonSerializers(
+            value => JsonSerializer.Serialize(value),
+            (value, type) => type != null ? JsonSerializer.Deserialize(value, type) : null);
 
-            if (model == null || !model.IsValid())
-            {
-                throw new InvalidOperationException("Cannot find a Facebook user by provided access token.");
-            }
+        return client;
+    }
 
-            return new User
-            {
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                UserName = model.Email,
-            };
-        }
+    private async Task ValidateAccessToken(FacebookClient client)
+    {
+        var appId = _configurationService.GetSetting<string>("Authentication:Facebook:AppId");
+        var appSecret = _configurationService.GetSetting<string>("Authentication:Facebook:AppSecret");
 
-        private static FacebookClient CreateFacebookClient(string accessToken)
+        var result = await client.GetTaskAsync<InspectTokenResponse>(
+            $"debug_token?input_token={client.AccessToken}&access_token={appId}|{appSecret}");
+
+        if (result?.Data == null || result.Data.IsValid == false)
         {
-            var client = new FacebookClient(accessToken);
-
-            client.SetJsonSerializers(
-                value => JsonSerializer.Serialize(value),
-                (value, type) => type != null ? JsonSerializer.Deserialize(value, type) : null);
-
-            return client;
-        }
-
-        private async Task ValidateAccessToken(FacebookClient client)
-        {
-            var appId = _configurationService.GetSetting<string>("Authentication:Facebook:AppId");
-            var appSecret = _configurationService.GetSetting<string>("Authentication:Facebook:AppSecret");
-
-            var result = await client.GetTaskAsync<InspectTokenResponse>(
-                $"debug_token?input_token={client.AccessToken}&access_token={appId}|{appSecret}");
-
-            if (result?.Data == null || result.Data.IsValid == false)
-            {
-                throw new InvalidOperationException("Invalid Facebook token provided.");
-            }
+            throw new InvalidOperationException("Invalid Facebook token provided.");
         }
     }
 }

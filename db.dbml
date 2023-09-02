@@ -1,0 +1,124 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table products {
+  id integer [primary key]
+  name varchar 
+}
+
+Table courses {
+  id integer [primary key]
+  name varchar
+  product_id integer
+  teacher_id integer
+  start_at timestamp 
+  finish_at timestamp
+  cost decimal
+}
+
+Table courseParticipants {
+  course_id integer
+  user_id integer
+
+  indexes {
+      (course_id, user_id) [pk]
+  }
+}
+
+Table courseLessons {
+  id integer [primary key]
+  course_id integer
+  teacher_id integer
+  number integer
+  start_at timestamp
+  completed bit
+  description varchar 
+}
+
+
+Table homeAssignments {
+  id integer [primary key]
+  teacher_id integer
+  student_id integer
+  lesson_id integer // cource/individual?
+  description varchar
+  completed bit
+  material_id varchar
+}
+
+Table individualLessons {
+  id integer [primary key]
+  teacher_id integer
+  student_id integer
+  product_id integer
+  start_at timestamp
+  completed bit
+  cost decimal
+  description varchar 
+}
+
+Table courseLessonMeterials {
+  course_lesson_id integer
+  material_id integer
+
+  indexes {
+      (course_lesson_id, material_id) [pk]
+  }
+}
+
+Table materials {
+  id integer [pk]
+  url varchar
+}
+
+Table courseLessonAttendies {
+  course_lesson_id integer
+  user_id integer
+
+  indexes {
+      (course_lesson_id, user_id) [pk]
+  }
+}
+
+Table users {
+  id integer [primary key]
+  username varchar
+  created_at timestamp
+}
+
+Table roles {
+  id integer [primary key]
+  name varchar
+}
+
+Table userroles {
+  user_id integer
+  role_id integer
+}
+
+Table parentsStudents {
+  user_id integer
+  student_id integer
+
+  indexes {
+      (user_id, student_id) [pk]
+  }
+}
+
+Ref: roles.id < userroles.role_id
+Ref: users.id < userroles.user_id
+Ref: courses.product_id > products.id
+Ref: courses.teacher_id > users.id
+Ref: parentsStudents.student_id > users.id
+Ref: parentsStudents.user_id > users.id
+Ref: courseParticipants.user_id > users.id
+Ref: courseParticipants.course_id > courses.id
+Ref: courseLessons.course_id > courses.id
+Ref: courseLessons.teacher_id > users.id
+Ref: courseLessonAttendies.user_id > users.id
+Ref: courseLessonAttendies.course_lesson_id > courseLessons.id
+Ref: courseLessonMeterials.course_lesson_id > courseLessons.id
+Ref: courseLessonMeterials.material_id > materials.id
+Ref: individualLessons.student_id > users.id
+Ref: individualLessons.teacher_id > users.id
+Ref: individualLessons.product_id > products.id

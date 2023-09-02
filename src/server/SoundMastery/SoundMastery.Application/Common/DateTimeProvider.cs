@@ -1,12 +1,11 @@
 using System;
 
-namespace SoundMastery.Application.Common
+namespace SoundMastery.Application.Common;
+
+public class DateTimeProvider : IDateTimeProvider
 {
-    public class DateTimeProvider : IDateTimeProvider
+    public DateTimeOffset GetUtcNow()
     {
-        public DateTimeOffset GetUtcNow()
-        {
-            return DateTimeOffset.UtcNow;
-        }
+        return DateTimeOffset.UtcNow;
     }
 }
