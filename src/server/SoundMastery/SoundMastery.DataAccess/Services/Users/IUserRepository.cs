@@ -1,19 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.DataAccess.Services.Users;
 
-public interface IUserRepository
+public interface IUserRepository : IUserEmailStore<User>, IUserPasswordStore<User>
 {
-    Task CreateAsync(User user);
+    Task<User> Create(User user);
 
-    Task<User> FindByNameAsync(string userName);
+    Task<User> Get(int userId);
 
-    Task<User> FindByEmailAsync(string email);
+    Task<User> FindByName(string userName);
 
-    Task UpdateAsync(User user);
+    Task<IReadOnlyCollection<User>> Find(Expression<Func<User, bool>> filter);
 
-    Task AssignRefreshToken(string token, User user);
+    Task<User> FindByEmail(string email);
 
-    Task ClearRefreshToken(User user);
+    Task Update(User user);
+
+    Task AssignRefreshToken(string token, int userId);
+
+    Task ClearRefreshToken(int userId);
 }

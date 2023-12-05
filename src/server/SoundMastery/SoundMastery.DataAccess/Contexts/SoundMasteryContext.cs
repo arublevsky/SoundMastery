@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SoundMastery.DataAccess.Services;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
@@ -19,19 +18,63 @@ public class SoundMasteryContext : DbContext
 
     public DbSet<Role> Roles { get; set; }
 
-    public DbSet<Product> Products { get; set; }
+    public DbSet<Material> Materials { get; set; }
 
-    public DbSet<Course> Courses { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.HasDefaultSchema("SoundMastery");
-        base.OnModelCreating(modelBuilder);
+        base.OnModelCreating(builder);
+
+        builder.HasDefaultSchema("SoundMastery");
+
+        builder.Entity<IndividualLessonMaterial>()
+            .HasIndex(p => new { p.IndividualLessonId, p.MaterialId }).IsUnique();
+
+        builder.Entity<IndividualLessonHomeAssignmentMaterial>()
+            .HasIndex(p => new { p.IndividualHomeAssignmentId, p.MaterialId }).IsUnique();
+        //
+        // builder.Entity<IndividualLesson>()
+        //     .HasOne(p => p.Student)
+        //     .WithMany()
+        //     .HasForeignKey(x => x.StudentId)
+        //     .OnDelete(DeleteBehavior.Restrict);
+        //
+        // // builder.Entity<IndividualLesson>()
+        // //     .Property(p => p.StudentId)
+        // //     .HasColumnName("StudentId");
+        // //
+        // // builder.Entity<IndividualLesson>()
+        // //     .Property(p => p.TeacherId)
+        // //     .HasColumnName("TeacherId");
+        //
+        builder.Entity<IndividualLesson>()
+            .HasOne(p => p.Teacher)
+            .WithMany()
+            .HasForeignKey(x => x.TeacherId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<User>()
+            .HasMany(x => x.Roles)
+            .WithMany(x => x.Users);
+
+        builder.Entity<User>()
+            .HasMany(x => x.IndividualLessons)
+            .WithOne(x => x.Student)
+            .HasForeignKey(x => x.StudentId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // builder.Entity<User>()
+        //     .HasMany(x => x.IndividualLessons)
+        //     .WithOne(x => x.Teacher)
+        //     .HasForeignKey(x => x.TeacherId)
+        //     .OnDelete(DeleteBehavior.Restrict);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        var connectionString = _service.GetConnectionString("SqlServerDatabaseConnection");
-        optionsBuilder.UseSqlServer(connectionString, b => b.MigrationsAssembly("SoundMastery.Migration"));
+        optionsBuilder
+            .UseLazyLoadingProxies()
+            .UseSqlServer(
+                _service.GetConnectionString("SqlServerDatabaseConnection"),
+                b => b.MigrationsAssembly("SoundMastery.Migration"));
     }
 }

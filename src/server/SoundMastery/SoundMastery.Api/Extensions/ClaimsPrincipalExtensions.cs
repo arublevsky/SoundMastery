@@ -9,4 +9,9 @@ public static class ClaimsPrincipalExtensions
     {
         return principal.Claims.Single(claim => claim.Type.Equals(ClaimsIdentity.DefaultNameClaimType)).Value;
     }
+
+    public static int GetId(this ClaimsPrincipal principal)
+    {
+        return int.Parse(principal.Claims.Single(claim => claim.Type.Equals("custom_claim_user_id")).Value);
+    }
 }

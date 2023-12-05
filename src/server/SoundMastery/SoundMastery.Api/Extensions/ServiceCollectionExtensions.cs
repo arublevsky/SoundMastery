@@ -12,11 +12,12 @@ using SoundMastery.Application.Authorization.ExternalProviders.Google;
 using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
 using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
+using SoundMastery.Application.Core;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
-using SoundMastery.DataAccess.IdentityStores;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 using Tweetinvi.Auth;
@@ -27,12 +28,13 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterDependencies(this IServiceCollection services)
     {
-        services.AddTransient<IUserStore<User>, UserStore>();
-        services.AddTransient<IUserEmailStore<User>, UserStore>();
-        services.AddTransient<IRoleStore<Role>, RoleStore>();
+        services.AddTransient<IUserStore<User>, UserRepository>();
+        services.AddTransient<IUserEmailStore<User>, UserRepository>();
+        services.AddTransient<IRoleStore<Role>, RolesRepository>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IGenericRepository<Material>, GenericRepository<Material>>();
         services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
         services.AddTransient<IIdentityManager, IdentityManager>();
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
@@ -41,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IGoogleService, GoogleService>();
         services.AddTransient<IMicrosoftService, MicrosoftService>();
         services.AddTransient<ITwitterService, TwitterService>();
+        services.AddTransient<ITeachersService, TeachersService>();
 
         // Singletons
         services.AddSingleton<IAuthenticationRequestStore, LocalAuthenticationRequestStore>();
@@ -107,7 +110,7 @@ public static class ServiceCollectionExtensions
                         // while running inside k8s the API is not exposed to outer world
                         // client requests are coming from cluster's localhost
                         builder
-                            .WithOrigins(configuration.GetValue<string>("CLIENT_URL"))
+                            .WithOrigins(configuration.GetValue<string>("ClientUrl"))
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();

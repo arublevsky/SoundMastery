@@ -19,11 +19,29 @@ namespace SoundMastery.Migration.Migrations
             modelBuilder
                 .HasDefaultSchema("SoundMastery")
                 .HasAnnotation("ProductVersion", "7.0.10")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("SoundMastery.Domain.Core.Course", b =>
+            modelBuilder.Entity("RoleUser", b =>
+                {
+                    b.Property<int>("RolesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UsersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RolesId", "UsersId");
+
+                    b.HasIndex("UsersId");
+
+                    b.ToTable("RoleUser", "SoundMastery");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualHomeAssignment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -31,21 +49,61 @@ namespace SoundMastery.Migration.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("IndividualLessonId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IndividualLessonId")
+                        .IsUnique();
+
+                    b.ToTable("IndividualHomeAssignment", "SoundMastery");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLesson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Completed")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Cost")
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<string>("Description")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("StartAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId");
+                    b.HasIndex("StudentId");
 
-                    b.ToTable("Courses", "SoundMastery");
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("IndividualLesson", "SoundMastery");
                 });
 
-            modelBuilder.Entity("SoundMastery.Domain.Core.Product", b =>
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLessonHomeAssignmentMaterial", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,13 +111,61 @@ namespace SoundMastery.Migration.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Name")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<int>("IndividualHomeAssignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", "SoundMastery");
+                    b.HasIndex("MaterialId");
+
+                    b.HasIndex("IndividualHomeAssignmentId", "MaterialId")
+                        .IsUnique();
+
+                    b.ToTable("IndividualLessonHomeAssignmentMaterial", "SoundMastery");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLessonMaterial", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("IndividualLessonId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaterialId");
+
+                    b.HasIndex("IndividualLessonId", "MaterialId")
+                        .IsUnique();
+
+                    b.ToTable("IndividualLessonMaterial", "SoundMastery");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.Material", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Url")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Materials", "SoundMastery");
                 });
 
             modelBuilder.Entity("SoundMastery.Domain.Identity.RefreshToken", b =>
@@ -103,12 +209,7 @@ namespace SoundMastery.Migration.Migrations
                     b.Property<string>("NormalizedName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Roles", "SoundMastery");
                 });
@@ -174,13 +275,87 @@ namespace SoundMastery.Migration.Migrations
                     b.ToTable("Users", "SoundMastery");
                 });
 
-            modelBuilder.Entity("SoundMastery.Domain.Core.Course", b =>
+            modelBuilder.Entity("RoleUser", b =>
                 {
-                    b.HasOne("SoundMastery.Domain.Core.Product", null)
-                        .WithMany("Courses")
-                        .HasForeignKey("ProductId")
+                    b.HasOne("SoundMastery.Domain.Identity.Role", null)
+                        .WithMany()
+                        .HasForeignKey("RolesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SoundMastery.Domain.Identity.User", null)
+                        .WithMany()
+                        .HasForeignKey("UsersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualHomeAssignment", b =>
+                {
+                    b.HasOne("SoundMastery.Domain.Core.IndividualLesson", "IndividualLesson")
+                        .WithOne("HomeAssignment")
+                        .HasForeignKey("SoundMastery.Domain.Core.IndividualHomeAssignment", "IndividualLessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IndividualLesson");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLesson", b =>
+                {
+                    b.HasOne("SoundMastery.Domain.Identity.User", "Student")
+                        .WithMany("IndividualLessons")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SoundMastery.Domain.Identity.User", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLessonHomeAssignmentMaterial", b =>
+                {
+                    b.HasOne("SoundMastery.Domain.Core.IndividualHomeAssignment", "IndividualHomeAssignment")
+                        .WithMany("Materials")
+                        .HasForeignKey("IndividualHomeAssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoundMastery.Domain.Core.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IndividualHomeAssignment");
+
+                    b.Navigation("Material");
+                });
+
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLessonMaterial", b =>
+                {
+                    b.HasOne("SoundMastery.Domain.Core.IndividualLesson", "IndividualLesson")
+                        .WithMany("Materials")
+                        .HasForeignKey("IndividualLessonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SoundMastery.Domain.Core.Material", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("IndividualLesson");
+
+                    b.Navigation("Material");
                 });
 
             modelBuilder.Entity("SoundMastery.Domain.Identity.RefreshToken", b =>
@@ -192,23 +367,23 @@ namespace SoundMastery.Migration.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("SoundMastery.Domain.Identity.Role", b =>
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualHomeAssignment", b =>
                 {
-                    b.HasOne("SoundMastery.Domain.Identity.User", null)
-                        .WithMany("Roles")
-                        .HasForeignKey("UserId");
+                    b.Navigation("Materials");
                 });
 
-            modelBuilder.Entity("SoundMastery.Domain.Core.Product", b =>
+            modelBuilder.Entity("SoundMastery.Domain.Core.IndividualLesson", b =>
                 {
-                    b.Navigation("Courses");
+                    b.Navigation("HomeAssignment");
+
+                    b.Navigation("Materials");
                 });
 
             modelBuilder.Entity("SoundMastery.Domain.Identity.User", b =>
                 {
-                    b.Navigation("RefreshTokens");
+                    b.Navigation("IndividualLessons");
 
-                    b.Navigation("Roles");
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

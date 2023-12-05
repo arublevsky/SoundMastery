@@ -59,7 +59,7 @@ public class AccountController : ControllerBase
         var result = await _authorizationService.Register(model);
 
         return result.Succeeded
-            ? Ok(_authorizationService.GetAccessToken(model.Email!))
+            ? Ok(await _authorizationService.GetAccessToken(model.Email!))
             : BadRequest(result.Errors);
     }
 

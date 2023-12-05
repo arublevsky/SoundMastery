@@ -14,6 +14,7 @@ using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
 using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
+using SoundMastery.Application.Models;
 using SoundMastery.Application.Profile;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
@@ -77,8 +78,8 @@ public class UserAuthorizationServiceTests
 
         // user repository
         var user = new UserBuilder().Build();
-        userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == "test@username"))).ReturnsAsync(user);
-        userService.Setup(x => x.GetOrAddRefreshToken(It.Is<User>(u => u == user))).ReturnsAsync("refresh_token");
+        userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == "test@username"))).ReturnsAsync(new UserModel(user));
+        userService.Setup(x => x.GetOrAddRefreshToken(It.Is<UserModel>(u => u.Id == user.Id))).ReturnsAsync("refresh_token");
 
         // JWT configuration
         var accessTokenLifeTime = 10;
@@ -141,7 +142,6 @@ public class UserAuthorizationServiceTests
             ExternalAuthProviderType type)
     {
         // Arrange
-        // Arrange
         var identityManager = new Mock<IIdentityManager>();
         var userService = new Mock<IUserService>();
         var googleService = new Mock<IGoogleService>();
@@ -161,11 +161,11 @@ public class UserAuthorizationServiceTests
         twitterService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
 
         userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
-            .ReturnsAsync((User) null);
+            .ReturnsAsync((UserModel) null);
 
         userService.SetupSequence(m => m.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
-            .ReturnsAsync((User) null) // user is not created yet
-            .ReturnsAsync(user); // user has been created
+            .ReturnsAsync((UserModel) null) // user is not created yet
+            .ReturnsAsync(new UserModel(user)); // user has been created
 
         var sut = new UserAuthorizationServiceBuilder()
             .With(identityManager.Object)

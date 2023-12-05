@@ -18,5 +18,5 @@ public interface IUserAuthorizationService
 
     Task<IdentityResult> Register(RegisterUserModel model);
 
-    TokenAuthenticationResult GetAccessToken(string username);
+    Task<TokenAuthenticationResult> GetAccessToken(string username);
 }
