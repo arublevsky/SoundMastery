@@ -1,10 +1,12 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SoundMastery.Api.Extensions;
 using SoundMastery.Application.Core;
 
 namespace SoundMastery.Api.Controllers;
 
-// [Authorize]
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
 public class TeachersController : ControllerBase
@@ -28,7 +30,7 @@ public class TeachersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> My()
     {
-        var teachers = await _service.GetMyTeachers(1);//User.GetId());
+        var teachers = await _service.GetMyTeachers(User.GetId());
         return Ok(teachers);
     }
 }

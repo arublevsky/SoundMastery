@@ -20,7 +20,4 @@
       <ProjectReference Include="..\SoundMastery.DataAccess\SoundMastery.DataAccess.csproj" />
       <ProjectReference Include="..\SoundMastery.Domain\SoundMastery.Domain.csproj" />
     </ItemGroup>
-
-
-
 </Project>

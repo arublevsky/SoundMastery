@@ -31,6 +31,8 @@ public class UserAuthorizationService : IUserAuthorizationService
     private readonly IExternalAuthProviderResolver _authProviderResolver;
     private readonly ITwitterService _twitterService;
 
+    public const string IdClaimName = "custom_claim_user_id";
+
     public UserAuthorizationService(
         ISystemConfigurationService configurationService,
         IHttpContextAccessor httpContextAccessor,
@@ -166,7 +168,7 @@ public class UserAuthorizationService : IUserAuthorizationService
         var claims = new[]
         {
             new Claim(ClaimsIdentity.DefaultNameClaimType, username),
-            new Claim("custom_claim_user_id", userId.ToString()),
+            new Claim(IdClaimName, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };

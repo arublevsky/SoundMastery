@@ -31,21 +31,7 @@ public class SoundMasteryContext : DbContext
 
         builder.Entity<IndividualLessonHomeAssignmentMaterial>()
             .HasIndex(p => new { p.IndividualHomeAssignmentId, p.MaterialId }).IsUnique();
-        //
-        // builder.Entity<IndividualLesson>()
-        //     .HasOne(p => p.Student)
-        //     .WithMany()
-        //     .HasForeignKey(x => x.StudentId)
-        //     .OnDelete(DeleteBehavior.Restrict);
-        //
-        // // builder.Entity<IndividualLesson>()
-        // //     .Property(p => p.StudentId)
-        // //     .HasColumnName("StudentId");
-        // //
-        // // builder.Entity<IndividualLesson>()
-        // //     .Property(p => p.TeacherId)
-        // //     .HasColumnName("TeacherId");
-        //
+
         builder.Entity<IndividualLesson>()
             .HasOne(p => p.Teacher)
             .WithMany()
@@ -61,12 +47,6 @@ public class SoundMasteryContext : DbContext
             .WithOne(x => x.Student)
             .HasForeignKey(x => x.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        // builder.Entity<User>()
-        //     .HasMany(x => x.IndividualLessons)
-        //     .WithOne(x => x.Teacher)
-        //     .HasForeignKey(x => x.TeacherId)
-        //     .OnDelete(DeleteBehavior.Restrict);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
