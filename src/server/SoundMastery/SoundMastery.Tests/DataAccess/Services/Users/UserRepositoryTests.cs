@@ -20,18 +20,15 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         // Arrange
         var configuration = new ConfigurationBuilder().For(_container).Build();
-        var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
-
-        await manager.MigrateUp();
 
         // Act
         const string username = "admin@gmail.com";
         var user = new UserBuilder().WithUsername(username).Build();
-        await sut.CreateAsync(user);
+        await sut.Create(user);
 
         // Assert
-        var result = await sut.FindByNameAsync(username);
+        var result = await sut.FindByName(username);
         result.Should().BeEquivalentTo(user, opt => opt.Excluding(x => x.Id));
     }
 
@@ -40,17 +37,14 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         // Arrange
         var configuration = new ConfigurationBuilder().For(_container).Build();
-        var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
-
-        await manager.MigrateUp();
 
         const string username = "admin@gmail.com";
         var user = new UserBuilder().WithUsername(username).Build();
-        await sut.CreateAsync(user);
+        await sut.Create(user);
 
         // Act
-        var persistedUser = await sut.FindByNameAsync(username);
+        var persistedUser = await sut.FindByName(username);
 
         persistedUser.FirstName = "NewFirstName";
         persistedUser.LastName = "NewLastName";
@@ -63,10 +57,10 @@ public class UserRepositoryTests : IAsyncLifetime
         persistedUser.LockoutEnabled = true;
         persistedUser.AccessFailedCount = 10;
 
-        await sut.UpdateAsync(persistedUser);
+        await sut.Update(persistedUser);
 
         // Assert
-        var result = await sut.FindByNameAsync(username);
+        var result = await sut.FindByName(username);
         result.Should().BeEquivalentTo(persistedUser, opt => opt.Excluding(x => x.Id));
     }
 
@@ -75,21 +69,18 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         // Arrange
         var configuration = new ConfigurationBuilder().For(_container).Build();
-        var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
-
-        await manager.MigrateUp();
 
         const string username = "admin@gmail.com";
         var user = new UserBuilder().WithUsername(username).Build();
-        await sut.CreateAsync(user);
+        await sut.Create(user);
 
         // Act
-        var persistedUser = await sut.FindByNameAsync(username);
+        var persistedUser = await sut.FindByName(username);
         await sut.AssignRefreshToken("some_token", persistedUser!);
 
         // Assert
-        var result = await sut.FindByNameAsync(username);
+        var result = await sut.FindByName(username);
         result.RefreshTokens.Should().ContainSingle("some_token");
     }
 
@@ -98,23 +89,20 @@ public class UserRepositoryTests : IAsyncLifetime
     {
         // Arrange
         var configuration = new ConfigurationBuilder().For(_container).Build();
-        var manager = new DatabaseManagerBuilder().With(configuration).Build();
         var sut = new UserRepositoryBuilder().With(configuration).Build();
-
-        await manager.MigrateUp();
 
         const string username = "admin@gmail.com";
         var user = new UserBuilder().WithUsername(username).Build();
-        await sut.CreateAsync(user);
+        await sut.Create(user);
 
-        user = await sut.FindByNameAsync(username);
+        user = await sut.FindByName(username);
         await sut.AssignRefreshToken("some_token", user!);
 
         // Act
         await sut.ClearRefreshToken(user!);
 
         // Assert
-        var result = await sut.FindByNameAsync(username);
+        var result = await sut.FindByName(username);
         result.RefreshTokens.Should().BeEmpty();
     }
 }

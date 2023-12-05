@@ -14,9 +14,9 @@ using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
-using SoundMastery.DataAccess.IdentityStores;
-using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 using Tweetinvi.Auth;
@@ -27,12 +27,14 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterDependencies(this IServiceCollection services)
     {
-        services.AddTransient<IUserStore<User>, UserStore>();
-        services.AddTransient<IUserEmailStore<User>, UserStore>();
-        services.AddTransient<IRoleStore<Role>, RoleStore>();
+        services.AddTransient<IUserStore<User>, UserRepository>();
+        services.AddTransient<IUserEmailStore<User>, UserRepository>();
+        services.AddTransient<IRoleStore<Role>, RolesRepository>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IGenericRepository<Product>, GenericRepository<Product>>();
+        services.AddTransient<IGenericRepository<Course>, GenericRepository<Course>>();
         services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
         services.AddTransient<IIdentityManager, IdentityManager>();
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();

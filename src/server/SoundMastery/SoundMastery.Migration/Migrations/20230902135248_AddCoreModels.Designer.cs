@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoundMastery.DataAccess.Contexts;
 
@@ -11,17 +12,16 @@ using SoundMastery.DataAccess.Contexts;
 namespace SoundMastery.Migration.Migrations
 {
     [DbContext(typeof(SoundMasteryContext))]
-    partial class SoundMasteryContextModelSnapshot : ModelSnapshot
+    [Migration("20230902135248_AddCoreModels")]
+    partial class AddCoreModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("SoundMastery")
                 .HasAnnotation("ProductVersion", "7.0.10")
-                .HasAnnotation("Proxies:ChangeTracking", false)
-                .HasAnnotation("Proxies:CheckEquality", false)
-                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -108,9 +108,6 @@ namespace SoundMastery.Migration.Migrations
                     b.Property<int>("CourseLessonId")
                         .HasColumnType("int")
                         .HasColumnOrder(0);
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.HasKey("UserId", "CourseLessonId");
 
@@ -459,11 +456,11 @@ namespace SoundMastery.Migration.Migrations
                     b.HasOne("SoundMastery.Domain.Core.Product", "Product")
                         .WithMany("Courses")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("SoundMastery.Domain.Identity.User", "Teacher")
-                        .WithMany("Courses")
+                        .WithMany()
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -728,8 +725,6 @@ namespace SoundMastery.Migration.Migrations
 
             modelBuilder.Entity("SoundMastery.Domain.Identity.User", b =>
                 {
-                    b.Navigation("Courses");
-
                     b.Navigation("FollowingStudents");
 
                     b.Navigation("RefreshTokens");

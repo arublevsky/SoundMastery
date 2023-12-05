@@ -3,12 +3,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SoundMastery.Domain.Core;
 
-public class Product
+public class Product : BaseEntity
 {
-    public int Id { get; set; }
-
+    [Required]
     [MaxLength(255)]
     public string Name { get; set; }
 
-    public List<Course> Courses { get; set; } = new();
+    public virtual ICollection<Course> Courses { get; set; } = new List<Course>();
 }

@@ -1,4 +1,5 @@
-﻿using FluentValidation.AspNetCore;
+﻿using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -35,11 +36,10 @@ public class Startup
         services.AddSwaggerGen();
         services.AddDbContext<SoundMasteryContext>();
 
-        services.AddMvc()
-            .AddFluentValidation(fv =>
-            {
-                fv.RegisterValidatorsFromAssemblyContaining<UserProfileValidator>();
-            });
+        services.AddMvc();
+
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<UserProfileValidator>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

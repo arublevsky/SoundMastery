@@ -21,7 +21,7 @@ public class UserService : IUserService
 
     public Task<User> FindByNameAsync(string username)
     {
-        return _userRepository.FindByNameAsync(username);
+        return _userRepository.FindByName(username);
     }
 
     public async Task<UserProfile> GetUserProfile(string email)
@@ -44,7 +44,7 @@ public class UserService : IUserService
         user.LastName = profile.LastName;
         user.PhoneNumber = profile.PhoneNumber;
 
-        await _userRepository.UpdateAsync(user);
+        await _userRepository.Update(user);
     }
 
     public Task<string> GetOrAddRefreshToken(User user)
@@ -86,7 +86,7 @@ public class UserService : IUserService
 
     private async Task<User> GetUser(string email)
     {
-        var user = await _userRepository.FindByEmailAsync(email);
+        var user = await _userRepository.FindByEmail(email);
         if (user == null)
         {
             throw new InvalidOperationException($"Cannot find a user {email}");

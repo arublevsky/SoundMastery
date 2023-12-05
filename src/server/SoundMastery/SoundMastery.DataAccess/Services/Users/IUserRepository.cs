@@ -1,17 +1,18 @@
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.DataAccess.Services.Users;
 
-public interface IUserRepository
+public interface IUserRepository : IUserEmailStore<User>, IUserPasswordStore<User>
 {
-    Task CreateAsync(User user);
+    Task<User> Create(User user);
 
-    Task<User> FindByNameAsync(string userName);
+    Task<User> FindByName(string userName);
 
-    Task<User> FindByEmailAsync(string email);
+    Task<User> FindByEmail(string email);
 
-    Task UpdateAsync(User user);
+    Task Update(User user);
 
     Task AssignRefreshToken(string token, User user);
 

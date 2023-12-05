@@ -2,7 +2,7 @@ using System;
 
 namespace SoundMastery.Domain.Identity;
 
-public class RefreshToken
+public class RefreshToken : BaseEntity
 {
     public int Id { get; set; }
 
