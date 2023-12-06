@@ -11,9 +11,9 @@ namespace SoundMastery.Api.Controllers;
 [ApiController]
 public class TeachersController : ControllerBase
 {
-    private readonly ITeachersService _service;
+    private readonly ICoreService _service;
 
-    public TeachersController(ITeachersService service)
+    public TeachersController(ICoreService service)
     {
         _service = service;
     }
@@ -22,7 +22,7 @@ public class TeachersController : ControllerBase
     [HttpGet]
     public async Task<ActionResult> List()
     {
-        var teachers = await _service.GetList();
+        var teachers = await _service.GetTeachers();
         return Ok(teachers);
     }
 

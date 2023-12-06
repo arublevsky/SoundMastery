@@ -35,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IGenericRepository<Material>, GenericRepository<Material>>();
+        services.AddTransient<IGenericRepository<IndividualLesson>, GenericRepository<IndividualLesson>>();
         services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
         services.AddTransient<IIdentityManager, IdentityManager>();
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
@@ -43,7 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IGoogleService, GoogleService>();
         services.AddTransient<IMicrosoftService, MicrosoftService>();
         services.AddTransient<ITwitterService, TwitterService>();
-        services.AddTransient<ITeachersService, TeachersService>();
+        services.AddTransient<ICoreService, CoreService>();
 
         // Singletons
         services.AddSingleton<IAuthenticationRequestStore, LocalAuthenticationRequestStore>();

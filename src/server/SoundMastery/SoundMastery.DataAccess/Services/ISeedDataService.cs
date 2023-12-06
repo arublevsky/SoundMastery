@@ -5,5 +5,5 @@ namespace SoundMastery.DataAccess.Services;
 
 public interface ISeedDataService
 {
-    Task ApplySeeds(User[] users, Role[] roles);
+    Task ApplySeeds(User[] users);
 }

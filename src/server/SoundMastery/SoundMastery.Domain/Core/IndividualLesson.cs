@@ -12,8 +12,6 @@ public class IndividualLesson : BaseEntity
 
     public int StudentId { get; set; }
 
-    public int ProductId { get; set; }
-
     public DateTime StartAt { get; set; }
 
     public bool Completed { get; set; }

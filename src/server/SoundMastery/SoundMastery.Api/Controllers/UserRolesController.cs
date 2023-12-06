@@ -19,7 +19,7 @@ public class UserRolesController : ControllerBase
     }
 
     [Route("add")]
-    [HttpPost]
+    [HttpPut]
     public async Task<ActionResult> Add([FromBody]AddUserRoleRequest request)
     {
         if (!ModelState.IsValid)

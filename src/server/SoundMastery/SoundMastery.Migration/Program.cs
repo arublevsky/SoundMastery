@@ -57,11 +57,11 @@ public static class Program
             case "recreate":
                 await manager.Drop();
                 await manager.MigrateUp();
-                await seedDataService.ApplySeeds(SeedData.Users, SeedData.Roles);
+                await seedDataService.ApplySeeds(SeedData.Users);
                 break;
             case "seeds":
                 await manager.MigrateUp();
-                await seedDataService.ApplySeeds(SeedData.Users, SeedData.Roles);
+                await seedDataService.ApplySeeds(SeedData.Users);
                 break;
             case "update":
                 await manager.MigrateUp();

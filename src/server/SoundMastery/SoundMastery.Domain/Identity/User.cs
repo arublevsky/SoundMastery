@@ -15,4 +15,6 @@ public class User : IdentityUser<int>
     public virtual IList<Role> Roles { get; set; } = new List<Role>();
 
     public virtual IList<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
+
+    public string FullName => $"{FirstName} {LastName}";
 }

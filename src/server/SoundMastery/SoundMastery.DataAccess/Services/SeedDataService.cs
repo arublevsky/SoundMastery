@@ -7,24 +7,17 @@ namespace SoundMastery.DataAccess.Services;
 public class SeedDataService : ISeedDataService
 {
     private readonly IUserStore<User> _userStore;
-    private readonly IRoleStore<Role> _roleStore;
 
-    public SeedDataService(IUserStore<User> userStore, IRoleStore<Role> roleStore)
+    public SeedDataService(IUserStore<User> userStore)
     {
         _userStore = userStore;
-        _roleStore = roleStore;
     }
 
-    public async Task ApplySeeds(User[] users, Role[] roles)
+    public async Task ApplySeeds(User[] users)
     {
-        foreach (var role in roles)
+        foreach (var user in users)
         {
-            await _roleStore.CreateAsync(role, default);
-        }
-
-        foreach (var role in users)
-        {
-            await _userStore.CreateAsync(role, default);
+            await _userStore.CreateAsync(user, default);
         }
     }
 }
