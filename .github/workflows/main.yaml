@@ -33,6 +33,7 @@ jobs:
 
       - name: Coverage report 
         uses: 5monkeys/cobertura-action@master
+        if: always()
         with:
           path: ./artifacts/coverage/coverage.cobertura.xml
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -41,6 +42,12 @@ jobs:
           show_branch: true
           show_class_names: true
           only_changed_files: true
+
+      - name: Process trx reports with default
+        uses: im-open/process-dotnet-test-results@v2.3.4
+        with:
+          base-directory: './artifacts/tests'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
   push_images:
     name: Publish Docker images

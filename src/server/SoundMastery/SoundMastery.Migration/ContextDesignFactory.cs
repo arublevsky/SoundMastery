@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore.Design;
 using SoundMastery.DataAccess.Contexts;
-using SoundMastery.DataAccess.Services;
 using SoundMastery.Domain.Services;
 
 namespace SoundMastery.Migration;

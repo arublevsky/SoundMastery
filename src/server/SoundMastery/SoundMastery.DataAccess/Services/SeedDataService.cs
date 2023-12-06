@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SoundMastery.Domain.Identity;
@@ -15,8 +13,11 @@ public class SeedDataService : ISeedDataService
         _userStore = userStore;
     }
 
-    public Task ApplySeeds(User[] users)
+    public async Task ApplySeeds(User[] users)
     {
-        return Task.WhenAll(users.Select(user => _userStore.CreateAsync(user, CancellationToken.None)));
+        foreach (var user in users)
+        {
+            await _userStore.CreateAsync(user, default);
+        }
     }
 }

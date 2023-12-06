@@ -5,9 +5,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SoundMastery.DataAccess.Contexts;
-using SoundMastery.DataAccess.IdentityStores;
 using SoundMastery.DataAccess.Services;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 using SoundMastery.Migration.Common;
@@ -31,11 +32,13 @@ public static class Program
         var services = new ServiceCollection()
             .AddSingleton(Configuration)
             .AddDbContext<SoundMasteryContext>()
-            .AddTransient<IUserStore<User>, UserStore>()
+            .AddTransient<IUserStore<User>, UserRepository>()
+            .AddTransient<IRoleStore<Role>, RolesRepository>()
             .AddTransient<ISeedDataService, SeedDataService>()
             .AddTransient<ISystemConfigurationService, SystemConfigurationService>()
             .AddTransient<IDatabaseManager, DatabaseManager>()
-            .AddTransient<IUserRepository, UserRepository>();
+            .AddTransient<IUserRepository, UserRepository>()
+            .AddTransient<IGenericRepository<Material>, GenericRepository<Material>>();
 
         return services.BuildServiceProvider(false);
     }

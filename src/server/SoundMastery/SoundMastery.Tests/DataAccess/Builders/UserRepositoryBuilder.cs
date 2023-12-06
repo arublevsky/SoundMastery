@@ -23,6 +23,8 @@ public class UserRepositoryBuilder
             throw new InvalidOperationException("Configuration is not specified");
         }
 
+        var manager = new DatabaseManagerBuilder().With(_configuration).Build();
+        manager.MigrateUp().GetAwaiter().GetResult();
         var configurationService = new SystemConfigurationService(_configuration);
         return new UserRepository(new SoundMasteryContext(configurationService));
     }

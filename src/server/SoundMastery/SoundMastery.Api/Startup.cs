@@ -1,10 +1,13 @@
-﻿using FluentValidation.AspNetCore;
+﻿using System;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.OpenApi.Models;
 using SoundMastery.Api.Extensions;
 using SoundMastery.Application.Validation;
 using SoundMastery.DataAccess.Contexts;
@@ -32,14 +35,39 @@ public class Startup
         services.ConfigureAuthentication(Configuration);
 
         services.ConfigureIdentityOptions();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(opt =>
+        {
+            opt.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+            {
+                Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+                In = ParameterLocation.Header,
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+
+            opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
+
         services.AddDbContext<SoundMasteryContext>();
 
-        services.AddMvc()
-            .AddFluentValidation(fv =>
-            {
-                fv.RegisterValidatorsFromAssemblyContaining<UserProfileValidator>();
-            });
+        services.AddMvc();
+
+        services.AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssemblyContaining<UserProfileValidator>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

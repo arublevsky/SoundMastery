@@ -15,6 +15,7 @@ using SoundMastery.Application.Authorization.ExternalProviders;
 using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
+using SoundMastery.Application.Models;
 
 namespace SoundMastery.Application.Authorization;
 
@@ -29,6 +30,8 @@ public class UserAuthorizationService : IUserAuthorizationService
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly IExternalAuthProviderResolver _authProviderResolver;
     private readonly ITwitterService _twitterService;
+
+    public const string IdClaimName = "custom_claim_user_id";
 
     public UserAuthorizationService(
         ISystemConfigurationService configurationService,
@@ -58,7 +61,7 @@ public class UserAuthorizationService : IUserAuthorizationService
 
         var user = await _userService.FindByNameAsync(model.Username!);
         await SetRefreshTokenCookie(user);
-        return GetAccessToken(user.UserName);
+        return GetAccessTokenInternal(user.Id, user.UserName);
     }
 
     public Task<string> GetTwitterRequestToken()
@@ -85,10 +88,10 @@ public class UserAuthorizationService : IUserAuthorizationService
                    ?? await CreateNewUser(userData, $"External-{Guid.NewGuid()}");
 
         await SetRefreshTokenCookie(user);
-        return GetAccessToken(user.UserName);
+        return GetAccessTokenInternal(user.Id, user.UserName);
     }
 
-    private async Task<User> CreateNewUser(User user, string password)
+    private async Task<UserModel> CreateNewUser(User user, string password)
     {
         var result = await _identityManager.CreateAsync(user, password);
         if (!result.Succeeded)
@@ -115,16 +118,22 @@ public class UserAuthorizationService : IUserAuthorizationService
         }
 
         var user = await _userService.FindByNameAsync(model.Username);
-        if (user == null || !_userService.IsValidRefreshToken(user, model.RefreshToken))
+        if (user == null || !user.RefreshTokens.Any())
         {
             return null;
         }
 
-        await _userService.ClearRefreshToken(user);
+        var existingToken = user.RefreshTokens.SingleOrDefault(t => t.Token.Equals(model.RefreshToken));
+        if (existingToken == null || !_userService.IsValidRefreshToken(existingToken))
+        {
+            return null;
+        }
+
+        await _userService.ClearRefreshToken(user.Id);
         user = (await _userService.FindByNameAsync(model.Username))!;
         await SetRefreshTokenCookie(user);
 
-        return GetAccessToken(user.UserName);
+        return GetAccessTokenInternal(user.Id, user.UserName);
     }
 
     public Task<IdentityResult> Register(RegisterUserModel model)
@@ -141,7 +150,13 @@ public class UserAuthorizationService : IUserAuthorizationService
         return _identityManager.CreateAsync(user, model.Password);
     }
 
-    public TokenAuthenticationResult GetAccessToken(string username)
+    public async Task<TokenAuthenticationResult> GetAccessToken(string username)
+    {
+        var user = (await _userService.Find(x => x.UserName == username)).Single();
+        return GetAccessTokenInternal(user.Id, user.UserName);
+    }
+
+    private TokenAuthenticationResult GetAccessTokenInternal(int userId, string username)
     {
         var expiresIn = _configurationService.GetSetting<int>("Jwt:AccessTokenExpirationInMinutes");
         var jwtKey = _configurationService.GetSetting<string>("Jwt:Key");
@@ -153,6 +168,7 @@ public class UserAuthorizationService : IUserAuthorizationService
         var claims = new[]
         {
             new Claim(ClaimsIdentity.DefaultNameClaimType, username),
+            new Claim(IdClaimName, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, username),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
@@ -168,7 +184,7 @@ public class UserAuthorizationService : IUserAuthorizationService
         return new TokenAuthenticationResult(result, expiresIn);
     }
 
-    private async Task SetRefreshTokenCookie(User user)
+    private async Task SetRefreshTokenCookie(UserModel user)
     {
         var refreshToken = await _userService.GetOrAddRefreshToken(user);
         var expires = _configurationService.GetSetting<int>("Jwt:RefreshTokenExpirationInMinutes");
@@ -196,7 +212,7 @@ public class UserAuthorizationService : IUserAuthorizationService
             return;
         }
 
-        await _userService.ClearRefreshToken(user);
+        await _userService.ClearRefreshToken(user.Id);
         _httpContextAccessor.HttpContext?.Response.Cookies.Delete(RefreshTokenCookieKey);
     }
 }
