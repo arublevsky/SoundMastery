@@ -24,11 +24,10 @@ public class CoreService : ICoreService
         return _userService.Find(x => x.Roles.Any(role => role.Name.Equals("teacher")));
     }
 
-    public Task<IReadOnlyCollection<UserModel>> GetMyTeachers(int userId)
+    public async Task<IReadOnlyCollection<UserModel>> GetMyTeachers(int userId)
     {
-        return _userService.Find(x =>
-            x.Roles.Any(role => role.Name.Equals("teacher")) &&
-            x.IndividualLessons.Any(lesson => lesson.StudentId == userId));
+        var lessons = await _lessonsRepository.Find(x => x.StudentId == userId);
+        return lessons.Select(x => new UserModel(x.Teacher)).ToArray();
     }
 
     public async Task<IReadOnlyCollection<IndividualLessonModel>> GetMyIndividualLessons(int userId)

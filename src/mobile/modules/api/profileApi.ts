@@ -9,10 +9,10 @@ export interface UserProfile {
     phoneNumber: string;
 }
 
-export const getProfile = async () => {
+export const getProfile = () => {
     return httpGet<UserProfile>(`${apiController}/get-profile`);
 };
 
-export const saveProfile = async (body: UserProfile) => {
+export const saveProfile = (body: UserProfile) => {
     return httpPost<void>(`${apiController}/save-profile`, { body: body });
 };

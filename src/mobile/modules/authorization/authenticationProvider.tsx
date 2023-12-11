@@ -1,7 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { ApiError } from "../common/apiErrors";
-import { getProfile, UserProfile } from "../profile/profileApi";
+import { getProfile, UserProfile } from "../api/profileApi";
 import { ExternalAuthenticationResult, externalLogin, logout, refreshToken, TokenAuthenticationResult } from "./accountApi";
 import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
 import { AuthorizationContext, initialState } from "./context";

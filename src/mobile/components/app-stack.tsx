@@ -5,11 +5,12 @@ import HomeScreen from "./home-screen.tsx";
 import LoginScreen from "./login-screen.tsx";
 import {useAuthContext} from "../modules/authorization/context.ts";
 import RegisterScreen from "./register-screen.tsx";
+import {Button} from "react-native";
 
 const Stack = createNativeStackNavigator();
 
 export const AppStack = () => {
-    const {isAuthenticated} = useAuthContext();
+    const {isAuthenticated, onLoggedOut} = useAuthContext();
 
     return (
         <NavigationContainer>
@@ -17,7 +18,12 @@ export const AppStack = () => {
                 {isAuthenticated && <Stack.Screen
                     name="HomeScreen"
                     component={HomeScreen}
-                    options={{title: 'Hello world'}}
+                    options={{
+                        title: 'Home screen',
+                        headerRight: () => (
+                            <Button onPress={onLoggedOut} title="Logout"/>
+                        )
+                    }}
                 />}
                 {!isAuthenticated &&
                     <>

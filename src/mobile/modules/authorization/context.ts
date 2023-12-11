@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { UserProfile } from "../profile/profileApi";
+import { UserProfile } from "../api/profileApi";
 import { ExternalAuthenticationResult, TokenAuthenticationResult } from "./accountApi";
 
 export interface AuthorizationContext {
