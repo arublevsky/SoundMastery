@@ -48,7 +48,7 @@ function Section({children, title}: SectionProps): React.JSX.Element {
     );
 }
 
-function HelloWorld(): React.JSX.Element {
+function HomeScreen(): React.JSX.Element {
     const isDarkMode = useColorScheme() === 'dark';
 
     const {onLoggedOut} = useAuthContext();
@@ -116,4 +116,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default HelloWorld;
+export default HomeScreen;

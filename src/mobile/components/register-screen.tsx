@@ -1,30 +1,29 @@
 import React, {useState} from 'react';
-import {Alert, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native';
-import {useAuthContext} from "../modules/authorization/context.ts";
+import {View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from 'react-native';
 import {useErrorHandling} from "../modules/errors/useErrorHandling.tsx";
-import {login} from "../modules/authorization/accountApi.ts";
+import {registerUser} from "../modules/authorization/accountApi.ts";
+import {useAuthContext} from "../modules/authorization/context.ts";
 import {ApplicationError} from "../modules/common/errorHandling.ts";
 import {useNavigation} from "@react-navigation/native";
-import {LoginScreenNavigationProps} from "./types.ts";
+import {RegisterScreenNavigationProps} from "./types.ts";
 
-const LoginScreen = () => {
-    const [username, setUsername] = useState('');
+const RegisterScreen = () => {
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
     const {onLoggedIn} = useAuthContext();
-    const navigator = useNavigation<LoginScreenNavigationProps>();
+    const navigator = useNavigation<RegisterScreenNavigationProps>();
 
-    const handleLogin = () => asyncHandler(async () => {
-        const result = await login(username, password);
+    const handleRegister = () => asyncHandler(async () => {
+        const result = await registerUser({email, firstName, lastName, password});
         await onLoggedIn(result);
+        navigator.navigate("HomeScreen");
     });
 
-    const handleRegister = () => {
-        navigator.navigate("RegisterScreen");
-    }
-
     const showErrorAlert = (errors: ApplicationError[]) => Alert.alert(
-        'Login attempt was unsuccessful',
+        'Register attempt was unsuccessful',
         errors[0].description,
         [{
             text: 'OK',
@@ -38,29 +37,38 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Login</Text>
+            <Text style={styles.title}>Register</Text>
 
             <TextInput
                 style={styles.input}
-                placeholder="Username"
-                value={username}
-                onChangeText={(text) => setUsername(text)}
+                placeholder="First Name"
+                value={firstName}
+                onChangeText={(text) => setFirstName(text)}
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="Last Name"
+                value={lastName}
+                onChangeText={(text) => setLastName(text)}
+            />
+
+            <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+                keyboardType="email-address"
             />
 
             <TextInput
                 style={styles.input}
                 placeholder="Password"
-                secureTextEntry={true}
                 value={password}
                 onChangeText={(text) => setPassword(text)}
+                secureTextEntry={true}
             />
 
-            <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Login</Text>
-            </TouchableOpacity>
-            <View style={styles.orContainer}>
-                <Text style={styles.orText}>OR</Text>
-            </View>
             <TouchableOpacity style={styles.button} onPress={handleRegister}>
                 <Text style={styles.buttonText}>Register</Text>
             </TouchableOpacity>
@@ -97,15 +105,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    orContainer: {
-        marginVertical: 10,
-        alignItems: 'center',
-    },
-    orText: {
-        color: 'black',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
 });
 
-export default LoginScreen;
+export default RegisterScreen;
+

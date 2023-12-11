@@ -5,8 +5,6 @@ import { getProfile, UserProfile } from "../profile/profileApi";
 import { ExternalAuthenticationResult, externalLogin, logout, refreshToken, TokenAuthenticationResult } from "./accountApi";
 import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
 import { AuthorizationContext, initialState } from "./context";
-import {useNavigation} from "@react-navigation/native";
-import {RootNavigationProp} from "../../components/app-stack.tsx";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
@@ -20,7 +18,6 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
     const [isLoading, setIsLoading] = useState(initialState.isLoading);
     const [profile, setProfile] = useState<UserProfile | null>(initialState.userProfile);
     const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo | null>(authenticationService.get());
-    const navigator = useNavigation<RootNavigationProp>();
 
     useEffect(() => {
         async function initialize() {
@@ -85,7 +82,6 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
         } catch (e) {
             if (e instanceof ApiError && e.isUnauthenticated()) {
                 await onLoggedOut();
-                navigator.navigate("LoginScreen");
             }
             throw e;
         }

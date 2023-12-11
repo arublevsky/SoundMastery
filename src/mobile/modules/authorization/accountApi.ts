@@ -1,4 +1,4 @@
-import { httpGet, httpPost } from "../common/requestApi";
+import {httpGet, httpPost} from "../common/requestApi";
 
 const apiController = "account";
 
@@ -28,20 +28,18 @@ export interface RegisterUserModel {
 
 export const login = async (username: string, password: string) => {
     return httpPost<TokenAuthenticationResult>(`${apiController}/login`, {
-        body: { username, password }
+        body: {username, password}
     });
 };
 
 export const externalLogin = async (accessToken: string, type: ExternalAuthProviderType) => {
     return httpPost<TokenAuthenticationResult>(`${apiController}/external-login`, {
-        body: { accessToken, type }
+        body: {accessToken, type}
     });
 };
 
 export const registerUser = async (body: RegisterUserModel) => {
-    return httpPost<TokenAuthenticationResult>(`${apiController}/register`, {
-        body: body
-    });
+    return httpPost<TokenAuthenticationResult>(`${apiController}/register`, {body: body});
 };
 
 export const refreshToken = async () => {
