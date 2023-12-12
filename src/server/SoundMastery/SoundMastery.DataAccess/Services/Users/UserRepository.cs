@@ -40,11 +40,6 @@ public class UserRepository : IUserRepository
         return await _context.Users.Where(filter).ToListAsync();
     }
 
-    public async Task<IReadOnlyCollection<User>> FindByRole(string roleName)
-    {
-        return await _context.Users.Where(x => x.Roles.Any(role => role.Name == roleName)).ToListAsync();
-    }
-
     public Task<User> FindByEmail(string email)
     {
         var normalizedEmail = email.ToUpperInvariant();
@@ -152,25 +147,22 @@ public class UserRepository : IUserRepository
         return Task.FromResult(user.NormalizedEmail);
     }
 
-    public async Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken token)
+    public Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken token)
     {
         user.NormalizedEmail = normalizedEmail;
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync(token);
+        return Task.CompletedTask;
     }
 
-    public async Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken token)
+    public Task SetPasswordHashAsync(User user, string passwordHash, CancellationToken token)
     {
         user.PasswordHash = passwordHash;
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync(token);
+        return Task.CompletedTask;
     }
 
-    public async Task SetEmailAsync(User user, string email, CancellationToken token)
+    public Task SetEmailAsync(User user, string email, CancellationToken token)
     {
         user.Email = email;
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync(token);
+        return Task.CompletedTask;
     }
 
     public async Task<IdentityResult> UpdateAsync(User user, CancellationToken token)
@@ -193,25 +185,23 @@ public class UserRepository : IUserRepository
             : Task.FromResult<User>(null);
     }
 
-    public async Task SetUserNameAsync(User user, string userName, CancellationToken token)
+    public Task SetUserNameAsync(User user, string userName, CancellationToken token)
     {
         user.UserName = userName;
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync(token);
+        return Task.CompletedTask;
     }
 
-    public async Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken token)
+    public Task SetNormalizedUserNameAsync(User user, string normalizedName, CancellationToken token)
     {
         user.NormalizedUserName = normalizedName;
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync(token);
+        return Task.CompletedTask;
     }
 
-    public async Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken token)
+    public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken token)
     {
         user.EmailConfirmed = confirmed;
         _context.Users.Update(user);
-        await _context.SaveChangesAsync(token);
+        return Task.CompletedTask;
     }
 
     public void Dispose()
