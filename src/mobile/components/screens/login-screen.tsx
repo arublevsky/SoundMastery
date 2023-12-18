@@ -4,8 +4,6 @@ import {
     Keyboard, KeyboardAvoidingView, Platform,
     StyleSheet,
     Text,
-    TextInput,
-    TouchableOpacity,
     TouchableWithoutFeedback,
     View
 } from 'react-native';
@@ -15,6 +13,7 @@ import {LoginScreenNavigationProps} from "../types.ts";
 import {useAuthContext} from "../../modules/authorization/context.ts";
 import {login} from "../../modules/api/accountApi.ts";
 import {ApplicationError} from "../../modules/common/errorHandling.ts";
+import { Button, Card, TextInput } from 'react-native-paper';
 
 const LoginScreen = () => {
     const [username, setUsername] = useState('');
@@ -48,32 +47,33 @@ const LoginScreen = () => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <Text style={styles.title}>Login</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="User name"
-                    placeholderTextColor='#242424'
-                    value={username}
-                    onChangeText={(text) => setUsername(text)}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor='#242424'
-                    secureTextEntry={true}
-                    value={password}
-                    textContentType='oneTimeCode'
-                    onChangeText={(text) => setPassword(text)}
-                />
-                <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                    <Text style={styles.buttonText}>Login</Text>
-                </TouchableOpacity>
-                <View style={styles.orContainer}>
-                    <Text style={styles.orText}>OR</Text>
-                </View>
-                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                    <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
+            <Card style={styles.card}>
+          <Card.Title title="Login" />
+          <Card.Content>
+            <TextInput
+              label="Username"
+              value={username}
+              onChangeText={setUsername}
+              style={styles.input}
+            />
+            <TextInput
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={styles.input}
+            />
+            <Button mode="contained" onPress={handleLogin}>
+              Login
+            </Button>
+            <View style={styles.orContainer}>
+              <Text style={styles.orText}>OR</Text>
+            </View>
+            <Button mode="contained" onPress={handleRegister}>
+              Register
+            </Button>
+          </Card.Content>
+        </Card>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     );
@@ -81,49 +81,25 @@ const LoginScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
-        padding: 16,
+      flex: 1,
+      justifyContent: 'center',
+      padding: 16,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
+    card: {
+      padding: 16,
     },
     input: {
-        width: '100%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        marginBottom: 16,
-        paddingHorizontal: 10,
-        borderRadius: 8,
-        backgroundColor: '#fff',
-    },
-    button: {
-        backgroundColor: '#2196F3',
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
+      marginBottom: 16,
     },
     orContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginVertical: 16,
     },
     orText: {
-        marginHorizontal: 8,
-        color: '#333',
+      fontSize: 16,
+      color: '#888',
     },
-});
+  });
 
 export default LoginScreen;

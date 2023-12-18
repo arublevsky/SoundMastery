@@ -11,6 +11,8 @@ import { getMyLessons, Lesson } from "../../modules/api/lessonsApi.ts";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { HomeTabScreenProps } from "../types.ts";
 import Icon from 'react-native-vector-icons/FontAwesome';
+import LessonCard from "./lesson-card.tsx";
+import { Card } from "react-native-paper";
 
 type MyLessonsProps = HomeTabScreenProps<'MyLessons'>;
 
@@ -34,51 +36,38 @@ function MyLessons(): React.JSX.Element {
 
     const renderLessonItem = (lesson: Lesson) => {
         const isTeacher = userProfile?.isTeacher || false;
-
-        return (
-            <View key={lesson.id} style={styles.card}>
-                {!isTeacher ? <Text>Teacher: {lesson.teacher.firstName} {lesson.teacher.lastName}</Text> : null}
-                {isTeacher ? <Text>Student: {lesson.student.firstName}  {lesson.student.lastName}</Text> : null}
-                <Text>Start at: {`${new Date(lesson.date).toDateString()} at ${lesson.hour}:00`}</Text>
-                {lesson.description ? <Text>Description: {`${lesson.description}`}</Text> : null}
-            </View>);
+        return (<LessonCard lesson={lesson} isTeacher={isTeacher} />);
     }
 
-    function renderLessonsBlock(lessons: Lesson[], title: string) {
+    const renderLessonsBlock = (lessons: Lesson[], title: string) => {
         return lessons.length
-            ? <>
-                <Text style={styles.sectionTitle}>{title}</Text>
-                {lessons.map((lesson) => renderLessonItem(lesson))}
-            </>
+            ? <Card style={styles.card}>
+                <Card.Title title={title} />
+                <Card.Content>
+                    {lessons.map((lesson) => renderLessonItem(lesson))}
+                </Card.Content>
+            </Card>
             : null;
     }
 
     return (
-        <ScrollView>
-            <View style={styles.container}>
-                <View style={styles.header}>
-                    <Text style={styles.title}>My Lessons</Text>
-                </View>
-                <View style={styles.content}>
-                    <View style={styles.emptyContainer}>
-                        <Button
-                            title="Schedule Your First Lesson"
-                            onPress={() => navigation.navigate('ScheduleLesson')}
-                        />
-                    </View>
-                    {upcomingLessons.length === 0
-                        ? (<View style={styles.button}>
+        // <ScrollView style={styles.container}>
+        <ScrollView style={styles.container}>
+            {upcomingLessons.length === 0
+                ? <Card style={styles.card}>
+                    <Card.Content>
+                        <View style={styles.button}>
                             <Button
-                                title="Schedule Your First Lesson"
+                                title="Schedule Your Next Lesson"
                                 color={styles.buttonText.color}
                                 onPress={() => navigation.navigate('ScheduleLesson')}
                             />
-                        </View>)
-                        : <><Text>test</Text></>}
-                    {renderLessonsBlock(upcomingLessons, "Upcoming Lessons")}
-                    {renderLessonsBlock(completedLessons, "Completed Lessons")}
-                </View>
-            </View>
+                        </View>
+                    </Card.Content>
+                </Card>
+                : null}
+            {renderLessonsBlock(upcomingLessons, "Upcoming lessons")}
+            {renderLessonsBlock(completedLessons, "Completed Lessons")}
         </ScrollView>
     );
 }

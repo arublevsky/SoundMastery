@@ -3,6 +3,7 @@ import {createMaterialBottomTabNavigator} from "react-native-paper/react-navigat
 import MyLessonsTab from "../tabs/my-lessons-tab.tsx";
 import ScheduleLessonTab from "../tabs/schedule-lesson-tab.tsx";
 import ProfileTab from "../tabs/profile-tab.tsx";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -13,7 +14,10 @@ function HomeScreen(): React.JSX.Element {
                 name="MyLessons"
                 component={MyLessonsTab}
                 options={{
-                    tabBarLabel: 'Home'
+                    tabBarLabel: 'Home',
+                    tabBarIcon: ({ color }) => (
+                        <Icon name="home" color={color} size={24}  />
+                    ),
                 }}
             />
             <Tab.Screen
@@ -21,14 +25,19 @@ function HomeScreen(): React.JSX.Element {
                 component={ScheduleLessonTab}
                 options={{
                     tabBarLabel: 'Schedule a Lesson',
-                    tabBarBadge: 3,
+                    tabBarIcon: ({ color }) => (
+                        <Icon name="calendar-plus-o" color={color} size={24}  />
+                    ),
                 }}
             />
             <Tab.Screen
                 name="Profile"
                 component={ProfileTab}
                 options={{
-                    tabBarLabel: 'Profile'
+                    tabBarLabel: 'Profile',
+                    tabBarIcon: ({ color }) => (
+                        <Icon name="user-circle-o" color={color} size={24} />
+                    ),
                 }}
             />
         </Tab.Navigator>
