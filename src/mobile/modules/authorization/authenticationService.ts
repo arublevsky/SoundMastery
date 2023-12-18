@@ -1,4 +1,4 @@
-import { TokenAuthenticationResult } from "./accountApi";
+import {TokenAuthenticationResult} from "../api/accountApi";
 
 export interface UserAuthorizationInfo extends TokenAuthenticationResult {
     loggedInAt: number;
@@ -6,6 +6,7 @@ export interface UserAuthorizationInfo extends TokenAuthenticationResult {
 
 export class AuthenticationService {
     private accessTokenInfo: UserAuthorizationInfo | null = null;
+    private logoutHandler: (() => void) | null = null;
 
     public set = (data: UserAuthorizationInfo) => {
         this.accessTokenInfo = data;
@@ -24,7 +25,15 @@ export class AuthenticationService {
     };
 
     public logout = () => {
+        if (this.logoutHandler) {
+            this.logoutHandler();
+        }
+
         this.accessTokenInfo = null;
+    };
+
+    public registerLogoutHandler = (handler: () => void) => {
+        this.logoutHandler = handler;
     };
 }
 

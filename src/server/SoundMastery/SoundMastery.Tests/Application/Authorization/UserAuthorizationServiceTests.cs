@@ -1,4 +1,5 @@
 using System;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Extensions;
@@ -16,6 +17,7 @@ using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Models;
 using SoundMastery.Application.Profile;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 using SoundMastery.Tests.Application.Builders;
@@ -59,6 +61,7 @@ public class UserAuthorizationServiceTests
         // Arrange
         var identityManager = new Mock<IIdentityManager>();
         var userService = new Mock<IUserService>();
+        var userRepository = new Mock<IGenericRepository<User>>();
         var configuration = new Mock<ISystemConfigurationService>();
         var dateTimeProvider = new Mock<IDateTimeProvider>();
         var httpContextAccessor = new Mock<IHttpContextAccessor>();
@@ -78,8 +81,8 @@ public class UserAuthorizationServiceTests
 
         // user repository
         var user = new UserBuilder().Build();
-        userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == "test@username"))).ReturnsAsync(new UserModel(user));
-        userService.Setup(x => x.GetOrAddRefreshToken(It.Is<UserModel>(u => u.Id == user.Id))).ReturnsAsync("refresh_token");
+        userRepository.Setup(x => x.Get(It.IsAny<Expression<Func<User, bool>>>())).ReturnsAsync(user);
+        userService.Setup(x => x.GetOrAddRefreshToken(It.Is<User>(u => u.Id == user.Id))).ReturnsAsync("refresh_token");
 
         // JWT configuration
         var accessTokenLifeTime = 10;
@@ -105,6 +108,7 @@ public class UserAuthorizationServiceTests
             .With(httpContextAccessor.Object)
             .With(dateTimeProvider.Object)
             .With(configuration.Object)
+            .With(userRepository.Object)
             .Build();
 
         // Act
@@ -148,6 +152,7 @@ public class UserAuthorizationServiceTests
         var facebookService = new Mock<IFacebookService>();
         var microsoftService = new Mock<IMicrosoftService>();
         var twitterService = new Mock<ITwitterService>();
+        var userRepository = new Mock<IGenericRepository<User>>();
 
         var accessToken = "access_token";
         var user = new UserBuilder().WithUsername($"TheNewUser@email.com").Build();
@@ -160,12 +165,9 @@ public class UserAuthorizationServiceTests
         microsoftService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
         twitterService.Setup(x => x.GetUserData(It.Is<string>(u => u == accessToken))).ReturnsAsync(user);
 
-        userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
-            .ReturnsAsync((UserModel) null);
-
-        userService.SetupSequence(m => m.FindByNameAsync(It.Is<string>(u => u == user.UserName)))
-            .ReturnsAsync((UserModel) null) // user is not created yet
-            .ReturnsAsync(new UserModel(user)); // user has been created
+        userRepository.SetupSequence(x => x.Get(It.IsAny<Expression<Func<User, bool>>>()))
+            .ReturnsAsync((User) null) // user is not created yet
+            .ReturnsAsync(user); // user has been created
 
         var sut = new UserAuthorizationServiceBuilder()
             .With(identityManager.Object)
@@ -175,6 +177,7 @@ public class UserAuthorizationServiceTests
             .With(facebookService.Object)
             .With(microsoftService.Object)
             .With(twitterService.Object)
+            .With(userRepository.Object)
             .Build();
 
         // Act

@@ -9,7 +9,9 @@ public class AddIndividualLessonModel
 
     public int StudentId { get; set; }
 
-    public DateTime StartAt { get; set; }
+    public DateTime Date { get; set; }
+
+    public TimeSpan Time { get; set; }
 
     public string Description { get; set; }
 
@@ -17,7 +19,8 @@ public class AddIndividualLessonModel
         new()
         {
             TeacherId = TeacherId,
-            StartAt = StartAt,
+            Date = Date,
+            Time = Time,
             StudentId = StudentId,
             Description = Description
         };

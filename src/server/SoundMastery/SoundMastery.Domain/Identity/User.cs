@@ -5,7 +5,7 @@ using SoundMastery.Domain.Core;
 
 namespace SoundMastery.Domain.Identity;
 
-public class User : IdentityUser<int>
+public class User : IdentityUser<int>, IHasId
 {
     public string FirstName { get; set; } = string.Empty;
 
@@ -17,9 +17,5 @@ public class User : IdentityUser<int>
 
     public virtual IList<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
-    public string FullName => $"{FirstName} {LastName}";
-
-    public bool IsNew => Id == 0;
-
-    public bool IsTeacher => Roles.Any(x => x.Name == "teacher");
+    public bool HasRole(string role) => Roles.Any(x => x.Name == role);
 }

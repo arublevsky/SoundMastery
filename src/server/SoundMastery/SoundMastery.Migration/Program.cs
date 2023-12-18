@@ -32,12 +32,12 @@ public static class Program
         var services = new ServiceCollection()
             .AddSingleton(Configuration)
             .AddDbContext<SoundMasteryContext>()
-            .AddTransient<IUserStore<User>, UserRepository>()
+            .AddTransient<IUserStore<User>, UserStore>()
             .AddTransient<IRoleStore<Role>, RolesRepository>()
             .AddTransient<ISeedDataService, SeedDataService>()
             .AddTransient<ISystemConfigurationService, SystemConfigurationService>()
             .AddTransient<IDatabaseManager, DatabaseManager>()
-            .AddTransient<IUserRepository, UserRepository>()
+
             .AddTransient<IGenericRepository<Material>, GenericRepository<Material>>();
 
         return services.BuildServiceProvider(false);

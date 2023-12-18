@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Models;
-using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
@@ -16,10 +14,10 @@ public class UserService : IUserService
 {
     private readonly ISystemConfigurationService _configurationService;
     private readonly IRoleStore<Role> _rolesStore;
-    private readonly IUserRepository _userRepository;
+    private readonly IGenericRepository<User> _userRepository;
 
     public UserService(
-        IUserRepository userRepository,
+        IGenericRepository<User> userRepository,
         ISystemConfigurationService configurationService,
         IRoleStore<Role> rolesStore)
     {
@@ -42,58 +40,45 @@ public class UserService : IUserService
         return true;
     }
 
-    public async Task<IReadOnlyCollection<UserModel>> Find(Expression<Func<User, bool>> filter)
-    {
-        return (await _userRepository.Find(filter)).Select(user => new UserModel(user)).ToArray();
-    }
-
-    public async Task<UserModel> FindByNameAsync(string username)
-    {
-        var user = await _userRepository.FindByName(username);
-        return new UserModel(user);
-    }
-
-    public async Task<UserProfile> GetUserProfile(string email)
+    public async Task<UserProfileModel> GetUserProfile(string email)
     {
         var user = await GetUser(email);
-        return new UserProfile
-        {
-            Email = email,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            PhoneNumber = user.PhoneNumber
-        };
+        return new UserProfileModel(user);
     }
 
-    public async Task SaveUserProfile(UserProfile profile)
+    public async Task UpdateUserProfile(UserModel userModel)
     {
-        var user = await GetUser(profile.Email);
+        var user = await GetUser(userModel.Email);
 
-        user.FirstName = profile.FirstName;
-        user.LastName = profile.LastName;
-        user.PhoneNumber = profile.PhoneNumber;
+        user.FirstName = userModel.FirstName;
+        user.LastName = userModel.LastName;
 
         await _userRepository.Update(user);
     }
 
-    public Task<string> GetOrAddRefreshToken(UserModel user)
+    public Task<string> GetOrAddRefreshToken(User user)
     {
-        var existing = FindActiveRefreshToken(user);
+        var existing = user.RefreshTokens.SingleOrDefault(IsValidRefreshToken)?.Token;
         return string.IsNullOrEmpty(existing)
             ? CreateRefreshToken(user)
             : Task.FromResult(existing);
     }
 
-    private async Task<string> CreateRefreshToken(UserModel user)
+    private async Task<string> CreateRefreshToken(User user)
     {
         var token = RefreshTokenFactory.GenerateToken();
-        await _userRepository.AssignRefreshToken(token, user.Id);
-        return token;
-    }
 
-    private string FindActiveRefreshToken(UserModel user)
-    {
-        return user.RefreshTokens.SingleOrDefault(IsValidRefreshToken)?.Token;
+        var existingUser = await _userRepository.Get(user.Id);
+
+        existingUser.RefreshTokens.Add(new RefreshToken
+        {
+            UserId = user.Id,
+            Token = token,
+            CreatedAtUtc = DateTime.UtcNow
+        });
+
+        await _userRepository.Update(existingUser);
+        return token;
     }
 
     public bool IsValidRefreshToken(RefreshToken token)
@@ -102,14 +87,16 @@ public class UserService : IUserService
         return token.CreatedAtUtc + TimeSpan.FromMinutes(lifeTime) > DateTime.UtcNow;
     }
 
-    public Task ClearRefreshToken(int userId)
+    public async Task ClearRefreshToken(int userId)
     {
-        return _userRepository.ClearRefreshToken(userId);
+        var existingUser = await _userRepository.Get(userId);
+        existingUser.RefreshTokens.Clear();
+        await _userRepository.Update(existingUser);
     }
 
     private async Task<User> GetUser(string email)
     {
-        var user = await _userRepository.FindByEmail(email);
+        var user = (await _userRepository.Find(x => x.Email == email)).SingleOrDefault();
         if (user == null)
         {
             throw new InvalidOperationException($"Cannot find a user {email}");

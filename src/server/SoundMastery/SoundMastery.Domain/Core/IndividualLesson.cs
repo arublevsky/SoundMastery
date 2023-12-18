@@ -12,7 +12,9 @@ public class IndividualLesson : BaseEntity
 
     public int StudentId { get; set; }
 
-    public DateTime StartAt { get; set; }
+    public DateTime Date { get; set; }
+
+    public TimeSpan Time { get; set; }
 
     public bool Completed { get; set; }
 

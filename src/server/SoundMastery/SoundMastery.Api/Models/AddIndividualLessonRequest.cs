@@ -8,5 +8,7 @@ public class AddIndividualLessonRequest
 
     public string Description { get; set; }
 
-    public DateTime StartAt { get; set; }
+    public DateTime Date { get; set; }
+
+    public int Hour { get; set; }
 }

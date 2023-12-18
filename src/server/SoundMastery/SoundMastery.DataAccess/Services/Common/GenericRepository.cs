@@ -10,7 +10,7 @@ using SoundMastery.Domain;
 namespace SoundMastery.DataAccess.Services.Common;
 
 public class GenericRepository<TEntity> : IGenericRepository<TEntity>
-    where TEntity : BaseEntity
+    where TEntity : class, IHasId
 {
     private readonly SoundMasteryContext _context;
 
@@ -22,6 +22,23 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
     public Task<TEntity> Get(int id)
     {
         return _context.Set<TEntity>().SingleOrDefaultAsync(x => x.Id == id);
+    }
+
+    public Task<TEntity> Get<T>(int id, Expression<Func<TEntity, T>> includable = null)
+    {
+        var set = _context.Set<TEntity>();
+
+        if (includable != null)
+        {
+            set.Include(includable);
+        }
+
+        return set.SingleOrDefaultAsync(x => x.Id == id);
+    }
+
+    public Task<TEntity> Get(Expression<Func<TEntity, bool>> filter)
+    {
+        return _context.Set<TEntity>().Where(filter).SingleOrDefaultAsync();
     }
 
     public async Task<IReadOnlyCollection<TEntity>> Find(Expression<Func<TEntity, bool>> filter)

@@ -1,10 +1,15 @@
 import React from "react";
-import { useEffect, useState } from "react";
-import { ApiError } from "../common/apiErrors";
-import { getProfile, UserProfile } from "../api/profileApi";
-import { ExternalAuthenticationResult, externalLogin, logout, refreshToken, TokenAuthenticationResult } from "./accountApi";
-import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
-import { AuthorizationContext, initialState } from "./context";
+import {useEffect, useState} from "react";
+import {ApiError} from "../common/apiErrors";
+import {getProfile, UserProfile} from "../api/profileApi";
+import {
+    ExternalAuthenticationResult,
+    externalLogin,
+    logout,
+    TokenAuthenticationResult
+} from "../api/accountApi";
+import {authenticationService, UserAuthorizationInfo} from "./authenticationService";
+import {AuthorizationContext, initialState} from "./context";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
@@ -14,18 +19,17 @@ const isExternalAuth = (
     object: TokenAuthenticationResult | ExternalAuthenticationResult
 ): object is ExternalAuthenticationResult => 'type' in object;
 
-const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
-    const [isLoading, setIsLoading] = useState(initialState.isLoading);
+const AuthenticationProvider = ({children}: AuthorizationProviderProps) => {
     const [profile, setProfile] = useState<UserProfile | null>(initialState.userProfile);
     const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo | null>(authenticationService.get());
 
     useEffect(() => {
-        async function initialize() {
-            const isAuthenticated = getIsAuthenticated();
-            if (isAuthenticated) {
+
+        authenticationService.registerLogoutHandler(onLoggedOut);
+
+        const initialize = async () => {
+            if (getIsAuthenticated()) {
                 await loadProfile();
-            } else {
-                await tryRefreshToken();
             }
         }
 
@@ -48,16 +52,9 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
     };
 
     const onLoggedOut = async () => {
-        setAuthorizationInfo(null);
         await logout();
+        setAuthorizationInfo(null);
     };
-
-    async function tryRefreshToken() {
-        await executeWithLoading(async () => {
-            const token = await refreshToken();
-            await onLoggedIn(token);
-        });
-    }
 
     async function loadProfile() {
         await executeWithLoading(async () => {
@@ -77,26 +74,23 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
 
     const executeWithLoading = async (action: () => Promise<unknown>) => {
         try {
-            setIsLoading(true);
             await action();
         } catch (e) {
             if (e instanceof ApiError && e.isUnauthenticated()) {
                 await onLoggedOut();
+                return;
             }
             throw e;
-        }
-        finally {
-            setIsLoading(false);
+        } finally {
         }
     };
 
     return (
         <AuthorizationContext.Provider value={{
-            onLoggedIn,
-            onLoggedOut,
             isAuthenticated: getIsAuthenticated(),
-            isLoading,
             userProfile: profile,
+            onLoggedIn,
+            onLoggedOut
         }}>
             {children}
         </AuthorizationContext.Provider>
