@@ -1,7 +1,9 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using SoundMastery.DataAccess.Contexts;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
 namespace SoundMastery.Tests.DataAccess.Builders;
@@ -16,7 +18,7 @@ public class UserRepositoryBuilder
         return this;
     }
 
-    public IUserRepository Build()
+    public IGenericRepository<User> Build()
     {
         if (_configuration == null)
         {
@@ -26,6 +28,6 @@ public class UserRepositoryBuilder
         var manager = new DatabaseManagerBuilder().With(_configuration).Build();
         manager.MigrateUp().GetAwaiter().GetResult();
         var configurationService = new SystemConfigurationService(_configuration);
-        return new UserStore(new SoundMasteryContext(configurationService));
+        return new GenericRepository<User>(new SoundMasteryContext(configurationService));
     }
 }

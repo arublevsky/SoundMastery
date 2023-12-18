@@ -10,6 +10,7 @@ using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
+using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
@@ -19,6 +20,7 @@ public class UserAuthorizationServiceBuilder
 {
     private ISystemConfigurationService _configurationService;
     private IUserService _userService;
+    private IGenericRepository<User> _userRepository;
     private IIdentityManager _identityManager;
     private IHttpContextAccessor _httpContextAccessor;
     private IDateTimeProvider _dateTimeProvider;
@@ -36,6 +38,12 @@ public class UserAuthorizationServiceBuilder
     public UserAuthorizationServiceBuilder With(IUserService userService)
     {
         _userService = userService;
+        return this;
+    }
+
+    public UserAuthorizationServiceBuilder With(IGenericRepository<User> userRepository)
+    {
+        _userRepository = userRepository;
         return this;
     }
 
@@ -94,11 +102,12 @@ public class UserAuthorizationServiceBuilder
         return new UserAuthorizationService(
             _configurationService ?? new Mock<ISystemConfigurationService>().Object,
             _httpContextAccessor ?? new Mock<IHttpContextAccessor>().Object,
-            _userService ?? new Mock<IUserService>().Object,
+            _userRepository ?? new Mock<IGenericRepository<User>>().Object,
             _identityManager ?? new Mock<IIdentityManager>().Object,
             _dateTimeProvider ?? new Mock<IDateTimeProvider>().Object,
             externalAuthResolver,
             twitterService,
-            new Mock<IRoleStore<Role>>().Object);
+            new Mock<IRoleStore<Role>>().Object,
+            _userService ?? new Mock<IUserService>().Object);
     }
 }

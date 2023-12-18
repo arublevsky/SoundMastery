@@ -28,7 +28,7 @@ public class UserRepositoryTests : IAsyncLifetime
         await sut.Create(user);
 
         // Assert
-        var result = await sut.FindByName(username);
+        var result = await sut.Get(x => x.UserName == username);
         result.Should().BeEquivalentTo(user, opt => opt.Excluding(x => x.Id));
     }
 
@@ -44,7 +44,7 @@ public class UserRepositoryTests : IAsyncLifetime
         await sut.Create(user);
 
         // Act
-        var persistedUser = await sut.FindByName(username);
+        var persistedUser = await sut.Get(x => x.UserName == username);
 
         persistedUser.FirstName = "NewFirstName";
         persistedUser.LastName = "NewLastName";
@@ -60,49 +60,7 @@ public class UserRepositoryTests : IAsyncLifetime
         await sut.Update(persistedUser);
 
         // Assert
-        var result = await sut.FindByName(username);
+        var result = await sut.Get(x => x.UserName == username);
         result.Should().BeEquivalentTo(persistedUser, opt => opt.Excluding(x => x.Id));
-    }
-
-    [Fact]
-    public async Task it_should_add_a_refresh_token()
-    {
-        // Arrange
-        var configuration = new ConfigurationBuilder().For(_container).Build();
-        var sut = new UserRepositoryBuilder().With(configuration).Build();
-
-        const string username = "admin@gmail.com";
-        var user = new UserBuilder().WithUsername(username).Build();
-        await sut.Create(user);
-
-        // Act
-        var persistedUser = await sut.FindByName(username);
-        await sut.AssignRefreshToken("some_token", persistedUser!.Id);
-
-        // Assert
-        var result = await sut.FindByName(username);
-        result.RefreshTokens.Should().ContainSingle("some_token");
-    }
-
-    [Fact]
-    public async Task it_should_delete_a_refresh_token()
-    {
-        // Arrange
-        var configuration = new ConfigurationBuilder().For(_container).Build();
-        var sut = new UserRepositoryBuilder().With(configuration).Build();
-
-        const string username = "admin@gmail.com";
-        var user = new UserBuilder().WithUsername(username).Build();
-        await sut.Create(user);
-
-        user = await sut.FindByName(username);
-        await sut.AssignRefreshToken("some_token", user!.Id);
-
-        // Act
-        await sut.ClearRefreshToken(user!.Id);
-
-        // Assert
-        var result = await sut.FindByName(username);
-        result.RefreshTokens.Should().BeEmpty();
     }
 }
