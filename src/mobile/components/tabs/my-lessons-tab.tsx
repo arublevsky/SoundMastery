@@ -41,12 +41,6 @@ function MyLessons(): React.JSX.Element {
                 {isTeacher ? <Text>Student: {lesson.student.firstName}  {lesson.student.lastName}</Text> : null}
                 <Text>Start at: {`${new Date(lesson.date).toDateString()} at ${lesson.hour}:00`}</Text>
                 {lesson.description ? <Text>Description: {`${lesson.description}`}</Text> : null}
-                <Icon 
-        name="chevron-right" 
-        size={22}
-        color="#777"
-        style={styles.icon} 
-      />
             </View>);
     }
 
@@ -150,7 +144,7 @@ const styles = StyleSheet.create({
     },
     icon: {
         marginLeft: 8
-      }
+    }
 });
 
 export default MyLessons;

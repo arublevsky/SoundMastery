@@ -41,18 +41,24 @@ public class CoreService : ICoreService
     {
         var user = await _userRepository.Get(userId);
 
-        IReadOnlyCollection<IndividualLesson> lessons = Array.Empty<IndividualLesson>();
+        var lessons = await FetchLessonsByRole(userId, user);
+        return lessons.Select(lesson => new IndividualLessonModel(lesson)).ToList();
+    }
 
+    private Task<IReadOnlyCollection<IndividualLesson>> FetchLessonsByRole(int userId, User user)
+    {
         if (user.HasRole(Roles.Teacher))
         {
-            lessons = await _lessonsRepository.Find(x => x.TeacherId == userId);
-        }
-        else if (user.HasRole(Roles.Student))
-        {
-            lessons = await _lessonsRepository.Find(x => x.StudentId == userId);
+            return _lessonsRepository.Find(x => x.TeacherId == userId);
         }
 
-        return lessons.Select(lesson => new IndividualLessonModel(lesson)).ToList();
+        if (user.HasRole(Roles.Student))
+        {
+           return _lessonsRepository.Find(x => x.StudentId == userId);
+        }
+
+        Log.Error($"Requesting lessons user is not a teacher or student: {userId}");
+        return Task.FromResult((IReadOnlyCollection<IndividualLesson>)Array.Empty<IndividualLesson>());
     }
 
     public async Task<bool> AddIndividualLesson(AddIndividualLessonModel model)

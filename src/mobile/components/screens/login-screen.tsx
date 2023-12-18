@@ -75,7 +75,6 @@ const LoginScreen = () => {
                     <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
             </KeyboardAvoidingView>
-
         </TouchableWithoutFeedback>
     );
 };
