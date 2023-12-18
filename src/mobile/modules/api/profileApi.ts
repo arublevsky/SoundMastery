@@ -2,17 +2,23 @@ import { httpGet, httpPost } from "../common/requestApi";
 
 const apiController = "profile";
 
-export interface UserProfile {
+export interface User {
+    id: number;
+    email: string;
     firstName: string;
     lastName: string;
-    email: string;
-    phoneNumber: string;
+    userName: string;
+}
+
+export interface UserProfile {
+    user: User;
+    isTeacher: boolean;
 }
 
 export const getProfile = () => {
     return httpGet<UserProfile>(`${apiController}/get-profile`);
 };
 
-export const saveProfile = (body: UserProfile) => {
-    return httpPost<void>(`${apiController}/save-profile`, { body: body });
+export const updateProfile = (body: UserProfile) => {
+    return httpPost<void>(`${apiController}/update-profile`, { body: body });
 };

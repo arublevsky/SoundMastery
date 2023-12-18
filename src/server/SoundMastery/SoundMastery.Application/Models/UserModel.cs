@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
@@ -15,6 +16,7 @@ public class UserModel
         LastName = user.LastName;
         UserName = user.UserName;
         RefreshTokens = user.RefreshTokens;
+        Roles = user.Roles;
         IndividualLessons = user.IndividualLessons;
     }
 
@@ -28,8 +30,13 @@ public class UserModel
 
     public string LastName { get; set; }
 
+    public bool HasRole(string role) => Roles.Any(x => x.Name == role);
+
     [JsonIgnore]
     public IList<RefreshToken> RefreshTokens { get; set; }
+
+    [JsonIgnore]
+    public IList<Role> Roles { get; set; }
 
     [JsonIgnore]
     public IList<IndividualLesson> IndividualLessons { get; set; }

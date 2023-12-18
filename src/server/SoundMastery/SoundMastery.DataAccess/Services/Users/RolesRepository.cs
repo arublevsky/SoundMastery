@@ -7,7 +7,7 @@ using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.DataAccess.Services.Users;
 
-public sealed class RolesRepository : IRolesRepository, IRoleStore<Role>
+public sealed class RolesRepository : IRoleStore<Role>
 {
     private readonly SoundMasteryContext _context;
 

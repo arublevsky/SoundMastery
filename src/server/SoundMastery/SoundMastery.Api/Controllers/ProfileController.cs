@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SoundMastery.Api.Extensions;
+using SoundMastery.Application.Models;
 using SoundMastery.Application.Profile;
 
 namespace SoundMastery.Api.Controllers;
@@ -20,23 +21,23 @@ public class ProfileController : ControllerBase
 
     [Route("get-profile")]
     [HttpGet]
-    public async Task<ActionResult<UserProfile>> GetUserProfile()
+    public async Task<ActionResult<UserProfileModel>> GetUserProfile()
     {
         var email = User.GetEmail();
         var profile = await _service.GetUserProfile(email);
         return Ok(profile);
     }
 
-    [Route("save-profile")]
+    [Route("update-profile")]
     [HttpPost]
-    public async Task<ActionResult<UserProfile>> SaveUserProfile([FromBody] UserProfile profile)
+    public async Task<ActionResult<UserProfileModel>> UpdateUserProfile([FromBody] UserModel user)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest();
         }
 
-        await _service.SaveUserProfile(profile);
+        await _service.UpdateUserProfile(user);
         return Ok();
     }
 }

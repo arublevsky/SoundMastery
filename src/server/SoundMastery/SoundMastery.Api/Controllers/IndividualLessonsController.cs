@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,14 @@ public class IndividualLessonsController : ControllerBase
         return Ok(lessons);
     }
 
+    [Route("availability")]
+    [HttpGet]
+    public async Task<ActionResult> GetAvailableLessons([FromQuery] IndividualLessonsAvailabilityRequest request)
+    {
+        var model = await _service.GetAvailableLessons(request.TeacherId, request.Date);
+        return Ok(model);
+    }
+
     [Route("add")]
     [HttpPut]
     public async Task<ActionResult> Add([FromBody] AddIndividualLessonRequest request)
@@ -37,7 +46,8 @@ public class IndividualLessonsController : ControllerBase
             TeacherId = request.TeacherId,
             StudentId = User.GetId(),
             Description = request.Description,
-            StartAt = request.StartAt
+            Date = request.Date.Date,
+            Time = TimeSpan.FromHours(request.Hour)
         };
 
         var success = await _service.AddIndividualLesson(model);

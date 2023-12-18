@@ -1,9 +1,9 @@
 using FluentValidation;
-using SoundMastery.Application.Profile;
+using SoundMastery.Application.Models;
 
 namespace SoundMastery.Application.Validation;
 
-public class UserProfileValidator : AbstractValidator<UserProfile>
+public class UserProfileValidator : AbstractValidator<UserModel>
 {
     public UserProfileValidator()
     {

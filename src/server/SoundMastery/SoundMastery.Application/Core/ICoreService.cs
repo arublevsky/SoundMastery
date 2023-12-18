@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SoundMastery.Application.Models;
@@ -13,4 +14,6 @@ public interface ICoreService
     Task<IReadOnlyCollection<IndividualLessonModel>> GetMyIndividualLessons(int userId);
 
     Task<bool> AddIndividualLesson(AddIndividualLessonModel model);
+
+    Task<IndividualLessonsAvailabilityModel> GetAvailableLessons(int teacherId, DateTime date);
 }

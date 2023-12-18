@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -11,84 +9,13 @@ using SoundMastery.Domain.Identity;
 
 namespace SoundMastery.DataAccess.Services.Users;
 
-public class UserRepository : IUserRepository
+public class UserStore : IUserEmailStore<User>, IUserPasswordStore<User>
 {
     private readonly SoundMasteryContext _context;
 
-    public UserRepository(SoundMasteryContext context)
+    public UserStore(SoundMasteryContext context)
     {
         _context = context;
-    }
-
-    public async Task<User> Create(User user)
-    {
-        var entry = await _context.Users.AddAsync(user);
-        await _context.SaveChangesAsync();
-        return entry.Entity;
-    }
-
-    public Task<User> Get(int userId) => GetUser(userId);
-
-    public Task<User> FindByName(string userName)
-    {
-        var name = userName.ToUpperInvariant();
-        return _context.Users.SingleOrDefaultAsync(x => x.NormalizedUserName == name);
-    }
-
-    public async Task<IReadOnlyCollection<User>> Find(Expression<Func<User, bool>> filter)
-    {
-        return await _context.Users.Where(filter).ToListAsync();
-    }
-
-    public Task<User> FindByEmail(string email)
-    {
-        var normalizedEmail = email.ToUpperInvariant();
-        return _context.Users.SingleOrDefaultAsync(x => x.NormalizedEmail == normalizedEmail);
-    }
-
-    public async Task Update(User user)
-    {
-        var existingUser = await GetUser(user.Id);
-        existingUser.FirstName = user.FirstName;
-        existingUser.LastName = user.LastName;
-        existingUser.Roles = user.Roles;
-
-        _context.Users.Update(existingUser);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task AssignRefreshToken(string token, int userId)
-    {
-        var existingUser = await GetUser(userId);
-
-        existingUser.RefreshTokens.Add(new RefreshToken
-        {
-            UserId = userId,
-            Token = token,
-            CreatedAtUtc = DateTime.UtcNow
-        });
-
-        _context.Users.Update(existingUser);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task ClearRefreshToken(int userId)
-    {
-        var existingUser = await GetUser(userId);
-        existingUser.RefreshTokens.Clear();
-        _context.Users.Update(existingUser);
-        await _context.SaveChangesAsync();
-    }
-
-    private async Task<User> GetUser(int userId)
-    {
-        var existingUser = await _context.Users.SingleOrDefaultAsync(x => x.Id == userId);
-        if (existingUser == null)
-        {
-            throw new InvalidOperationException($"Cannot find user to update: {userId}");
-        }
-
-        return existingUser;
     }
 
     public Task<string> GetUserIdAsync(User user, CancellationToken token)
@@ -139,7 +66,7 @@ public class UserRepository : IUserRepository
 
     public Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken token)
     {
-        return FindByEmail(normalizedEmail)!;
+        return _context.Users.Where(x => x.NormalizedEmail == normalizedEmail).SingleOrDefaultAsync(token);
     }
 
     public Task<string> GetNormalizedEmailAsync(User user, CancellationToken token)
@@ -202,6 +129,39 @@ public class UserRepository : IUserRepository
         user.EmailConfirmed = confirmed;
         _context.Users.Update(user);
         return Task.CompletedTask;
+    }
+    private async Task Create(User user)
+    {
+        await _context.Users.AddAsync(user);
+        await _context.SaveChangesAsync();
+    }
+
+    private Task<User> FindByName(string userName)
+    {
+        var name = userName.ToUpperInvariant();
+        return _context.Users.SingleOrDefaultAsync(x => x.NormalizedUserName == name);
+    }
+
+    private async Task Update(User user)
+    {
+        var existingUser = await GetUser(user.Id);
+        existingUser.FirstName = user.FirstName;
+        existingUser.LastName = user.LastName;
+        existingUser.Roles = user.Roles;
+
+        _context.Users.Update(existingUser);
+        await _context.SaveChangesAsync();
+    }
+
+    private async Task<User> GetUser(int userId)
+    {
+        var existingUser = await _context.Users.SingleOrDefaultAsync(x => x.Id == userId);
+        if (existingUser == null)
+        {
+            throw new InvalidOperationException($"Cannot find user to update: {userId}");
+        }
+
+        return existingUser;
     }
 
     public void Dispose()

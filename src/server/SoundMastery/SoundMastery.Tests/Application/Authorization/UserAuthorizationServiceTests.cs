@@ -79,7 +79,7 @@ public class UserAuthorizationServiceTests
         // user repository
         var user = new UserBuilder().Build();
         userService.Setup(x => x.FindByNameAsync(It.Is<string>(u => u == "test@username"))).ReturnsAsync(new UserModel(user));
-        userService.Setup(x => x.GetOrAddRefreshToken(It.Is<UserModel>(u => u.Id == user.Id))).ReturnsAsync("refresh_token");
+        userService.Setup(x => x.GetOrAddRefreshToken(It.Is<User>(u => u.Id == user.Id))).ReturnsAsync("refresh_token");
 
         // JWT configuration
         var accessTokenLifeTime = 10;

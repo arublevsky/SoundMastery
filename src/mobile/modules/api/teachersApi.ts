@@ -12,3 +12,7 @@ export interface TeacherProfile {
 export const getMyTeachers = () => {
     return httpGet<TeacherProfile[]>(`${apiController}/my`);
 };
+
+export const getTeachers = () => {
+    return httpGet<TeacherProfile[]>(`${apiController}/list`);
+};

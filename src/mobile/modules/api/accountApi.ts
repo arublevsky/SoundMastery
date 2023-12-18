@@ -24,6 +24,7 @@ export interface RegisterUserModel {
     firstName: string;
     lastName: string;
     password: string;
+    role: number;
 }
 
 export const login = async (username: string, password: string) => {
@@ -42,14 +43,6 @@ export const registerUser = async (body: RegisterUserModel) => {
     return httpPost<TokenAuthenticationResult>(`${apiController}/register`, {body: body});
 };
 
-export const refreshToken = async () => {
-    return httpGet<TokenAuthenticationResult>(`${apiController}/refresh-token`);
-};
+export const acquireTwitterRequestToken = () => httpGet<string>(`${apiController}/twitter-request-token`);
 
-export const acquireTwitterRequestToken = () => {
-    return httpGet<string>(`${apiController}/twitter-request-token`);
-};
-
-export const logout = () => {
-    return httpGet<void>(`${apiController}/logout`);
-};
+export const logout = () => httpGet<void>(`${apiController}/logout`);

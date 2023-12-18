@@ -28,13 +28,13 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterDependencies(this IServiceCollection services)
     {
-        services.AddTransient<IUserStore<User>, UserRepository>();
-        services.AddTransient<IUserEmailStore<User>, UserRepository>();
+        services.AddTransient<IUserStore<User>, UserStore>();
+        services.AddTransient<IUserEmailStore<User>, UserStore>();
         services.AddTransient<IRoleStore<Role>, RolesRepository>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
-        services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IGenericRepository<Material>, GenericRepository<Material>>();
+        services.AddTransient<IGenericRepository<User>, GenericRepository<User>>();
         services.AddTransient<IGenericRepository<IndividualLesson>, GenericRepository<IndividualLesson>>();
         services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
         services.AddTransient<IIdentityManager, IdentityManager>();

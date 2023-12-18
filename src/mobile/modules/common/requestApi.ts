@@ -1,5 +1,7 @@
-import { authenticationService } from "../authorization/authenticationService";
-import { ApiError } from "./apiErrors";
+import {authenticationService} from "../authorization/authenticationService";
+import {ApiError} from "./apiErrors";
+import {useNavigation} from "@react-navigation/native";
+import {useAuthContext} from "../authorization/context.ts";
 
 declare const __API_BASE_URL__: string;
 
@@ -72,7 +74,7 @@ const getBody = (options?: RequestOptions) => {
 
 const getContentTypeHeader = (options?: RequestOptions) => {
     if (options === null || options === undefined) {
-        return { "Content-Type": "text/plain" };
+        return {"Content-Type": "text/plain"};
     }
     if (options.body instanceof FormData) {
         return {};
@@ -93,10 +95,11 @@ const handleResponse = async <T>(response: Response): Promise<T> => {
 };
 
 const processFailedResponse = (response: Response) => {
-    // TODO send data from server to enrich UI errors
-    // const errorCode = response.headers.get(apiConstants.headers.errorCode) as string;
-    // const errorId = response.headers.get(apiConstants.headers.errorId) as string;
-    // const payloadError = response.headers.get(apiConstants.headers.payloadError);
+    if (response.status === 401) {
+        authenticationService.logout();
+        return;
+    }
+
     throw new ApiError(response, '');
 };
 

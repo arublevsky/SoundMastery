@@ -8,16 +8,25 @@ public class IndividualLessonModel
     public IndividualLessonModel(IndividualLesson lesson)
     {
         Id = lesson.Id;
-        TeacherFullname = lesson.Teacher.FullName;
+        Teacher = new UserModel(lesson.Teacher);
+        Student = new UserModel(lesson.Student);
         Completed = lesson.Completed;
-        StartAt = lesson.StartAt;
+        Description = lesson.Description;
+        Date = lesson.Date;
+        Hour = lesson.Time.Hours;
     }
+
+    public string Description { get; set; }
 
     public bool Completed { get; set; }
 
-    public DateTime StartAt { get; set; }
+    public DateTime Date { get; set; }
+
+    public int Hour { get; set; }
 
     public int Id { get; set; }
 
-    public string TeacherFullname { get; set; }
+    public UserModel Teacher { get; set; }
+
+    public UserModel Student { get; set; }
 }

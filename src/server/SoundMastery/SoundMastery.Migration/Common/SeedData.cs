@@ -10,7 +10,7 @@ internal static class SeedData
     private const string StudentUsername = "student@gmail.com";
     private const string TeacherUsername = "teacher@gmail.com";
 
-    public static readonly Role[] Roles =
+    private static readonly Role[] Roles =
     {
         new()
         {
@@ -23,6 +23,12 @@ internal static class SeedData
             Name = "teacher",
             ConcurrencyStamp = Guid.NewGuid().ToString(),
             NormalizedName = "teacher"
+        },
+        new()
+        {
+            Name = "student",
+            ConcurrencyStamp = Guid.NewGuid().ToString(),
+            NormalizedName = "student"
         }
     };
 
@@ -65,6 +71,7 @@ internal static class SeedData
             FirstName = "Student",
             LastName = "John",
             SecurityStamp = Guid.NewGuid().ToString(),
+            Roles = new List<Role> { Roles[2] }
         }
     };
 }

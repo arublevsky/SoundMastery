@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Moq;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Authorization.ExternalProviders;
@@ -9,6 +10,7 @@ using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
+using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
 namespace SoundMastery.Tests.Application.Builders;
@@ -96,6 +98,7 @@ public class UserAuthorizationServiceBuilder
             _identityManager ?? new Mock<IIdentityManager>().Object,
             _dateTimeProvider ?? new Mock<IDateTimeProvider>().Object,
             externalAuthResolver,
-            twitterService);
+            twitterService,
+            new Mock<IRoleStore<Role>>().Object);
     }
 }

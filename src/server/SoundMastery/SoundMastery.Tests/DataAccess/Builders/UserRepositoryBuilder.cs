@@ -26,6 +26,6 @@ public class UserRepositoryBuilder
         var manager = new DatabaseManagerBuilder().With(_configuration).Build();
         manager.MigrateUp().GetAwaiter().GetResult();
         var configurationService = new SystemConfigurationService(_configuration);
-        return new UserRepository(new SoundMasteryContext(configurationService));
+        return new UserStore(new SoundMasteryContext(configurationService));
     }
 }
