@@ -3,14 +3,12 @@ import {
     Button,
     ScrollView,
     StyleSheet,
-    Text,
     View
 } from "react-native";
 import { useAuthContext } from "../../modules/authorization/context.ts";
 import { getMyLessons, Lesson } from "../../modules/api/lessonsApi.ts";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { HomeTabScreenProps } from "../types.ts";
-import Icon from 'react-native-vector-icons/FontAwesome';
 import LessonCard from "./lesson-card.tsx";
 import { Card } from "react-native-paper";
 
@@ -51,7 +49,6 @@ function MyLessons(): React.JSX.Element {
     }
 
     return (
-        // <ScrollView style={styles.container}>
         <ScrollView style={styles.container}>
             {upcomingLessons.length === 0
                 ? <Card style={styles.card}>
@@ -77,18 +74,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff'
     },
-    header: {
-        backgroundColor: '#3f51b5',
-        padding: 16,
-    },
-    title: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: '500'
-    },
-    content: {
-        padding: 16
-    },
     card: {
         backgroundColor: '#fff',
         borderRadius: 4,
@@ -102,18 +87,6 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'center'
-    },
-    sectionTitle: {
-        fontSize: 18,
-        fontWeight: '500',
-        marginTop: 16,
-        marginBottom: 8
-    },
-    emptyContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 16
     },
     button: {
         backgroundColor: '#3f51b5',
@@ -130,9 +103,6 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: '500',
-    },
-    icon: {
-        marginLeft: 8
     }
 });
 
