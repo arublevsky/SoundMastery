@@ -1,26 +1,17 @@
 import React from 'react';
 import { Image, StyleSheet } from 'react-native';
-import { Lesson } from '../../modules/api/lessonsApi';
-import { Card, Paragraph } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
-import { HomeTabScreenProps } from '../types';
+import { RootStackParamList } from '../types';
 import { formatFullName } from '../utils';
+import { Card, Paragraph } from 'react-native-paper';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-interface LessonCardProps {
-    lesson: Lesson;
-    isTeacher: boolean;
-    id: string;
-};
+type Props = NativeStackScreenProps<RootStackParamList, 'LessonDetailsScreen'>;
 
-const LessonCard = ({ lesson, isTeacher, id }: LessonCardProps) => {
-    const navigation = useNavigation<HomeTabScreenProps<'MyLessons'>['navigation']>();
-
-    const navigateToLessonDetails = () => {
-        navigation.navigate('LessonDetailsScreen', { lesson, isTeacher });
-    }
+const LessonDetailsScreen = ({ route }: Props) => {
+    const { lesson, isTeacher } = route.params;
 
     return (
-        <Card onPress={() => navigateToLessonDetails()} style={styles.card} id={id}>
+        <Card style={styles.card}>
             <Card.Title
                 title={`${formatFullName(isTeacher ? lesson.teacher : lesson.student)}`}
                 left={() => <Image source={{ uri: 'https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png' }} style={styles.avatar} />}
@@ -33,6 +24,7 @@ const LessonCard = ({ lesson, isTeacher, id }: LessonCardProps) => {
     );
 };
 
+
 const styles = StyleSheet.create({
     card: {
         margin: 10,
@@ -44,4 +36,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default LessonCard;
+export default LessonDetailsScreen;

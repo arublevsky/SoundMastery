@@ -34,7 +34,7 @@ function MyLessons(): React.JSX.Element {
 
     const renderLessonItem = (lesson: Lesson) => {
         const isTeacher = userProfile?.isTeacher || false;
-        return (<LessonCard lesson={lesson} isTeacher={isTeacher} />);
+        return (<LessonCard id={lesson.id.toString()} lesson={lesson} isTeacher={isTeacher} />);
     }
 
     const renderLessonsBlock = (lessons: Lesson[], title: string) => {

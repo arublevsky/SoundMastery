@@ -2,8 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import 'react-native-get-random-values';
 import {
     View,
-    Text,
-    TouchableOpacity,
     Alert,
     StyleSheet,
     Keyboard,
@@ -112,8 +110,6 @@ const ScheduleLesson = () => {
         else {
             setAvailableHours([]);
         }
-
-
     }
 
     const handleHourChange = async (value: string) => {
@@ -185,27 +181,6 @@ const ScheduleLesson = () => {
                         </Card.Content>
                     </Card>
                 </View>
-
-                {/* {selectedTeacherId
-                    ? <View style={styles.datePickerContainer}>
-                        <DateTimePicker
-                            value={selectedDate}
-                            mode={'date'}
-                            is24Hour={true}
-                            display="default"
-                            minimumDate={new Date()}
-                            onChange={handleDateChange}
-                        />
-                    </View>
-                    : null}
-               
-
-    
-                {selectedHour
-                    ? <TouchableOpacity style={styles.button} onPress={handleSchedule}>
-                        <Text style={styles.buttonText}>Schedule</Text>
-                    </TouchableOpacity>
-                    : null} */}
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     );

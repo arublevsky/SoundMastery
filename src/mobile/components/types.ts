@@ -1,17 +1,20 @@
-import {NativeStackNavigationProp, NativeStackScreenProps} from "@react-navigation/native-stack";
-import {CompositeScreenProps} from "@react-navigation/native";
-import {MaterialBottomTabScreenProps} from "react-native-paper/react-navigation";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
+import { CompositeScreenProps } from "@react-navigation/native";
+import { MaterialBottomTabScreenProps } from "react-native-paper/react-navigation";
+import { Lesson } from "../modules/api/lessonsApi";
 
 export type RootStackParamList = {
     LoginScreen: undefined;
     HomeScreen: undefined;
     RegisterScreen: undefined;
+    LessonDetailsScreen: { lesson: Lesson, isTeacher: boolean };
 };
 
 export type BottomBarParamList = {
-    MyLessons: {refreshToken: string};
+    MyLessons: { refreshToken: string };
     ScheduleLesson: undefined;
     Profile: undefined;
+   
 };
 
 export type RegisterScreenNavigationProps = NativeStackNavigationProp<RootStackParamList, "RegisterScreen">;
