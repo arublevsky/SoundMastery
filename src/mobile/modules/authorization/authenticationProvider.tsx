@@ -93,7 +93,8 @@ const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
             isAuthenticated: getIsAuthenticated(),
             userProfile: profile,
             onLoggedIn,
-            onLoggedOut
+            onLoggedOut,
+            updateProfile: (profile) => setProfile(profile)
         }}>
             {children}
         </AuthorizationContext.Provider>

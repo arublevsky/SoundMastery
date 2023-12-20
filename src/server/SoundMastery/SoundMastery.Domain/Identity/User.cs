@@ -22,5 +22,7 @@ public class User : IdentityUser<int>, IHasId
 
     public virtual IList<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
+    public virtual WorkingHours WorkingHours { get; set; }
+
     public bool HasRole(string role) => Roles.Any(x => x.Name == role);
 }

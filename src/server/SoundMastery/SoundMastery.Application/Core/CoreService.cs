@@ -62,23 +62,20 @@ public class CoreService : ICoreService
 
     public async Task<bool> AddIndividualLesson(AddIndividualLessonModel model)
     {
-        if (model.Date == DateTime.MinValue || !WorkingHours.Hours.Contains(model.Time.Hours))
+        var user = await _userRepository.Get(model.TeacherId);
+        if (!user.HasRole(Roles.Teacher))
         {
-            Log.Warning($"Invalid lesson date or time: {model.Date} - {model.Time}");
+            Log.Warning($"User {model.TeacherId} is not a teacher.");
             return false;
         }
 
-        var users = await _userRepository.Find(x =>
-            x.Id == model.TeacherId && x.Roles.Any(role => role.Name.Equals(Roles.Teacher)));
-
-        if (!users.Any())
+        if (user.WorkingHours == null || !user.WorkingHours.IsWorking(model.Time))
         {
-            Log.Warning($"Could not found a teacher with ID: {model.TeacherId}");
+            Log.Warning($"User {model.TeacherId} is not working at {model.Time}.");
             return false;
         }
 
-        var teacher = users.Single();
-        if (teacher.IndividualLessons.Any(x => x.Time == model.Time && x.Date == model.Date))
+        if (user.IndividualLessons.Any(x => x.Time == model.Time && x.Date == model.Date))
         {
             Log.Warning(
                 $"Lesson for teacher ({model.TeacherId}) has been already booked at {model.Date} - {model.Time}.");
@@ -91,12 +88,15 @@ public class CoreService : ICoreService
 
     public async Task<IndividualLessonsAvailabilityModel> GetAvailableLessons(int teacherId, DateTime date)
     {
-        var lessons = await _lessonsRepository.Find(x => x.TeacherId == teacherId && x.Date == date.Date);
-        var bookedHours = lessons.Select(x => TimeOnly.FromTimeSpan(x.Time).Hour);
+        var user = await _userRepository.Get(teacherId);
+
+        var bookedHours = user.IndividualLessons
+            .Where(x => x.Date == date.Date)
+            .Select(x => x.Time.Hours);
 
         return new IndividualLessonsAvailabilityModel
         {
-            AvailableHours = WorkingHours.Hours.Except(bookedHours).ToArray()
+            AvailableHours = user.WorkingHours?.GetAvailableHours(bookedHours) ?? Array.Empty<int>()
         };
     }
 

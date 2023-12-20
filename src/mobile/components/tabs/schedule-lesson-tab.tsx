@@ -12,7 +12,7 @@ import RNPickerSelect from 'react-native-picker-select';
 import { getTeachers, TeacherProfile } from "../../modules/api/teachersApi.ts";
 import { addLesson, getAvailableLessons } from "../../modules/api/lessonsApi.ts";
 import { useNavigation } from "@react-navigation/native";
-import { HomeTabScreenProps } from "../types.ts";
+import { ScreenProps } from "../types.ts";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useErrorHandling } from "../../modules/errors/useErrorHandling.tsx";
 import { v4 as uuidv4 } from 'uuid';
@@ -26,7 +26,7 @@ const ScheduleLesson = () => {
     const [availableHours, setAvailableHours] = useState<number[]>([]);
     const [selectedHour, setSelectedHour] = useState('');
     const [description, setDescription] = useState('');
-    const navigator = useNavigation<HomeTabScreenProps<'ScheduleLesson'>['navigation']>();
+    const navigator = useNavigation<ScreenProps<'ScheduleLesson'>['navigation']>();
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
 
     useEffect(() => {
@@ -97,7 +97,7 @@ const ScheduleLesson = () => {
         }
     }
 
-    const handleHourChange = async (value: string) => {
+    const handleHourChange = (value: string) => {
         setSelectedHour(value);
     }
 

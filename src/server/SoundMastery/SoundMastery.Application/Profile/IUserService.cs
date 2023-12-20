@@ -10,9 +10,9 @@ public interface IUserService
 
     Task<bool> UploadAvatar(int getId, string image);
 
-    Task<UserProfileModel> GetUserProfile(string email);
+    Task<UserProfileModel> UpdateUserProfile(UserModel user, WorkingHoursModel workingHours);
 
-    Task UpdateUserProfile(UserModel user);
+    Task<UserProfileModel> GetUserProfile(string email);
 
     Task<string> GetOrAddRefreshToken(User user);
 

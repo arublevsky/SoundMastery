@@ -31,7 +31,7 @@ function HomeScreen(): React.JSX.Element {
                 }}
             />
             <Tab.Screen
-                name="Profile"
+                name="ProfileTab"
                 component={ProfileTab}
                 options={{
                     tabBarLabel: 'Profile',

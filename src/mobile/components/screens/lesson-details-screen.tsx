@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { HomeTabScreenProps } from '../types';
+import { ScreenProps } from '../types';
 import { Button, Card } from 'react-native-paper';
 import { cancel, complete } from '../../modules/api/lessonsApi';
 import { useErrorHandling } from '../../modules/errors/useErrorHandling';
@@ -8,7 +8,7 @@ import { showComfirmationAlert, showErrorAlert, showSuccessAlert } from '../comm
 import { v4 as uuidv4 } from 'uuid';
 import LessonCardContent from '../tabs/my-lessons/my-lesson-card-content';
 
-type Props = HomeTabScreenProps<'LessonDetailsScreen'>;
+type Props = ScreenProps<'LessonDetailsScreen'>;
 
 const LessonDetailsScreen = ({ route, navigation }: Props) => {
     const { lesson, isTeacher } = route.params;

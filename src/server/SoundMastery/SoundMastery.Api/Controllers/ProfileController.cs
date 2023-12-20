@@ -31,15 +31,15 @@ public class ProfileController : ControllerBase
 
     [Route("update-profile")]
     [HttpPost]
-    public async Task<ActionResult<UserProfileModel>> UpdateUserProfile([FromBody] UserModel user)
+    public async Task<ActionResult<UserProfileModel>> UpdateUserProfile([FromBody] UpdateProfileRequest request)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest();
         }
 
-        await _service.UpdateUserProfile(user);
-        return Ok();
+        var updatedProfile = await _service.UpdateUserProfile(request.User, request.WorkingHours);
+        return Ok(updatedProfile);
     }
 
     [Route("upload-avatar")]

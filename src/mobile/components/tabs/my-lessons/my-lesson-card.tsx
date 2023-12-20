@@ -3,7 +3,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { Lesson } from '../../../modules/api/lessonsApi';
 import { Button, Card, Paragraph, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { HomeTabScreenProps } from '../../types';
+import { ScreenProps } from '../../types';
 import { formatFullName } from '../../utils';
 import LessonCardContent from './my-lesson-card-content';
 
@@ -13,7 +13,7 @@ interface LessonCardProps {
 };
 
 const LessonCard = ({ lesson, isTeacher }: LessonCardProps) => {
-    const navigation = useNavigation<HomeTabScreenProps<'MyLessons'>['navigation']>();
+    const navigation = useNavigation<ScreenProps<'MyLessons'>['navigation']>();
 
     const navigateToLessonDetails = () => {
         navigation.navigate('LessonDetailsScreen', { lesson, isTeacher });

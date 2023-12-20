@@ -14,16 +14,21 @@ export interface User {
 export interface UserProfile {
     user: User;
     isTeacher: boolean;
+    workingHours: { from: number; to: number; }
 }
 
 interface UploadAvatarRequest {
     image: string;
 }
 
+type UpdateProfileRequest = Omit<UserProfile, 'isTeacher'>;
+
 export const getProfile = () => {
     return httpGet<UserProfile>(`${apiController}/get-profile`);
 };
 
-export const updateProfile = (body: UserProfile) => httpPost(`${apiController}/update-profile`, { body: body });
+export const updateUserProfile = (body: UpdateProfileRequest) =>
+    httpPost<UserProfile>(`${apiController}/update-profile`, { body: body });
 
-export const uploadAvatar = (body: UploadAvatarRequest) => httpPost(`${apiController}/upload-avatar`, { body: body });
+export const uploadAvatar = (body: UploadAvatarRequest) =>
+    httpPost(`${apiController}/upload-avatar`, { body: body });

@@ -12,7 +12,8 @@ export type RootStackParamList = {
 export type BottomBarParamList = {
     MyLessons: { refreshToken: string };
     ScheduleLesson: undefined;
-    Profile: undefined;
+    ProfileTab: undefined;
+    EditProfileScreen: undefined;
     LessonDetailsScreen: { lesson: Lesson, isTeacher: boolean };   
 };
 
@@ -22,7 +23,7 @@ export type LoginScreenNavigationProps = NativeStackNavigationProp<RootStackPara
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, T>;
 
-export type HomeTabScreenProps<T extends keyof BottomBarParamList> =
+export type ScreenProps<T extends keyof BottomBarParamList> =
     CompositeScreenProps<
         MaterialBottomTabScreenProps<BottomBarParamList, T>,
         RootStackScreenProps<keyof RootStackParamList>

@@ -1,4 +1,3 @@
-// profile.tsx
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Avatar, Button, Title, Caption } from 'react-native-paper';
@@ -10,32 +9,27 @@ import { useErrorHandling } from '../../modules/errors/useErrorHandling.tsx';
 import { uploadAvatar } from '../../modules/api/profileApi.ts';
 import { images } from '../../assets/index.ts';
 import { showErrorAlert } from '../common.tsx';
+import { useNavigation } from '@react-navigation/native';
+import { ScreenProps } from '../types.ts';
 
-const Profile = () => {
+const avatarUploadOptions = {
+    width: 300,
+    height: 300,
+    cropping: true
+};
+
+const ProfileTab = () => {
     const { userProfile } = useAuthContext();
-    const [avatar, setAvatar] = useState(userProfile?.user.avatar);
-
+    const [avatar, setAvatar] = useState(userProfile!.user.avatar);
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
+    const navigator = useNavigation<ScreenProps<'ProfileTab'>['navigation']>();
 
-    const avatarUploadOptions = {
-        width: 300,
-        height: 300,
-        cropping: true
-    };
-
-    const handleEditProfile = () => {
-        // Handle the edit profile action here
-    };
+    const handleEditProfile = () => navigator.navigate('EditProfileScreen');
 
     const handleUpload = () => asyncHandler(async () => {
         const image = await ImagePicker.openPicker(avatarUploadOptions);
         await onImageSelected(image.path);
     });
-
-    const handleCamera = async () => {
-        const image = await ImagePicker.openCamera(avatarUploadOptions);
-        await onImageSelected(image.path);
-    };
 
     const onImageSelected = async (path: string) => {
         const base64 = await RNFS.readFile(path, 'base64')
@@ -58,12 +52,14 @@ const Profile = () => {
                 <Button style={styles.uploadButton} mode="contained" icon="camera" onPress={handleUpload}>
                     Upload photo
                 </Button>
-                <Button style={styles.uploadButton} mode="contained" icon="camera" onPress={handleCamera}>
-                    Take a photo
-                </Button>
-                <Title style={styles.name}>{formatFullName(userProfile?.user!)}</Title>
-                <Caption style={styles.email}>{userProfile?.user.email}</Caption>
-                <Caption style={styles.role}>{userProfile?.isTeacher ? "Teacher" : "Student"}</Caption>
+                <Title style={styles.name}>{formatFullName(userProfile!.user)}</Title>
+                <Caption style={styles.email}>{userProfile!.user.email}</Caption>
+                <Caption style={styles.role}>{userProfile!.isTeacher ? "Teacher" : "Student"}</Caption>
+                {userProfile!.isTeacher && userProfile?.workingHours
+                    ? <Caption style={styles.workingHours}>
+                        Working Hours: {`${userProfile!.workingHours.from}:00 - ${userProfile?.workingHours.to}:00` }
+                    </Caption>
+                    : null}
             </View>
             <Button mode="contained" onPress={handleEditProfile} style={styles.button}>
                 Edit Profile
@@ -96,7 +92,11 @@ const styles = StyleSheet.create({
     },
     role: {
         fontSize: 16,
-        marginBottom: 16,
+        marginBottom: 8,
+    },
+    workingHours: {
+        fontSize: 16,
+        marginBottom: 8,
     },
     button: {
         marginTop: 16,
@@ -106,4 +106,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Profile;
+export default ProfileTab;

@@ -1,47 +1,49 @@
 import React, { useEffect, useState } from "react";
 import {
+    RefreshControl,
     ScrollView,
     StyleSheet
 } from "react-native";
 import { useAuthContext } from "../../../modules/authorization/context.ts";
 import { getMyLessons, Lesson } from "../../../modules/api/lessonsApi.ts";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { HomeTabScreenProps } from "../../types.ts";
+import { ScreenProps } from "../../types.ts";
 import LessonCard from "./my-lesson-card.tsx";
 import { Button, Card } from "react-native-paper";
 
-type MyLessonsProps = HomeTabScreenProps<'MyLessons'>;
+type MyLessonsProps = ScreenProps<'MyLessons'>;
 
 function MyLessons(): React.JSX.Element {
     const { userProfile } = useAuthContext();
     const route = useRoute<MyLessonsProps['route']>();
     const navigation = useNavigation<MyLessonsProps['navigation']>();
     const [lessons, setLessons] = useState<Lesson[]>([]);
+    const [refreshing, setRefreshing] = React.useState(false);
+    
     const isTeacher = userProfile!.isTeacher;
 
-    useEffect(() => {
-        const loadData = async () => {
-            const lessonsData = await getMyLessons();
-            setLessons(lessonsData);
-        }
+    const loadData = async () => {
+        setRefreshing(true);
+        const lessonsData = await getMyLessons();
+        setLessons(lessonsData);
+        setRefreshing(false);
+    }
 
+    useEffect(() => {
         loadData();
     }, [route]);
 
     const completedLessons = lessons.filter(l => l.completed || l.cancelled);
     const upcomingLessons = lessons.filter(l => !l.completed && !l.cancelled);
 
-    const renderLessonItem = (lesson: Lesson) => {
-        
-        return (<LessonCard lesson={lesson} isTeacher={isTeacher} key={lesson.id} />);
-    }
+    const onRefresh = React.useCallback(loadData, []);
 
     const renderLessonsBlock = (lessons: Lesson[], title: string) => {
         return lessons.length
             ? <Card style={styles.card} key={title}>
                 <Card.Title title={title} />
                 <Card.Content>
-                    {lessons.map((lesson) => renderLessonItem(lesson))}
+                    {lessons.map((lesson) => <LessonCard lesson={lesson} isTeacher={isTeacher} key={lesson.id} />)}
                 </Card.Content>
             </Card>
             : null;
@@ -49,7 +51,8 @@ function MyLessons(): React.JSX.Element {
 
     return (
         <ScrollView style={styles.container}>
-            {upcomingLessons.length === 0
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            {upcomingLessons.length === 0 && !refreshing
                 ? <Card style={styles.card} key="schedule-next">
                     <Card.Title title="You have no upcoming lessons" />
                     <Card.Content>

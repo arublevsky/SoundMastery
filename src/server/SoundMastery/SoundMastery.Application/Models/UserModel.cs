@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.Json.Serialization;
 using SoundMastery.Domain.Core;
@@ -9,6 +10,10 @@ namespace SoundMastery.Application.Models;
 
 public class UserModel
 {
+    public UserModel()
+    {
+    }
+
     public UserModel(User user)
     {
         Id = user.Id;
@@ -28,8 +33,12 @@ public class UserModel
 
     public string UserName { get; set; }
 
+    [Required]
+    [MaxLength(100)]
     public string FirstName { get; set; }
 
+    [Required]
+    [MaxLength(100)]
     public string LastName { get; set; }
 
     public string Avatar { get; set; }
