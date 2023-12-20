@@ -17,6 +17,7 @@ function MyLessons(): React.JSX.Element {
     const route = useRoute<MyLessonsProps['route']>();
     const navigation = useNavigation<MyLessonsProps['navigation']>();
     const [lessons, setLessons] = useState<Lesson[]>([]);
+    const isTeacher = userProfile!.isTeacher;
 
     useEffect(() => {
         const loadData = async () => {
@@ -31,7 +32,7 @@ function MyLessons(): React.JSX.Element {
     const upcomingLessons = lessons.filter(l => !l.completed && !l.cancelled);
 
     const renderLessonItem = (lesson: Lesson) => {
-        const isTeacher = userProfile?.isTeacher || false;
+        
         return (<LessonCard lesson={lesson} isTeacher={isTeacher} key={lesson.id} />);
     }
 
@@ -52,7 +53,7 @@ function MyLessons(): React.JSX.Element {
                 ? <Card style={styles.card} key="schedule-next">
                     <Card.Title title="You have no upcoming lessons" />
                     <Card.Content>
-                        <Button mode="contained" onPress={() => navigation.navigate('ScheduleLesson')} buttonColor='#3f50b5'>
+                        <Button mode="contained" onPress={() => navigation.navigate('ScheduleLesson')}>
                             Schedule Your Next Lesson
                         </Button>
                     </Card.Content>

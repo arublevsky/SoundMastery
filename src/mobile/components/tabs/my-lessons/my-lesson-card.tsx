@@ -21,7 +21,7 @@ const LessonCard = ({ lesson, isTeacher }: LessonCardProps) => {
 
     return (
         <Card onPress={() => navigateToLessonDetails()} style={styles.card} key={lesson.id.toString()}>
-            <LessonCardContent lesson={lesson} isTeacher />
+            <LessonCardContent lesson={lesson} isTeacher={isTeacher} />
         </Card>
     );
 };

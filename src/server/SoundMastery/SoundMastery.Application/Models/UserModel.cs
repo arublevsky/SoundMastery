@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -17,6 +18,7 @@ public class UserModel
         UserName = user.UserName;
         RefreshTokens = user.RefreshTokens;
         Roles = user.Roles;
+        Avatar = user.Avatar != null ? Convert.ToBase64String(user.Avatar) : null;
         IndividualLessons = user.IndividualLessons;
     }
 
@@ -30,7 +32,7 @@ public class UserModel
 
     public string LastName { get; set; }
 
-    public byte[] Avatar { get; set; }
+    public string Avatar { get; set; }
 
     public bool HasRole(string role) => Roles.Any(x => x.Name == role);
 

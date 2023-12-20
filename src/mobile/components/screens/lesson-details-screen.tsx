@@ -11,7 +11,7 @@ import LessonCardContent from '../tabs/my-lessons/my-lesson-card-content';
 type Props = HomeTabScreenProps<'LessonDetailsScreen'>;
 
 const LessonDetailsScreen = ({ route, navigation }: Props) => {
-    const { lesson } = route.params;
+    const { lesson, isTeacher } = route.params;
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
 
     const handleCancel = () => showComfirmationAlert(
@@ -51,7 +51,7 @@ const LessonDetailsScreen = ({ route, navigation }: Props) => {
     return (
         <View style={styles.container}>
             <Card style={styles.card}>
-            <LessonCardContent lesson={lesson} isTeacher />
+                <LessonCardContent lesson={lesson} isTeacher={isTeacher} />
             </Card>
             {editable
                 ? <View style={styles.buttonContainer}>

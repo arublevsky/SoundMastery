@@ -14,7 +14,7 @@ public class User : IdentityUser<int>, IHasId
     [MaxLength(100)]
     public string LastName { get; set; }
 
-    public string Avatar { get; set; }
+    public byte[] Avatar { get; set; }
 
     public virtual IList<IndividualLesson> IndividualLessons { get; set; } = new List<IndividualLesson>();
 

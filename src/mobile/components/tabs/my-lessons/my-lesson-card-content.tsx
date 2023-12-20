@@ -3,6 +3,7 @@ import { Lesson } from '../../../modules/api/lessonsApi';
 import { Button, Card, Paragraph } from 'react-native-paper';
 import { Image, StyleSheet } from 'react-native';
 import { formatFullName } from '../../utils';
+import { images } from '../../../assets';
 
 interface Props {
     lesson: Lesson;
@@ -11,12 +12,18 @@ interface Props {
 
 const LessonCardContent = ({ lesson, isTeacher }: Props) => {
     const active = !lesson.cancelled && !lesson.completed;
+    const avatar = isTeacher ? lesson.student.avatar : lesson.teacher.avatar;
+    const user = isTeacher ? lesson.student : lesson.teacher;
+    const fullName = formatFullName(user);
 
     return (
         <>
             <Card.Title
-                title={`${formatFullName(isTeacher ? lesson.teacher : lesson.student)}`}
-                left={() => <Image source={{ uri: lesson.teacher.avatar }} style={styles.avatar} />}
+                title={isTeacher ? `Student: ${fullName}` : `Teacher: ${fullName}`}
+                left={() => <Image
+                    source={avatar ? { uri: `data:image/png;base64,${avatar}` } : images.avatar}
+                    style={styles.avatar}
+                />}
             />
             <Card.Content>
                 <Paragraph>Start at: {`${new Date(lesson.date).toDateString()} at ${lesson.hour}:00`}</Paragraph>

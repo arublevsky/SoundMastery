@@ -8,6 +8,8 @@ import ImagePicker from 'react-native-image-crop-picker';
 import RNFS from 'react-native-fs';
 import { useErrorHandling } from '../../modules/errors/useErrorHandling.tsx';
 import { uploadAvatar } from '../../modules/api/profileApi.ts';
+import { images } from '../../assets/index.ts';
+import { showErrorAlert } from '../common.tsx';
 
 const Profile = () => {
     const { userProfile } = useAuthContext();
@@ -27,23 +29,29 @@ const Profile = () => {
 
     const handleUpload = () => asyncHandler(async () => {
         const image = await ImagePicker.openPicker(avatarUploadOptions);
-        const base64 = await RNFS.readFile(image.path, 'base64');
-        // await uploadAvatar({ image: base64 });
-        setAvatar(base64);
+        await onImageSelected(image.path);
     });
 
     const handleCamera = async () => {
         const image = await ImagePicker.openCamera(avatarUploadOptions);
-        console.log(image);
-        const base64 = RNFS.readFile(image.path, 'base64')
-        console.log(base64);
+        await onImageSelected(image.path);
     };
+
+    const onImageSelected = async (path: string) => {
+        const base64 = await RNFS.readFile(path, 'base64')
+        await uploadAvatar({ image: base64 });
+        setAvatar(base64);
+    }
+
+    if (errors.length) {
+        showErrorAlert(`Failed to upload avatar: ${errors[0].description}.`, clearErrors);
+    }
 
     return (
         <View style={styles.container}>
             <View style={styles.contentContainer}>
                 <Avatar.Image
-                    source={{ uri: `data:image/png;base64,${avatar}` }}
+                    source={avatar ? { uri: `data:image/png;base64,${avatar}` } : images.avatar}
                     size={100}
                     style={styles.avatar}
                 />

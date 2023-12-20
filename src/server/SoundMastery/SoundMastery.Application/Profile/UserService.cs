@@ -41,15 +41,20 @@ public class UserService : IUserService
         return true;
     }
 
-    public Task<bool> UploadAvatar(int userId, string image)
+    public async Task<bool> UploadAvatar(int userId, string image)
     {
         var imageBytes = Convert.FromBase64String(image);
 
         const int sizeLimit = 8 * 1024 * 1024; // 8MB
         if (imageBytes.Length > sizeLimit)
         {
-            Log.Information($"Image size is too big for user's avatar {userId}");
+            Log.Warning($"Image size is too big for user's avatar {userId}");
         }
+
+        var user = await _userRepository.Get(userId);
+        user.Avatar = imageBytes;
+        await _userRepository.Update(user);
+        return true;
     }
 
     public async Task<UserProfileModel> GetUserProfile(string email)
