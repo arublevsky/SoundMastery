@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import 'react-native-get-random-values';
 import {
     View,
     Alert,
@@ -17,7 +16,7 @@ import { HomeTabScreenProps } from "../types.ts";
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useErrorHandling } from "../../modules/errors/useErrorHandling.tsx";
 import { v4 as uuidv4 } from 'uuid';
-import { pickerSelectStyles } from "../common.tsx";
+import { pickerSelectStyles, showErrorAlert, showSuccessAlert } from "../common.tsx";
 import { Button, Card, TextInput } from 'react-native-paper';
 
 const ScheduleLesson = () => {
@@ -67,28 +66,14 @@ const ScheduleLesson = () => {
             hour: Number(selectedHour!),
         });
 
-        Alert.alert(
-            'Success',
-            'Lesson scheduled successfully',
-            [{
-                text: 'OK',
-                onPress: () => {
-                    clearState();
-                    navigator.jumpTo("MyLessons", { refreshToken: uuidv4() })
-                },
-                style: 'cancel',
-            }]);
+        showSuccessAlert('Lesson scheduled successfully', () => {
+            clearState();
+            navigator.jumpTo("MyLessons", { refreshToken: uuidv4() })
+        });
     });
 
     if (errors.length) {
-        Alert.alert(
-            'Error',
-            `Failed to schedule lesson: ${errors[0].description}.`,
-            [{
-                text: 'OK',
-                onPress: () => clearErrors(),
-                style: 'cancel',
-            }]);
+        showErrorAlert(`Failed to schedule lesson: ${errors[0].description}.`, clearErrors);
     }
 
     const handleDateChange = async (_: DateTimePickerEvent, date?: Date) => {

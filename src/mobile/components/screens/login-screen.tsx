@@ -23,7 +23,7 @@ const LoginScreen = () => {
     const navigator = useNavigation<LoginScreenNavigationProps>();
 
     const handleLogin = () => asyncHandler(async () => {
-        const result = await login("test@test.com", "UserPass123!");
+        const result = await login("Alex.jan@g.com", "UserPass123!");
         await onLoggedIn(result);
     });
 

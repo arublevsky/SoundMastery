@@ -18,6 +18,8 @@ public class IndividualLesson : BaseEntity
 
     public bool Completed { get; set; }
 
+    public bool Cancelled { get; set; }
+
     [Column(TypeName = "decimal(18,4)")]
     public decimal Cost { get; set; }
 

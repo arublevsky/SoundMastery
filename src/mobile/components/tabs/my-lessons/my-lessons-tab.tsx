@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import {
-    Button,
     ScrollView,
-    StyleSheet,
-    View
+    StyleSheet
 } from "react-native";
-import { useAuthContext } from "../../modules/authorization/context.ts";
-import { getMyLessons, Lesson } from "../../modules/api/lessonsApi.ts";
+import { useAuthContext } from "../../../modules/authorization/context.ts";
+import { getMyLessons, Lesson } from "../../../modules/api/lessonsApi.ts";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { HomeTabScreenProps } from "../types.ts";
-import LessonCard from "./lesson-card.tsx";
-import { Card } from "react-native-paper";
+import { HomeTabScreenProps } from "../../types.ts";
+import LessonCard from "./my-lesson-card.tsx";
+import { Button, Card } from "react-native-paper";
 
 type MyLessonsProps = HomeTabScreenProps<'MyLessons'>;
 
@@ -29,17 +27,17 @@ function MyLessons(): React.JSX.Element {
         loadData();
     }, [route]);
 
-    const completedLessons = lessons.filter(l => l.completed);
-    const upcomingLessons = lessons.filter(l => !l.completed);
+    const completedLessons = lessons.filter(l => l.completed || l.cancelled);
+    const upcomingLessons = lessons.filter(l => !l.completed && !l.cancelled);
 
     const renderLessonItem = (lesson: Lesson) => {
         const isTeacher = userProfile?.isTeacher || false;
-        return (<LessonCard id={lesson.id.toString()} lesson={lesson} isTeacher={isTeacher} />);
+        return (<LessonCard lesson={lesson} isTeacher={isTeacher} key={lesson.id} />);
     }
 
     const renderLessonsBlock = (lessons: Lesson[], title: string) => {
         return lessons.length
-            ? <Card style={styles.card}>
+            ? <Card style={styles.card} key={title}>
                 <Card.Title title={title} />
                 <Card.Content>
                     {lessons.map((lesson) => renderLessonItem(lesson))}
@@ -51,15 +49,12 @@ function MyLessons(): React.JSX.Element {
     return (
         <ScrollView style={styles.container}>
             {upcomingLessons.length === 0
-                ? <Card style={styles.card}>
+                ? <Card style={styles.card} key="schedule-next">
+                    <Card.Title title="You have no upcoming lessons" />
                     <Card.Content>
-                        <View style={styles.button}>
-                            <Button
-                                title="Schedule Your Next Lesson"
-                                color={styles.buttonText.color}
-                                onPress={() => navigation.navigate('ScheduleLesson')}
-                            />
-                        </View>
+                        <Button mode="contained" onPress={() => navigation.navigate('ScheduleLesson')} buttonColor='#3f50b5'>
+                            Schedule Your Next Lesson
+                        </Button>
                     </Card.Content>
                 </Card>
                 : null}
@@ -98,11 +93,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowOffset: { width: 0, height: 2 },
         shadowRadius: 8,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '500',
     }
 });
 

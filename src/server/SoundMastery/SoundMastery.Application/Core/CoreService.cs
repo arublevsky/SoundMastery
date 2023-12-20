@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
 using SoundMastery.Application.Models;
-using SoundMastery.Application.Profile;
 using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
@@ -54,7 +53,7 @@ public class CoreService : ICoreService
 
         if (user.HasRole(Roles.Student))
         {
-           return _lessonsRepository.Find(x => x.StudentId == userId);
+            return _lessonsRepository.Find(x => x.StudentId == userId);
         }
 
         Log.Error($"Requesting lessons user is not a teacher or student: {userId}");
@@ -99,5 +98,36 @@ public class CoreService : ICoreService
         {
             AvailableHours = WorkingHours.Hours.Except(bookedHours).ToArray()
         };
+    }
+
+    public Task<bool> CancelIndividualLesson(int userId, int lessonId)
+    {
+        return UpdateIndividualLesson(
+            userId,
+            lessonId,
+            lesson => lesson.Cancelled = true);
+    }
+
+    public Task<bool> CompleteIndividualLesson(int userId, int lessonId)
+    {
+        return UpdateIndividualLesson(
+            userId,
+            lessonId,
+            lesson => lesson.Completed = true);
+    }
+
+    private async Task<bool> UpdateIndividualLesson(int userId, int lessonId, Action<IndividualLesson> updater)
+    {
+        var lesson = await _lessonsRepository.Get(lessonId);
+        if (lesson.StudentId != userId && lesson.TeacherId != userId)
+        {
+            Log.Warning($"User {userId} is not allowed to update this lesson {lesson}.");
+            return false;
+        }
+
+        updater(lesson);
+        await _lessonsRepository.Update(lesson);
+        return true;
+
     }
 }

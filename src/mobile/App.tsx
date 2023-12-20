@@ -1,4 +1,5 @@
 import React from 'react';
+import 'react-native-get-random-values';
 import { AppStack } from "./components/app-stack.tsx";
 import AuthenticationProvider from "./modules/authorization/authenticationProvider.tsx";
 import { DefaultTheme, PaperProvider } from 'react-native-paper';

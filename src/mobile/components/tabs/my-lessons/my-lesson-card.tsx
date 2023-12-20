@@ -1,18 +1,18 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
-import { Lesson } from '../../modules/api/lessonsApi';
-import { Card, Paragraph } from 'react-native-paper';
+import { Image, StyleSheet, View } from 'react-native';
+import { Lesson } from '../../../modules/api/lessonsApi';
+import { Button, Card, Paragraph, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { HomeTabScreenProps } from '../types';
-import { formatFullName } from '../utils';
+import { HomeTabScreenProps } from '../../types';
+import { formatFullName } from '../../utils';
+import LessonCardContent from './my-lesson-card-content';
 
 interface LessonCardProps {
     lesson: Lesson;
     isTeacher: boolean;
-    id: string;
 };
 
-const LessonCard = ({ lesson, isTeacher, id }: LessonCardProps) => {
+const LessonCard = ({ lesson, isTeacher }: LessonCardProps) => {
     const navigation = useNavigation<HomeTabScreenProps<'MyLessons'>['navigation']>();
 
     const navigateToLessonDetails = () => {
@@ -20,15 +20,12 @@ const LessonCard = ({ lesson, isTeacher, id }: LessonCardProps) => {
     }
 
     return (
-        <Card onPress={() => navigateToLessonDetails()} style={styles.card} id={id}>
+        <Card onPress={() => navigateToLessonDetails()} style={styles.card} key={lesson.id.toString()}>
             <Card.Title
                 title={`${formatFullName(isTeacher ? lesson.teacher : lesson.student)}`}
                 left={() => <Image source={{ uri: 'https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png' }} style={styles.avatar} />}
             />
-            <Card.Content>
-                <Paragraph>Start at: {`${new Date(lesson.date).toDateString()} at ${lesson.hour}:00`}</Paragraph>
-                {lesson.description ? <Paragraph>{`${lesson.description}`}</Paragraph> : null}
-            </Card.Content>
+            <LessonCardContent lesson={lesson} />
         </Card>
     );
 };
@@ -41,7 +38,7 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         borderRadius: 25,
-    },
+    }
 });
 
 export default LessonCard;

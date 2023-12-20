@@ -7,14 +7,13 @@ export type RootStackParamList = {
     LoginScreen: undefined;
     HomeScreen: undefined;
     RegisterScreen: undefined;
-    LessonDetailsScreen: { lesson: Lesson, isTeacher: boolean };
 };
 
 export type BottomBarParamList = {
     MyLessons: { refreshToken: string };
     ScheduleLesson: undefined;
     Profile: undefined;
-   
+    LessonDetailsScreen: { lesson: Lesson, isTeacher: boolean };   
 };
 
 export type RegisterScreenNavigationProps = NativeStackNavigationProp<RootStackParamList, "RegisterScreen">;

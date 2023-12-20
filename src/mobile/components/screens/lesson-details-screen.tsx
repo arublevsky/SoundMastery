@@ -1,38 +1,81 @@
 import React from 'react';
-import { Image, StyleSheet } from 'react-native';
-import { RootStackParamList } from '../types';
-import { formatFullName } from '../utils';
-import { Card, Paragraph } from 'react-native-paper';
-import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { StyleSheet, View } from 'react-native';
+import { HomeTabScreenProps } from '../types';
+import { Button } from 'react-native-paper';
+import { cancel, complete } from '../../modules/api/lessonsApi';
+import { useErrorHandling } from '../../modules/errors/useErrorHandling';
+import { showComfirmationAlert, showErrorAlert, showSuccessAlert } from '../common';
+import { v4 as uuidv4 } from 'uuid';
+import LessonCardContent from '../tabs/my-lessons/my-lesson-card-content';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'LessonDetailsScreen'>;
+type Props = HomeTabScreenProps<'LessonDetailsScreen'>;
 
-const LessonDetailsScreen = ({ route }: Props) => {
+const LessonDetailsScreen = ({ route, navigation }: Props) => {
     const { lesson, isTeacher } = route.params;
+    const [errors, asyncHandler, clearErrors] = useErrorHandling();
+
+    const handleCancel = () => showComfirmationAlert(
+        "Cancel Lesson",
+        "Are you sure you want to cancel this lesson?",
+        cancelLesson);
+
+    const handleComplete = () => showComfirmationAlert(
+        "Complete Lesson",
+        "Are you sure you want to complete this lesson?",
+        completeLesson);
+
+
+    const cancelLesson = () => asyncHandler(async () => {
+        await cancel(lesson.id);
+        onUpdateSuccess('Lesson cancelled successfully');
+    });
+
+    const completeLesson = () => asyncHandler(async () => {
+        await complete(lesson.id);
+        onUpdateSuccess('Lesson completed successfully');
+    });
+
+    if (errors.length) {
+        showErrorAlert(`Failed to update a lesson: ${errors[0].description}.`, clearErrors);
+    }
+
+    const onUpdateSuccess = (message: string) => {
+        showSuccessAlert(message, () => {
+            clearErrors();
+            navigation.navigate("MyLessons", { refreshToken: uuidv4() })
+        });
+    };
+
+    const editable = !lesson.cancelled && !lesson.completed;
 
     return (
-        <Card style={styles.card}>
-            <Card.Title
-                title={`${formatFullName(isTeacher ? lesson.teacher : lesson.student)}`}
-                left={() => <Image source={{ uri: 'https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png' }} style={styles.avatar} />}
-            />
-            <Card.Content>
-                <Paragraph>Start at: {`${new Date(lesson.date).toDateString()} at ${lesson.hour}:00`}</Paragraph>
-                {lesson.description ? <Paragraph>{`${lesson.description}`}</Paragraph> : null}
-            </Card.Content>
-        </Card>
+        <View style={styles.container}>
+            <LessonCardContent lesson={lesson} isTeacher />
+            {editable
+                ? <View style={styles.buttonContainer}>
+                    <Button mode="contained" onPress={handleComplete} style={styles.button} buttonColor='#3f50b5'>
+                        Complete Lesson
+                    </Button>
+                    <Button mode="contained" onPress={handleCancel} style={styles.button} buttonColor='#f44336'>
+                        Cancel Lesson
+                    </Button>
+                </View>
+                : null}
+
+        </View>
     );
 };
 
-
 const styles = StyleSheet.create({
-    card: {
-        margin: 10,
+    container: {
+        flex: 1,
+        justifyContent: 'space-between',
     },
-    avatar: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+    button: {
+        margin: 8,
+    },
+    buttonContainer: {
+        marginBottom: 16,
     },
 });
 

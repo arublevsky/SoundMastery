@@ -1,6 +1,6 @@
 import React from "react";
 import {createMaterialBottomTabNavigator} from "react-native-paper/react-navigation";
-import MyLessonsTab from "../tabs/my-lessons-tab.tsx";
+import MyLessonsTab from "../tabs/my-lessons/my-lessons-tab.tsx";
 import ScheduleLessonTab from "../tabs/schedule-lesson-tab.tsx";
 import ProfileTab from "../tabs/profile-tab.tsx";
 import Icon from "react-native-vector-icons/FontAwesome";
