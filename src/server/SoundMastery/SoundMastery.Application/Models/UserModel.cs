@@ -30,7 +30,7 @@ public class UserModel
 
     public string LastName { get; set; }
 
-    public string Avatar => "https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png";
+    public byte[] Avatar { get; set; }
 
     public bool HasRole(string role) => Roles.Any(x => x.Name == role);
 

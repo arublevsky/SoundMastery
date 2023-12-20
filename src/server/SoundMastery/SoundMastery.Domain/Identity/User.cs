@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using SoundMastery.Domain.Core;
@@ -7,9 +8,13 @@ namespace SoundMastery.Domain.Identity;
 
 public class User : IdentityUser<int>, IHasId
 {
-    public string FirstName { get; set; } = string.Empty;
+    [MaxLength(100)]
+    public string FirstName { get; set; }
 
-    public string LastName { get; set; } = string.Empty;
+    [MaxLength(100)]
+    public string LastName { get; set; }
+
+    public string Avatar { get; set; }
 
     public virtual IList<IndividualLesson> IndividualLessons { get; set; } = new List<IndividualLesson>();
 

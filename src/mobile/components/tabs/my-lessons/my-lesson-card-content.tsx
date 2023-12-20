@@ -13,7 +13,7 @@ const LessonCardContent = ({ lesson, isTeacher }: Props) => {
     const active = !lesson.cancelled && !lesson.completed;
 
     return (
-        <Card style={styles.card}>
+        <>
             <Card.Title
                 title={`${formatFullName(isTeacher ? lesson.teacher : lesson.student)}`}
                 left={() => <Image source={{ uri: lesson.teacher.avatar }} style={styles.avatar} />}
@@ -37,14 +37,11 @@ const LessonCardContent = ({ lesson, isTeacher }: Props) => {
                     </Button>
                     : null}
             </Card.Content>
-        </Card>
+        </>
     );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        margin: 10,
-    },
     avatar: {
         width: 50,
         height: 50,

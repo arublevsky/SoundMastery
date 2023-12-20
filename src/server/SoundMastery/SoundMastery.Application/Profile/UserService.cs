@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Models;
 using SoundMastery.DataAccess.Services.Common;
@@ -38,6 +39,17 @@ public class UserService : IUserService
         user.Roles.Add(role);
         await _userRepository.Update(user);
         return true;
+    }
+
+    public Task<bool> UploadAvatar(int userId, string image)
+    {
+        var imageBytes = Convert.FromBase64String(image);
+
+        const int sizeLimit = 8 * 1024 * 1024; // 8MB
+        if (imageBytes.Length > sizeLimit)
+        {
+            Log.Information($"Image size is too big for user's avatar {userId}");
+        }
     }
 
     public async Task<UserProfileModel> GetUserProfile(string email)

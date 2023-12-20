@@ -8,6 +8,8 @@ public interface IUserService
 {
     Task<bool> AddRole(int userId, string role);
 
+    Task<bool> UploadAvatar(int getId, string image);
+
     Task<UserProfileModel> GetUserProfile(string email);
 
     Task UpdateUserProfile(UserModel user);
@@ -17,4 +19,5 @@ public interface IUserService
     bool IsValidRefreshToken(RefreshToken token);
 
     Task ClearRefreshToken(int userId);
+
 }

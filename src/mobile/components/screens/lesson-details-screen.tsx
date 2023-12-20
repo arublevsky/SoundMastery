@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { HomeTabScreenProps } from '../types';
-import { Button } from 'react-native-paper';
+import { Button, Card } from 'react-native-paper';
 import { cancel, complete } from '../../modules/api/lessonsApi';
 import { useErrorHandling } from '../../modules/errors/useErrorHandling';
 import { showComfirmationAlert, showErrorAlert, showSuccessAlert } from '../common';
@@ -11,7 +11,7 @@ import LessonCardContent from '../tabs/my-lessons/my-lesson-card-content';
 type Props = HomeTabScreenProps<'LessonDetailsScreen'>;
 
 const LessonDetailsScreen = ({ route, navigation }: Props) => {
-    const { lesson, isTeacher } = route.params;
+    const { lesson } = route.params;
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
 
     const handleCancel = () => showComfirmationAlert(
@@ -50,7 +50,9 @@ const LessonDetailsScreen = ({ route, navigation }: Props) => {
 
     return (
         <View style={styles.container}>
+            <Card style={styles.card}>
             <LessonCardContent lesson={lesson} isTeacher />
+            </Card>
             {editable
                 ? <View style={styles.buttonContainer}>
                     <Button mode="contained" onPress={handleComplete} style={styles.button} buttonColor='#3f50b5'>
@@ -77,6 +79,9 @@ const styles = StyleSheet.create({
     buttonContainer: {
         marginBottom: 16,
     },
+    card: {
+        margin: 10,
+    }
 });
 
 export default LessonDetailsScreen;

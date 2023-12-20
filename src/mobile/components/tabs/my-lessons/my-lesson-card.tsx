@@ -21,11 +21,7 @@ const LessonCard = ({ lesson, isTeacher }: LessonCardProps) => {
 
     return (
         <Card onPress={() => navigateToLessonDetails()} style={styles.card} key={lesson.id.toString()}>
-            <Card.Title
-                title={`${formatFullName(isTeacher ? lesson.teacher : lesson.student)}`}
-                left={() => <Image source={{ uri: 'https://w7.pngwing.com/pngs/340/946/png-transparent-avatar-user-computer-icons-software-developer-avatar-child-face-heroes-thumbnail.png' }} style={styles.avatar} />}
-            />
-            <LessonCardContent lesson={lesson} />
+            <LessonCardContent lesson={lesson} isTeacher />
         </Card>
     );
 };
