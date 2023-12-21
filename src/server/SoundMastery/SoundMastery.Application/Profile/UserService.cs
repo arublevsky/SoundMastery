@@ -2,9 +2,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Serilog;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Models;
 using SoundMastery.DataAccess.Services.Common;
+using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
 
@@ -40,20 +42,40 @@ public class UserService : IUserService
         return true;
     }
 
+    public async Task<bool> UploadAvatar(int userId, string image)
+    {
+        var imageBytes = Convert.FromBase64String(image);
+
+        const int sizeLimit = 8 * 1024 * 1024; // 8MB
+        if (imageBytes.Length > sizeLimit)
+        {
+            Log.Warning($"Image size is too big for user's avatar {userId}");
+        }
+
+        var user = await _userRepository.Get(userId);
+        user.Avatar = imageBytes;
+        await _userRepository.Update(user);
+        return true;
+    }
+
+    public async Task<UserProfileModel> UpdateUserProfile(UserModel userModel, WorkingHoursModel workingHours)
+    {
+        var user = await _userRepository.Get(userModel.Id);
+
+        user.FirstName = userModel.FirstName;
+        user.LastName = userModel.LastName;
+        user.WorkingHours ??= new WorkingHours();
+        user.WorkingHours.From = workingHours.From;
+        user.WorkingHours.To = workingHours.To;
+
+        await _userRepository.Update(user);
+        return new UserProfileModel(user);
+    }
+
     public async Task<UserProfileModel> GetUserProfile(string email)
     {
         var user = await GetUser(email);
         return new UserProfileModel(user);
-    }
-
-    public async Task UpdateUserProfile(UserModel userModel)
-    {
-        var user = await GetUser(userModel.Email);
-
-        user.FirstName = userModel.FirstName;
-        user.LastName = userModel.LastName;
-
-        await _userRepository.Update(user);
     }
 
     public Task<string> GetOrAddRefreshToken(User user)

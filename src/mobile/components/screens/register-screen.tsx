@@ -1,31 +1,35 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
-    Text,
-    TextInput,
-    TouchableOpacity,
     StyleSheet,
     Alert,
     Keyboard,
     TouchableWithoutFeedback, Platform, KeyboardAvoidingView
 } from 'react-native';
-import {useErrorHandling} from "../../modules/errors/useErrorHandling.tsx";
-import {registerUser} from "../../modules/api/accountApi.ts";
-import {useAuthContext} from "../../modules/authorization/context.ts";
-import {ApplicationError} from "../../modules/common/errorHandling.ts";
-import {useNavigation} from "@react-navigation/native";
-import {RegisterScreenNavigationProps} from "../types.ts";
-import RNPickerSelect from "react-native-picker-select";
-import {pickerSelectStyles} from "../common.tsx";
+import RNPickerSelect from 'react-native-picker-select';
+import { useErrorHandling } from "../../modules/errors/useErrorHandling.tsx";
+import { registerUser } from "../../modules/api/accountApi.ts";
+import { useAuthContext } from "../../modules/authorization/context.ts";
+import { ApplicationError } from "../../modules/common/errorHandling.ts";
+import { useNavigation } from "@react-navigation/native";
+import { RegisterScreenNavigationProps } from "../types.ts";
+import { Button, Card, Menu, TextInput } from 'react-native-paper';
+
+const DefaultRole = { label: 'Select a role...', value: '' };
 
 const RegisterScreen = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [role, setRole] = useState('');
+    const [role, setRole] = useState(DefaultRole);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [visible, setVisible] = React.useState(false);
+
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
-    const {onLoggedIn} = useAuthContext();
+    const { onLoggedIn } = useAuthContext();
     const navigator = useNavigation<RegisterScreenNavigationProps>();
+
+    const openMenu = () => setVisible(true);
+    const closeMenu = () => setVisible(false);
 
     const handleRegister = () => asyncHandler(async () => {
         if (!email || !firstName || !lastName || !password || !role) {
@@ -33,7 +37,7 @@ const RegisterScreen = () => {
             return;
         }
 
-        const result = await registerUser({email, firstName, lastName, password, role: Number(role)});
+        const result = await registerUser({ email, firstName, lastName, password, role: Number(role.value) });
         await onLoggedIn(result);
         navigator.navigate("HomeScreen");
     });
@@ -54,52 +58,47 @@ const RegisterScreen = () => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-                <Text style={styles.title}>Register</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="First Name"
-                    placeholderTextColor='#242424'
-                    value={firstName}
-                    onChangeText={setFirstName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Last Name"
-                    placeholderTextColor='#242424'
-                    value={lastName}
-                    onChangeText={setLastName}
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    placeholderTextColor='#242424'
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                />
-                <TextInput
-                    style={styles.input}
-                    placeholder="Password"
-                    placeholderTextColor='#242424'
-                    value={password}
-                    textContentType='oneTimeCode'
-                    onChangeText={setPassword}
-                    secureTextEntry={true}
-                />
-                <RNPickerSelect
-                    items={[{text: "Teacher", value: "2"}, {text: "Student", value: "1"}]
-                        .map(item => ({
-                            label: item.text,
-                            value: item.value
-                        }))}
-                    onValueChange={setRole}
-                    placeholder={{label: 'Select your role', value: ''}}
-                    value={role}
-                    style={pickerSelectStyles}
-                />
-                <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                    <Text style={styles.buttonText}>Register</Text>
-                </TouchableOpacity>
+                <Card style={styles.card}>
+                    <Card.Title title="Register" />
+                    <Card.Content>
+                        <TextInput
+                            label="First name"
+                            value={firstName}
+                            onChangeText={setFirstName}
+                            style={styles.input}
+                        />
+                        <TextInput
+                            label="Last name"
+                            value={lastName}
+                            onChangeText={setLastName}
+                            style={styles.input}
+                        />
+                        <TextInput
+                            label="Email"
+                            value={email}
+                            onChangeText={setEmail}
+                            style={styles.input}
+                        />
+                        <TextInput
+                            label="Password"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            style={styles.input}
+                        />
+                        <Menu
+                            visible={visible}
+                            onDismiss={closeMenu}
+                            anchor={<Button onPress={openMenu}>{role ? role.label : "Select a role..."}</Button>}
+                        >
+                            <Menu.Item onPress={() => { setRole({ label: 'Student', value: '1' }); closeMenu(); }} title="Student" />
+                            <Menu.Item onPress={() => { setRole({ label: 'Teacher', value: '2' }); closeMenu(); }} title="Teacher" />
+                        </Menu>
+                        <Button style={styles.registerButton} mode="contained" onPress={handleRegister}>
+                            Register
+                        </Button>
+                    </Card.Content>
+                </Card>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     );
@@ -109,38 +108,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f5f5f5',
         padding: 16,
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: '#333',
+    card: {
+        padding: 16,
     },
     input: {
-        width: '100%',
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        marginBottom: 16,
-        paddingHorizontal: 10,
-        borderRadius: 8,
-        backgroundColor: '#fff',
-    },
-    button: {
-        backgroundColor: '#2196F3',
-        padding: 15,
-        borderRadius: 8,
-        alignItems: 'center',
         marginBottom: 16,
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
+    registerButton: {
+        marginTop: 16,
+    }
 });
 
 export default RegisterScreen;

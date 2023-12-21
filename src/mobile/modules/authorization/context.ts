@@ -5,6 +5,7 @@ import { ExternalAuthenticationResult, TokenAuthenticationResult } from "../api/
 export interface AuthorizationContext {
     onLoggedIn: (data: TokenAuthenticationResult | ExternalAuthenticationResult) => Promise<void>;
     onLoggedOut: () => Promise<void>;
+    updateProfile: (newProfile: UserProfile) => void;
     isAuthenticated: boolean;
     userProfile: UserProfile | null;
 }
@@ -12,6 +13,7 @@ export interface AuthorizationContext {
 export const initialState: AuthorizationContext = {
     isAuthenticated: false,
     userProfile: null,
+    updateProfile: (_: UserProfile) => {},
     onLoggedIn: () => Promise.reject("Authorization context state is not initialized yet"),
     onLoggedOut: () => Promise.reject("Authorization context state is not initialized yet"),
 };

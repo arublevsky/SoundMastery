@@ -1,15 +1,15 @@
 import React from "react";
-import {useEffect, useState} from "react";
-import {ApiError} from "../common/apiErrors";
-import {getProfile, UserProfile} from "../api/profileApi";
+import { useEffect, useState } from "react";
+import { ApiError } from "../common/apiErrors";
+import { getProfile, UserProfile } from "../api/profileApi";
 import {
     ExternalAuthenticationResult,
     externalLogin,
     logout,
     TokenAuthenticationResult
 } from "../api/accountApi";
-import {authenticationService, UserAuthorizationInfo} from "./authenticationService";
-import {AuthorizationContext, initialState} from "./context";
+import { authenticationService, UserAuthorizationInfo } from "./authenticationService";
+import { AuthorizationContext, initialState } from "./context";
 
 export interface AuthorizationProviderProps {
     children?: React.ReactNode;
@@ -19,7 +19,7 @@ const isExternalAuth = (
     object: TokenAuthenticationResult | ExternalAuthenticationResult
 ): object is ExternalAuthenticationResult => 'type' in object;
 
-const AuthenticationProvider = ({children}: AuthorizationProviderProps) => {
+const AuthenticationProvider = ({ children }: AuthorizationProviderProps) => {
     const [profile, setProfile] = useState<UserProfile | null>(initialState.userProfile);
     const [authorizationInfo, setAuthorizationInfo] = useState<UserAuthorizationInfo | null>(authenticationService.get());
 
@@ -52,7 +52,10 @@ const AuthenticationProvider = ({children}: AuthorizationProviderProps) => {
     };
 
     const onLoggedOut = async () => {
-        await logout();
+        if (authorizationInfo) {
+            await logout();
+        }
+
         setAuthorizationInfo(null);
     };
 
@@ -90,7 +93,8 @@ const AuthenticationProvider = ({children}: AuthorizationProviderProps) => {
             isAuthenticated: getIsAuthenticated(),
             userProfile: profile,
             onLoggedIn,
-            onLoggedOut
+            onLoggedOut,
+            updateProfile: (profile) => setProfile(profile)
         }}>
             {children}
         </AuthorizationContext.Provider>

@@ -1,11 +1,12 @@
-import {authenticationService} from "../authorization/authenticationService";
-import {ApiError} from "./apiErrors";
-import {useNavigation} from "@react-navigation/native";
-import {useAuthContext} from "../authorization/context.ts";
+import { authenticationService } from "../authorization/authenticationService";
+import { ApiError } from "./apiErrors";
+import { Platform } from "react-native";
 
 declare const __API_BASE_URL__: string;
 
-const baseApiRoute = `http://localhost:5000/api/`;
+const baseApiRoute = Platform.OS === 'ios'
+    ? `http://localhost:5000/api/`
+    : `http://10.0.2.2:5000/api/`;
 
 interface Options {
     silent?: boolean;
@@ -74,7 +75,7 @@ const getBody = (options?: RequestOptions) => {
 
 const getContentTypeHeader = (options?: RequestOptions) => {
     if (options === null || options === undefined) {
-        return {"Content-Type": "text/plain"};
+        return { "Content-Type": "text/plain" };
     }
     if (options.body instanceof FormData) {
         return {};

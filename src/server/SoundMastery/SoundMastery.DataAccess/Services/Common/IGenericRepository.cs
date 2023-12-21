@@ -21,9 +21,9 @@ public interface IGenericRepository<TEntity>
         Expression<Func<TEntity, bool>> filter,
         Expression<Func<TEntity, T>> includable = null);
 
-    Task<TEntity> Create(TEntity course);
+    Task<TEntity> Create(TEntity entity);
 
     Task Delete(int id);
 
-    Task Update(TEntity product);
+    Task Update(TEntity entity);
 }

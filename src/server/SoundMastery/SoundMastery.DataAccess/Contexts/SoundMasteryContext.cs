@@ -47,6 +47,12 @@ public class SoundMasteryContext : DbContext
             .WithOne(x => x.Student)
             .HasForeignKey(x => x.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<User>()
+            .HasOne(x => x.WorkingHours)
+            .WithOne()
+            .HasForeignKey<WorkingHours>(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
