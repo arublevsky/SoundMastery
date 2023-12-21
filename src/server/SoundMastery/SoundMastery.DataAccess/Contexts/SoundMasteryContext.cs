@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SoundMastery.Domain.Common;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
@@ -16,6 +17,8 @@ public class SoundMasteryContext : DbContext
 
     public DbSet<User> Users { get; set; }
 
+    public DbSet<FileRecord> Files { get; set; }
+
     public DbSet<Role> Roles { get; set; }
 
     public DbSet<Material> Materials { get; set; }
@@ -28,9 +31,6 @@ public class SoundMasteryContext : DbContext
 
         builder.Entity<IndividualLessonMaterial>()
             .HasIndex(p => new { p.IndividualLessonId, p.MaterialId }).IsUnique();
-
-        builder.Entity<IndividualLessonHomeAssignmentMaterial>()
-            .HasIndex(p => new { p.IndividualHomeAssignmentId, p.MaterialId }).IsUnique();
 
         builder.Entity<IndividualLesson>()
             .HasOne(p => p.Teacher)

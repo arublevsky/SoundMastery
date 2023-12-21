@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 declare const __API_BASE_URL__: string;
 
 const baseApiRoute = Platform.OS === 'ios'
-    ? `http://localhost:5000/api/`
+    ? 'https://d9d9-2a02-a317-2339-e880-cde6-7319-66ee-76a.ngrok-free.app/api/'//`http://localhost:5000/api/`
     : `http://10.0.2.2:5000/api/`;
 
 interface Options {

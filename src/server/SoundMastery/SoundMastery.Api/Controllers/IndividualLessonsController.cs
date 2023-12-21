@@ -69,4 +69,26 @@ public class IndividualLessonsController : ControllerBase
         var success = await _service.CompleteIndividualLesson(User.GetId(), lessonId);
         return success ? Ok() : Conflict();
     }
+
+    [Route("add-material/{lessonId}")]
+    [HttpPost]
+    public async Task<ActionResult> AddMaterial(int lessonId, [FromBody] AddMaterialRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        var success = await _service.AddMaterial(
+            new AddMaterialModel
+            {
+                UserId = User.GetId(),
+                LessonId = lessonId,
+                Description = request.Description,
+                File = request.File,
+                Url = request.Url
+            });
+
+        return success ? Ok() : Conflict();
+    }
 }

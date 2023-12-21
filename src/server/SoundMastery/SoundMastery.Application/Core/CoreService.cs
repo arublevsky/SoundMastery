@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Serilog;
+using SoundMastery.Application.Common.Files;
 using SoundMastery.Application.Models;
 using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.Domain.Core;
@@ -15,13 +16,16 @@ public class CoreService : ICoreService
 {
     private readonly IGenericRepository<IndividualLesson> _lessonsRepository;
     private readonly IGenericRepository<User> _userRepository;
+    private readonly IFileProvider _fileProvider;
 
     public CoreService(
         IGenericRepository<IndividualLesson> lessonsRepository,
-        IGenericRepository<User> userRepository)
+        IGenericRepository<User> userRepository,
+        IFileProvider fileProvider)
     {
         _lessonsRepository = lessonsRepository;
         _userRepository = userRepository;
+        _fileProvider = fileProvider;
     }
 
     public async Task<IReadOnlyCollection<UserModel>> GetTeachers()
@@ -114,6 +118,38 @@ public class CoreService : ICoreService
             userId,
             lessonId,
             lesson => lesson.Completed = true);
+    }
+
+    public async Task<bool> AddMaterial(AddMaterialModel model)
+    {
+        var fileId = await TrySaveFile(model);
+        return await UpdateIndividualLesson(
+            model.UserId,
+            model.LessonId,
+            lesson =>
+            {
+                lesson.Materials.Add(new IndividualLessonMaterial
+                {
+                    Description = model.Description,
+                    Material = new Material
+                    {
+                        Type = fileId.HasValue ? MaterialType.File : MaterialType.Link,
+                        FileId = fileId,
+                        Url = model.Url
+                    }
+                });
+            });
+    }
+
+    private async Task<int?> TrySaveFile(AddMaterialModel model)
+    {
+        if (model.File == null)
+        {
+            return null;
+        }
+
+        var result = await _fileProvider.Save(model.File);
+        return result.Success ? result.FileId : null;
     }
 
     private async Task<bool> UpdateIndividualLesson(int userId, int lessonId, Action<IndividualLesson> updater)

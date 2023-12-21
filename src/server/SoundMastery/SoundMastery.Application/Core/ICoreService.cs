@@ -20,4 +20,6 @@ public interface ICoreService
     Task<bool> CancelIndividualLesson(int userId, int lessonId);
 
     Task<bool> CompleteIndividualLesson(int userId, int lessonId);
+
+    Task<bool> AddMaterial(AddMaterialModel model);
 }
