@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoundMastery.DataAccess.Contexts;
 
@@ -11,9 +12,11 @@ using SoundMastery.DataAccess.Contexts;
 namespace SoundMastery.Migration.Migrations
 {
     [DbContext(typeof(SoundMasteryContext))]
-    partial class SoundMasteryContextModelSnapshot : ModelSnapshot
+    [Migration("20231220151433_AddAvatar")]
+    partial class AddAvatar
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -169,31 +172,6 @@ namespace SoundMastery.Migration.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Materials", "SoundMastery");
-                });
-
-            modelBuilder.Entity("SoundMastery.Domain.Core.WorkingHours", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("From")
-                        .HasColumnType("int");
-
-                    b.Property<int>("To")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("WorkingHours", "SoundMastery");
                 });
 
             modelBuilder.Entity("SoundMastery.Domain.Identity.RefreshToken", b =>
@@ -391,15 +369,6 @@ namespace SoundMastery.Migration.Migrations
                     b.Navigation("Material");
                 });
 
-            modelBuilder.Entity("SoundMastery.Domain.Core.WorkingHours", b =>
-                {
-                    b.HasOne("SoundMastery.Domain.Identity.User", null)
-                        .WithOne("WorkingHours")
-                        .HasForeignKey("SoundMastery.Domain.Core.WorkingHours", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("SoundMastery.Domain.Identity.RefreshToken", b =>
                 {
                     b.HasOne("SoundMastery.Domain.Identity.User", null)
@@ -426,8 +395,6 @@ namespace SoundMastery.Migration.Migrations
                     b.Navigation("IndividualLessons");
 
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("WorkingHours");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,6 +11,7 @@ public class IndividualLessonModel
         Teacher = new UserModel(lesson.Teacher);
         Student = new UserModel(lesson.Student);
         Completed = lesson.Completed;
+        Cancelled = lesson.Cancelled;
         Description = lesson.Description;
         Date = lesson.Date;
         Hour = lesson.Time.Hours;
@@ -19,6 +20,8 @@ public class IndividualLessonModel
     public string Description { get; set; }
 
     public bool Completed { get; set; }
+
+    public bool Cancelled { get; set; }
 
     public DateTime Date { get; set; }
 

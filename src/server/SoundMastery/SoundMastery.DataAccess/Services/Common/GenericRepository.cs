@@ -60,23 +60,23 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
         return await set.Where(filter).ToListAsync();
     }
 
-    public async Task<TEntity> Create(TEntity course)
+    public async Task<TEntity> Create(TEntity entity)
     {
-        var result = await _context.Set<TEntity>().AddAsync(course);
+        var result = await _context.Set<TEntity>().AddAsync(entity);
         await _context.SaveChangesAsync();
         return result.Entity;
     }
 
     public async Task Delete(int id)
     {
-        var product = await Get(id);
-        _context.Set<TEntity>().Remove(product);
+        var entity = await Get(id);
+        _context.Set<TEntity>().Remove(entity);
         await _context.SaveChangesAsync();
     }
 
-    public Task Update(TEntity product)
+    public Task Update(TEntity entity)
     {
-        _context.Set<TEntity>().Update(product);
+        _context.Set<TEntity>().Update(entity);
         return _context.SaveChangesAsync();
     }
 }

@@ -1,4 +1,4 @@
-import {httpGet, httpPut} from "../common/requestApi";
+import {httpGet, httpPost, httpPut} from "../common/requestApi";
 import {User} from "./profileApi.ts";
 
 const apiController = "individualLessons";
@@ -8,6 +8,7 @@ export interface Lesson {
     teacher: User;
     student: User;
     completed: boolean;
+    cancelled: boolean;
     description: string;
     date: string;
     hour: number;
@@ -28,6 +29,8 @@ export const getAvailableLessons = (teacher: string, date: Date) => {
     );
 };
 
-export const addLesson = (body: AddLessonRequest) => {
-    return httpPut(`${apiController}/add`, {body: body});
-};
+export const addLesson = (body: AddLessonRequest) => httpPut(`${apiController}/add`, {body: body});
+
+export const cancel = (lessonId: number) => httpPost(`${apiController}/cancel/${lessonId}`);
+
+export const complete = (lessonId: number) => httpPost(`${apiController}/complete/${lessonId}`);

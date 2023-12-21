@@ -53,4 +53,20 @@ public class IndividualLessonsController : ControllerBase
         var success = await _service.AddIndividualLesson(model);
         return success ? Ok() : Conflict();
     }
+
+    [Route("cancel/{lessonId}")]
+    [HttpPost]
+    public async Task<ActionResult> Cancel(int lessonId)
+    {
+        var success = await _service.CancelIndividualLesson(User.GetId(), lessonId);
+        return success ? Ok() : Conflict();
+    }
+
+    [Route("complete/{lessonId}")]
+    [HttpPost]
+    public async Task<ActionResult> Complete(int lessonId)
+    {
+        var success = await _service.CompleteIndividualLesson(User.GetId(), lessonId);
+        return success ? Ok() : Conflict();
+    }
 }
