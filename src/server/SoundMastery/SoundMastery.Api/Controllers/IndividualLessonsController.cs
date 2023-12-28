@@ -84,7 +84,7 @@ public class IndividualLessonsController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         var success = await _service.AddMaterial(

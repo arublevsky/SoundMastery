@@ -143,6 +143,5 @@ public class IndividualLessonsService : IIndividualLessonsService
         updater(lesson);
         await _lessonsRepository.Update(lesson);
         return true;
-
     }
 }

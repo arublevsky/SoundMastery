@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SoundMastery.DataAccess.Contexts;
 
@@ -11,9 +12,11 @@ using SoundMastery.DataAccess.Contexts;
 namespace SoundMastery.Migration.Migrations
 {
     [DbContext(typeof(SoundMasteryContext))]
-    partial class SoundMasteryContextModelSnapshot : ModelSnapshot
+    [Migration("20231228090805_LimitFileRecordLengths")]
+    partial class LimitFileRecordLengths
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

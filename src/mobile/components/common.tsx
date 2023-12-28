@@ -30,7 +30,7 @@ export const showSuccessAlert = (
         }]);
 }
 
-export const showErrorAlert = (text: string, handler?: () => Promise<void | null> | void ) => {
+export const showErrorAlert = (text: string, handler?: () => Promise<void | null> | void) => {
     Alert.alert(
         'Error',
         text,

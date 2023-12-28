@@ -96,7 +96,6 @@ const EditProfileScreen = () => {
                         Save
                     </Button>
                 </KeyboardAvoidingView>
-
             </View >
         </TouchableWithoutFeedback>
     );
