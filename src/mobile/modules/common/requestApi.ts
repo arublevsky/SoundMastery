@@ -10,12 +10,15 @@ const baseApiRoute = Platform.OS === 'ios'
 
 interface Options {
     silent?: boolean;
+    blob?: boolean;
 }
 
 export interface RequestOptions extends Options {
     body?: unknown;
     params?: unknown;
 }
+
+export const getRequestUrl = (path: string) => `${baseApiRoute}${path}`;
 
 export const httpGet = async <T>(url: string, options?: RequestOptions) => {
     return await request<T>(url, "GET", options);
@@ -33,15 +36,20 @@ export const httpDelete = async (url: string, options?: RequestOptions) => {
     await request(url, "DELETE", options);
 };
 
+export const getAuthHeader = () => ({
+    "Authorization": authenticationService.getAuthHeader()!  
+});
+
 const request = async <T>(
     url: string,
     method: "GET" | "POST" | "DELETE" | "PUT",
     options?: RequestOptions,
 ) => {
     let response: Response;
+
     try {
         toggleLoading(true);
-        response = await fetch(baseApiRoute + url, {
+        response = await fetch(getRequestUrl(url), {
             body: getBody(options),
             credentials: 'include',
             headers: {
@@ -60,7 +68,7 @@ const request = async <T>(
         toggleLoading(false, options?.silent);
     }
 
-    return handleResponse<T>(response);
+    return handleResponse<T>(response, options);
 };
 
 const getBody = (options?: RequestOptions) => {
@@ -85,10 +93,15 @@ const getContentTypeHeader = (options?: RequestOptions) => {
     };
 };
 
-const handleResponse = async <T>(response: Response): Promise<T> => {
+const handleResponse = async <T>(response: Response, options: RequestOptions | undefined): Promise<T> => {
     if (!response.ok) {
         // TODO client logging https://github.com/arublevsky/SoundMastery/issues/24
         processFailedResponse(response);
+    }
+
+    if (options?.blob) {
+        const blob = await response.blob()
+        return { file: blob } as T;
     }
 
     const text = await response.text();

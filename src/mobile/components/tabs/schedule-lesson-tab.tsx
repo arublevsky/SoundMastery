@@ -32,7 +32,7 @@ const ScheduleLesson = () => {
     useEffect(() => {
         const fetchTeachers = async () => {
             const response = await getTeachers();
-            setTeachers(response);
+            setTeachers(response || []);
         };
 
         fetchTeachers();

@@ -14,9 +14,9 @@ namespace SoundMastery.Api.Controllers;
 [ApiController]
 public class IndividualLessonsController : ControllerBase
 {
-    private readonly ICoreService _service;
+    private readonly IIndividualLessonsService _service;
 
-    public IndividualLessonsController(ICoreService service)
+    public IndividualLessonsController(IIndividualLessonsService service)
     {
         _service = service;
     }
@@ -67,6 +67,36 @@ public class IndividualLessonsController : ControllerBase
     public async Task<ActionResult> Complete(int lessonId)
     {
         var success = await _service.CompleteIndividualLesson(User.GetId(), lessonId);
+        return success ? Ok() : Conflict();
+    }
+
+    [Route("materials/{lessonId}")]
+    [HttpGet]
+    public async Task<ActionResult> GetMaterials(int lessonId)
+    {
+        var materials = await _service.GetIndividualLessonMaterials(User.GetId(), lessonId);
+        return Ok(materials);
+    }
+
+    [Route("add-material/{lessonId}")]
+    [HttpPost]
+    public async Task<ActionResult> AddMaterial(int lessonId, [FromBody] AddMaterialRequest request)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest();
+        }
+
+        var success = await _service.AddMaterial(
+            new AddMaterialModel
+            {
+                UserId = User.GetId(),
+                LessonId = lessonId,
+                Description = request.Description,
+                FileId = request.FileId,
+                Url = request.Url
+            });
+
         return success ? Ok() : Conflict();
     }
 }

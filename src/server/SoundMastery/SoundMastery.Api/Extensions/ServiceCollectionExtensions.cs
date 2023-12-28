@@ -1,9 +1,11 @@
 using System;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using SoundMastery.Application.Authorization;
 using SoundMastery.Application.Authorization.ExternalProviders;
@@ -12,11 +14,13 @@ using SoundMastery.Application.Authorization.ExternalProviders.Google;
 using SoundMastery.Application.Authorization.ExternalProviders.Microsoft;
 using SoundMastery.Application.Authorization.ExternalProviders.Twitter;
 using SoundMastery.Application.Common;
+using SoundMastery.Application.Common.Files;
 using SoundMastery.Application.Core;
 using SoundMastery.Application.Identity;
 using SoundMastery.Application.Profile;
 using SoundMastery.DataAccess.Services.Common;
 using SoundMastery.DataAccess.Services.Users;
+using SoundMastery.Domain.Common;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
@@ -28,12 +32,17 @@ public static class ServiceCollectionExtensions
 {
     public static void RegisterDependencies(this IServiceCollection services)
     {
+        var env = services.BuildServiceProvider().GetRequiredService<IWebHostEnvironment>();
+
+        RegisterFileProvider(services, env);
+
         services.AddTransient<IUserStore<User>, UserStore>();
         services.AddTransient<IUserEmailStore<User>, UserStore>();
         services.AddTransient<IRoleStore<Role>, RolesRepository>();
         services.AddTransient<IUserService, UserService>();
         services.AddTransient<ISystemConfigurationService, SystemConfigurationService>();
         services.AddTransient<IGenericRepository<Material>, GenericRepository<Material>>();
+        services.AddTransient<IGenericRepository<FileRecord>, GenericRepository<FileRecord>>();
         services.AddTransient<IGenericRepository<User>, GenericRepository<User>>();
         services.AddTransient<IGenericRepository<IndividualLesson>, GenericRepository<IndividualLesson>>();
         services.AddTransient<IUserAuthorizationService, UserAuthorizationService>();
@@ -45,9 +54,22 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IMicrosoftService, MicrosoftService>();
         services.AddTransient<ITwitterService, TwitterService>();
         services.AddTransient<ICoreService, CoreService>();
+        services.AddTransient<IIndividualLessonsService, IndividualLessonsService>();
 
         // Singletons
         services.AddSingleton<IAuthenticationRequestStore, LocalAuthenticationRequestStore>();
+    }
+
+    private static void RegisterFileProvider(IServiceCollection services, IWebHostEnvironment env)
+    {
+        if (env.IsProduction())
+        {
+            services.AddTransient<IFileProvider, AzureFileProvider>();
+        }
+        else
+        {
+            services.AddTransient<IFileProvider, LocalFileProvider>();
+        }
     }
 
     public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)

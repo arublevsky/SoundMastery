@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Button, Card, Text, TextInput } from 'react-native-paper';
 import { useAuthContext } from '../../modules/authorization/context.ts';
 import { updateUserProfile } from '../../modules/api/profileApi.ts';
@@ -48,49 +48,57 @@ const EditProfileScreen = () => {
     }
 
     return (
-        <View style={styles.container}>
-            <View>
-                <Card style={styles.card}>
-                    <Card.Title title="Personal info" />
-                    <Card.Content>
-                        <TextInput label="First Name" value={firstName} onChangeText={setFirstName} style={styles.input} />
-                        <TextInput label="Last Name" value={lastName} onChangeText={setLastName} style={styles.input} />
-                    </Card.Content>
-                </Card>
-                <Card style={styles.card}>
-                    <Card.Title title="Working Hours" />
-                    <Card.Content>
-                        <View style={styles.row} id="working-hours">
-                            <Text style={styles.label}>From:</Text>
-                            <RNPickerSelect
-                                items={workingTimeLimit.map(hour => ({
-                                    label: `${hour}:00`,
-                                    value: hour.toString()
-                                }))}
-                                onValueChange={setWorkingHoursFrom}
-                                placeholder={{ label: 'Select from time', value: '' }}
-                                value={workingHoursFrom}
-                                style={pickerSelectStyles}
-                            />
-                            <Text style={styles.label}>To:</Text>
-                            <RNPickerSelect
-                                items={workingTimeLimit.map(hour => ({
-                                    label: `${hour}:00`,
-                                    value: hour.toString()
-                                }))}
-                                onValueChange={setWorkingHoursTo}
-                                placeholder={{ label: 'Select to time', value: '' }}
-                                value={workingHoursTo}
-                                style={pickerSelectStyles}
-                            />
-                        </View>
-                    </Card.Content>
-                </Card>
-            </View>
-            <Button mode="contained" onPress={handleSave} style={styles.button}>
-                Save
-            </Button>
-        </View >
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+            <View style={styles.container}>
+
+                <View>
+                    <Card style={styles.card}>
+                        <Card.Title title="Personal info" />
+                        <Card.Content>
+                            <TextInput label="First Name" value={firstName} onChangeText={setFirstName} style={styles.input} />
+                            <TextInput label="Last Name" value={lastName} onChangeText={setLastName} style={styles.input} />
+                        </Card.Content>
+                    </Card>
+                    {userProfile?.isTeacher
+                        ? <Card style={styles.card}>
+                            <Card.Title title="Working Hours" />
+                            <Card.Content>
+                                <View style={styles.row} id="working-hours">
+                                    <Text style={styles.label}>From:</Text>
+                                    <RNPickerSelect
+                                        items={workingTimeLimit.map(hour => ({
+                                            label: `${hour}:00`,
+                                            value: hour.toString()
+                                        }))}
+                                        onValueChange={setWorkingHoursFrom}
+                                        placeholder={{ label: 'From', value: '' }}
+                                        value={workingHoursFrom}
+                                        style={pickerSelectStyles}
+                                    />
+                                    <Text style={styles.label}>To:</Text>
+                                    <RNPickerSelect
+                                        items={workingTimeLimit.map(hour => ({
+                                            label: `${hour}:00`,
+                                            value: hour.toString()
+                                        }))}
+                                        onValueChange={setWorkingHoursTo}
+                                        placeholder={{ label: 'To', value: '' }}
+                                        value={workingHoursTo}
+                                        style={pickerSelectStyles}
+                                    />
+                                </View>
+                            </Card.Content>
+                        </Card>
+                        : null}
+                </View>
+                <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={100}>
+                    <Button mode="contained" onPress={handleSave} style={styles.button}>
+                        Save
+                    </Button>
+                </KeyboardAvoidingView>
+
+            </View >
+        </TouchableWithoutFeedback>
     );
 };
 

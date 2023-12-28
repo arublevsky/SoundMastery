@@ -26,6 +26,7 @@ bld/
 generated/
 **/StaticContent/css/
 **/StaticContent/js/
+**/uploads/*
 
 # webstorm settings
 *.idea

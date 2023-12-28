@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SoundMastery.Domain.Common;
 using SoundMastery.Domain.Core;
 using SoundMastery.Domain.Identity;
 using SoundMastery.Domain.Services;
@@ -16,6 +17,8 @@ public class SoundMasteryContext : DbContext
 
     public DbSet<User> Users { get; set; }
 
+    public DbSet<FileRecord> Files { get; set; }
+
     public DbSet<Role> Roles { get; set; }
 
     public DbSet<Material> Materials { get; set; }
@@ -27,16 +30,27 @@ public class SoundMasteryContext : DbContext
         builder.HasDefaultSchema("SoundMastery");
 
         builder.Entity<IndividualLessonMaterial>()
-            .HasIndex(p => new { p.IndividualLessonId, p.MaterialId }).IsUnique();
+            .HasOne(x => x.Material)
+            .WithMany()
+            .HasForeignKey(x => x.MaterialId)
+            .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Entity<IndividualLessonHomeAssignmentMaterial>()
-            .HasIndex(p => new { p.IndividualHomeAssignmentId, p.MaterialId }).IsUnique();
+        builder.Entity<Material>()
+            .HasOne(x => x.File)
+            .WithMany()
+            .HasForeignKey(x => x.FileId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<IndividualLesson>()
             .HasOne(p => p.Teacher)
             .WithMany()
             .HasForeignKey(x => x.TeacherId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<IndividualLessonMaterial>()
+            .HasOne(p => p.IndividualLesson)
+            .WithMany(x => x.Materials)
+            .HasForeignKey(x => x.IndividualLessonId);
 
         builder.Entity<User>()
             .HasMany(x => x.Roles)
