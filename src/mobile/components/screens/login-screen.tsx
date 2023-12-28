@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
     Alert,
     Keyboard, KeyboardAvoidingView, Platform,
@@ -7,24 +7,31 @@ import {
     TouchableWithoutFeedback,
     View
 } from 'react-native';
-import {useNavigation} from "@react-navigation/native";
-import {useErrorHandling} from "../../modules/errors/useErrorHandling.tsx";
-import {LoginScreenNavigationProps} from "../types.ts";
-import {useAuthContext} from "../../modules/authorization/context.ts";
-import {login} from "../../modules/api/accountApi.ts";
-import {ApplicationError} from "../../modules/common/errorHandling.ts";
+import { useNavigation } from "@react-navigation/native";
+import { useErrorHandling } from "../../modules/errors/useErrorHandling.tsx";
+import { LoginScreenNavigationProps } from "../types.ts";
+import { useAuthContext } from "../../modules/authorization/context.ts";
+import { login } from "../../modules/api/accountApi.ts";
+import { ApplicationError } from "../../modules/common/errorHandling.ts";
 import { Button, Card, TextInput } from 'react-native-paper';
 
 const LoginScreen = () => {
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState('1');
     const [password, setPassword] = useState('');
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
-    const {onLoggedIn} = useAuthContext();
+    const { onLoggedIn } = useAuthContext();
     const navigator = useNavigation<LoginScreenNavigationProps>();
 
     const handleLogin = () => asyncHandler(async () => {
-        const result = await login("teacher@gmail.com", "UserPass123");
-        await onLoggedIn(result);
+        let result;
+        if (username === "1") {
+            result = await login("teacher@gmail.com", "UserPass123");
+        }
+        if (username === "2") {
+            result = await login("student@gmail.com", "UserPass123");
+        }
+
+        await onLoggedIn(result!);
     });
 
     const handleRegister = () => {
@@ -47,33 +54,33 @@ const LoginScreen = () => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <Card style={styles.card}>
-          <Card.Title title="Login" />
-          <Card.Content>
-            <TextInput
-              label="Username"
-              value={username}
-              onChangeText={setUsername}
-              style={styles.input}
-            />
-            <TextInput
-              label="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              style={styles.input}
-            />
-            <Button mode="contained" onPress={handleLogin}>
-              Login
-            </Button>
-            <View style={styles.orContainer}>
-              <Text style={styles.orText}>OR</Text>
-            </View>
-            <Button mode="contained" onPress={handleRegister}>
-              Register
-            </Button>
-          </Card.Content>
-        </Card>
+                <Card style={styles.card}>
+                    <Card.Title title="Login" />
+                    <Card.Content>
+                        <TextInput
+                            label="Username"
+                            value={username}
+                            onChangeText={setUsername}
+                            style={styles.input}
+                        />
+                        <TextInput
+                            label="Password"
+                            value={password}
+                            onChangeText={setPassword}
+                            secureTextEntry
+                            style={styles.input}
+                        />
+                        <Button mode="contained" onPress={handleLogin}>
+                            Login
+                        </Button>
+                        <View style={styles.orContainer}>
+                            <Text style={styles.orText}>OR</Text>
+                        </View>
+                        <Button mode="contained" onPress={handleRegister}>
+                            Register
+                        </Button>
+                    </Card.Content>
+                </Card>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     );
@@ -81,25 +88,25 @@ const LoginScreen = () => {
 
 const styles = StyleSheet.create({
     container: {
-      flex: 1,
-      justifyContent: 'center',
-      padding: 16,
+        flex: 1,
+        justifyContent: 'center',
+        padding: 16,
     },
     card: {
-      padding: 16,
+        padding: 16,
     },
     input: {
-      marginBottom: 16,
+        marginBottom: 16,
     },
     orContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginVertical: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 16,
     },
     orText: {
-      fontSize: 16,
-      color: '#888',
+        fontSize: 16,
+        color: '#888',
     },
-  });
+});
 
 export default LoginScreen;

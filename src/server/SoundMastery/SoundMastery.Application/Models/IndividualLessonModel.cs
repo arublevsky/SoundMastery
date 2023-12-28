@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using SoundMastery.Domain.Core;
 
 namespace SoundMastery.Application.Models;
@@ -15,6 +17,7 @@ public class IndividualLessonModel
         Description = lesson.Description;
         Date = lesson.Date;
         Hour = lesson.Time.Hours;
+        Materials = lesson.Materials.Select(x => new IndividualLessonMaterialModel(x)).ToArray();
     }
 
     public string Description { get; set; }
@@ -32,4 +35,6 @@ public class IndividualLessonModel
     public UserModel Teacher { get; set; }
 
     public UserModel Student { get; set; }
+
+    public IReadOnlyCollection<IndividualLessonMaterialModel> Materials { get; set; }
 }

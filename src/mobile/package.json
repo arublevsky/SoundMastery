@@ -19,6 +19,7 @@
     "@types/react-native-vector-icons": "^6.4.18",
     "react": "18.2.0",
     "react-native": "0.73.0",
+    "react-native-document-picker": "^9.1.0",
     "react-native-fs": "^2.20.0",
     "react-native-get-random-values": "^1.10.0",
     "react-native-image-crop-picker": "^0.40.2",
@@ -27,6 +28,7 @@
     "react-native-safe-area-context": "^4.8.0",
     "react-native-screens": "^3.29.0",
     "react-native-vector-icons": "^10.0.3",
+    "rfc4648": "^1.5.3",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
