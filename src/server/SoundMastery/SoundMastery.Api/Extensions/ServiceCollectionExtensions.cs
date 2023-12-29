@@ -124,6 +124,12 @@ public static class ServiceCollectionExtensions
 
     public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
     {
+        var clientUrl = configuration.GetValue<string>("ClientUrl");
+        if (string.IsNullOrWhiteSpace(clientUrl))
+        {
+            return;
+        }
+
         services.AddCors(
             options =>
             {
@@ -133,7 +139,7 @@ public static class ServiceCollectionExtensions
                         // while running inside k8s the API is not exposed to outer world
                         // client requests are coming from cluster's localhost
                         builder
-                            .WithOrigins(configuration.GetValue<string>("ClientUrl"))
+                            .WithOrigins(clientUrl)
                             .AllowAnyMethod()
                             .AllowAnyHeader()
                             .AllowCredentials();

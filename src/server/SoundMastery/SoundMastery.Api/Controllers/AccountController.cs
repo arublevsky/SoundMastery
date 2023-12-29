@@ -53,7 +53,7 @@ public class AccountController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            return BadRequest();
+            return BadRequest(ModelState);
         }
 
         var result = await _authorizationService.Register(model);

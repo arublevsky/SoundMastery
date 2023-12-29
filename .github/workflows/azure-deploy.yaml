@@ -27,13 +27,30 @@ jobs:
           ./build.sh --target SetAppVersion
           echo "::set-output name=app-version::$(grep APP_VERSION ./.config/ci.env | cut -d '=' -f 2)"
 
+      - name: Deploy API
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'soundmastery'
+          publish-profile: ${{ secrets.API_PUBLISH_PROFILE }}
+          images: 'ghcr.io/arublevsky/sound-mastery-api:${{ steps.get_version.outputs.app-version }}'
+
+      - name: Deploy Client
+        if: false
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'soundmastery-client'
+          publish-profile: ${{ secrets.CLIENT_PUBLISH_PROFILE }}
+          images: 'ghcr.io/arublevsky/sound-mastery-client:${{ steps.get_version.outputs.app-version }}'
+
       - uses: Azure/aks-set-context@v1
+        if: false
         with:
           creds: '${{ secrets.AZURE_AUTH }}'
           cluster-name: SoundMasteryCluster
           resource-group: SoundMasteryCluster_group
 
       - uses: Azure/k8s-create-secret@v1.1
+        if: false
         with:
           namespace: ${{ env.NAMESPACE  }}
           container-registry-url: ghcr.io
@@ -42,6 +59,7 @@ jobs:
           secret-name: demo-k8s-secret
 
       - uses: azure/k8s-bake@v2
+        if: false
         with:
           renderEngine: 'helm'
           helmChart: './tools/helm/postgres'
@@ -49,6 +67,7 @@ jobs:
         id: bake-postgres
 
       - uses: azure/k8s-bake@v2
+        if: false
         with:
           renderEngine: 'helm'
           helmChart: './tools/helm/backend'
@@ -62,6 +81,7 @@ jobs:
         id: bake-backend
 
       - uses: azure/k8s-bake@v2
+        if: false
         with:
           renderEngine: 'helm'
           helmChart: './tools/helm/client'
@@ -76,6 +96,7 @@ jobs:
         id: bake-client
 
       - uses: Azure/k8s-deploy@v1.2
+        if: false
         with:
           action: deploy
           manifests: ${{ steps.bake-postgres.outputs.manifestsBundle }}
@@ -83,6 +104,7 @@ jobs:
               demo-k8s-secret
 
       - uses: Azure/k8s-deploy@v1.2
+        if: false
         with:
           action: deploy
           manifests: ${{ steps.bake-backend.outputs.manifestsBundle }}
@@ -90,6 +112,7 @@ jobs:
               demo-k8s-secret
 
       - uses: Azure/k8s-deploy@v1.2
+        if: false
         with:
           action: deploy
           manifests: ${{ steps.bake-client.outputs.manifestsBundle }}

@@ -54,8 +54,9 @@ const LessonDetailsScreen = ({ route, navigation }: ScreenProps<'LessonDetailsSc
 
     if (errors.length) {
         const error = errors[0];
-        if (error.code === "E_PICKER_CANCELLED") {
+        if (error.code === "E_PICKER_CANCELLED" || error.code === "DOCUMENT_PICKER_CANCELED") {
             clearErrors();
+            setModalType(0);
             return;
         }
 
@@ -172,6 +173,7 @@ const LessonDetailsScreen = ({ route, navigation }: ScreenProps<'LessonDetailsSc
 
     const reloadMaterials = async () => {
         const materials = await getLessonMaterials(lesson.id);
+        lesson.materials = materials;
         setMaterials(materials || []);
     };
 

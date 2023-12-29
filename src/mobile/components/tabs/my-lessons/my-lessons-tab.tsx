@@ -72,7 +72,7 @@ function MyLessons(): React.JSX.Element {
         <ScrollView style={styles.container}>
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} title="Loading..." />
             {renderLessonsBlock(upcomingLessons, "Upcoming lessons", true)}
-            {renderLessonsBlock(completedLessons, "Completed Lessons")}
+            {completedLessons.length ? renderLessonsBlock(completedLessons, "Completed Lessons") : null}
         </ScrollView>
     );
 }

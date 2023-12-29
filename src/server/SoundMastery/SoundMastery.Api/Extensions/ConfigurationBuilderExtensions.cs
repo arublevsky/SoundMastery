@@ -11,7 +11,7 @@ public static class ConfigurationBuilderExtensions
     {
         return configurationBuilder
             .AddJsonFile("appsettings.json", false, true)
-            .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName}.json", true, true)
+            .AddJsonFile($"appsettings.{hostingEnvironment.EnvironmentName.ToLowerInvariant()}.json", true, true)
             .AddJsonFile("appsettings.Personal.json", true, true)
             .AddEnvironmentVariables();
     }
