@@ -39,6 +39,8 @@ public class FileController : ControllerBase
     public async Task<ActionResult> Download(int fileId)
     {
         var model = await _fileProvider.Get(fileId);
-        return File(model.FileStream, "application/force-download", model.FileName);
+        return model != null
+            ? File(model.FileStream, "application/force-download", model.FileName)
+            : NotFound();
     }
 }

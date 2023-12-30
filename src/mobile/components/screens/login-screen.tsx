@@ -16,7 +16,7 @@ import { ApplicationError } from "../../modules/common/errorHandling.ts";
 import { Button, Card, TextInput } from 'react-native-paper';
 
 const LoginScreen = () => {
-    const [username, setUsername] = useState('1');
+    const [username, setUsername] = useState('2');
     const [password, setPassword] = useState('');
     const [errors, asyncHandler, clearErrors] = useErrorHandling();
     const { onLoggedIn } = useAuthContext();
